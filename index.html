@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulgaria Decides — Parliamentary Campaign Strategy</title>
+<link rel="stylesheet" href="vendor/xp.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+
+  <section id="screen-title" class="screen active">
+    <div class="title-wrap bevel-out">
+      <div class="flag-stripe"><span class="fs-w"></span><span class="fs-g"></span><span class="fs-r"></span></div>
+      <h1 class="title-logo">BULGARIA <span>DECIDES</span></h1>
+      <div class="title-sub">Campaign for the 240 seats of the <b>Народно събрание</b> — Narodno Subranie</div>
+      <div class="title-desc">
+        20 weeks. 29 electoral districts. A strict 4% threshold. Five rivals who want your voters.
+        Build your candidate, raise your banner, hit the trail — and win a 121-seat majority.
+      </div>
+      <div class="title-buttons">
+        <button id="btn-new-game" class="btn primary big">New Campaign</button>
+        <button id="btn-continue" class="btn big ghost" style="display:none">Continue Saved Campaign</button>
+        <button id="btn-title-help" class="btn big ghost">How to Play</button>
+      </div>
+      <div class="title-foot">A single-page political strategy game · inspired by The Political Machine</div>
+    </div>
+  </section>
+
+  <section id="screen-setup" class="screen">
+    <div class="setup-wrap window">
+      <div class="title-bar">
+        <span class="title-bar-text">Campaign Setup</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <div class="setup-head">
+        <div class="flag-stripe small"><span class="fs-w"></span><span class="fs-g"></span><span class="fs-r"></span></div>
+        <h2>Campaign Setup</h2>
+        <div class="step-tabs">
+          <div class="step-tab active" id="step-tab-0">1 · Candidate</div>
+          <div class="step-tab" id="step-tab-1">2 · Party &amp; Banner</div>
+          <div class="step-tab" id="step-tab-2">3 · Launch</div>
+        </div>
+      </div>
+
+      <div class="setup-panel active" id="setup-step-0">
+        <div class="cols">
+          <div class="col">
+            <h3>Preset candidates</h3>
+            <div id="preset-leaders" class="preset-list"></div>
+            <h3>Or create your own</h3>
+            <label class="fld">
+              <span>Candidate name</span>
+              <input type="text" id="in-cand-name" maxlength="28" placeholder="e.g. Aleksandar Vasilev">
+            </label>
+            <h3>Attributes <span id="attr-remaining" class="chip gold"></span></h3>
+            <div class="attr-row">
+              <label>Stamina <em>max action points per week</em></label>
+              <input type="range" id="in-attr-stamina" min="1" max="8" step="1">
+              <span class="attr-val" id="val-attr-stamina"></span>
+            </div>
+            <div class="attr-row">
+              <label>Charisma <em>rally &amp; speech power</em></label>
+              <input type="range" id="in-attr-charisma" min="1" max="8" step="1">
+              <span class="attr-val" id="val-attr-charisma"></span>
+            </div>
+            <div class="attr-row">
+              <label>Intelligence <em>ad efficiency &amp; poll accuracy</em></label>
+              <input type="range" id="in-attr-intelligence" min="1" max="8" step="1">
+              <span class="attr-val" id="val-attr-intelligence"></span>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Portrait</h3>
+            <div id="face-grid" class="face-grid"></div>
+            <div class="app-box">
+              <div class="app-row"><span class="mini-label">Skin tone</span><div class="swatches" id="sw-skin"></div></div>
+              <div class="app-row"><span class="mini-label">Hair colour</span><div class="swatches" id="sw-hair"></div></div>
+              <div class="app-row"><span class="mini-label">Hair style</span>
+                <div class="car"><button class="btn ghost sm" id="btn-hair-prev">‹</button><span id="hair-label"></span><button class="btn ghost sm" id="btn-hair-next">›</button></div>
+              </div>
+              <div class="app-row"><span class="mini-label">Outfit</span>
+                <div class="car"><button class="btn ghost sm" id="btn-suit-prev">‹</button><span id="suit-label"></span><button class="btn ghost sm" id="btn-suit-next">›</button></div>
+              </div>
+              <div class="app-row"><span class="mini-label">Suit colour</span><div class="swatches" id="sw-suit"></div></div>
+              <div class="app-row"><span class="mini-label">Shirt colour</span><div class="swatches" id="sw-shirt"></div></div>
+              <div class="app-row"><span class="mini-label">Gender</span>
+                <div class="gender-row"><button class="btn sm" id="btn-gender-m">Male</button><button class="btn sm" id="btn-gender-f">Female</button></div>
+              </div>
+              <div class="app-row"><span class="mini-label">Ethnicity</span>
+                <select id="sel-ethnicity">
+                  <option value="bulgarian">Bulgarian</option>
+                  <option value="turkish">Turkish minority</option>
+                  <option value="roma">Roma</option>
+                </select>
+              </div>
+              <div class="app-row"><button class="btn sm" id="btn-glasses">Glasses: Off</button></div>
+            </div>
+            <div class="upload-row">
+              <button class="btn ghost" id="btn-upload-photo">Upload your own PM photo…</button>
+              <button class="btn ghost subtle" id="btn-clear-photo" style="display:none">Remove photo</button>
+              <input type="file" id="file-photo" accept="image/*" style="display:none">
+            </div>
+            <div class="portrait-preview" id="portrait-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-panel" id="setup-step-1">
+        <div class="cols">
+          <div class="col">
+            <h3>Party identity</h3>
+            <label class="fld"><span>Party name</span>
+              <input type="text" id="in-party-name" maxlength="40" value="National Renewal Movement">
+            </label>
+            <div class="row2">
+              <label class="fld"><span>Abbreviation</span>
+                <input type="text" id="in-party-abbr" maxlength="6" value="NRM">
+              </label>
+              <label class="fld"><span>Party colour</span>
+                <div id="color-swatches" class="swatches"></div>
+              </label>
+            </div>
+            <label class="fld"><span>Slogan</span>
+              <input type="text" id="in-party-slogan" maxlength="48" value="Bulgaria, forward!">
+            </label>
+            <h3>Platform <em class="hint">districts vote where you stand closest to them</em></h3>
+            <div id="platform-sliders"></div>
+          </div>
+          <div class="col">
+            <h3>Banner workshop</h3>
+            <div class="banner-stage" id="banner-preview"></div>
+            <div class="banner-controls">
+              <div class="car">
+                <button class="btn ghost sm" id="btn-bg-prev">‹</button>
+                <span id="bg-label">Banner style</span>
+                <button class="btn ghost sm" id="btn-bg-next">›</button>
+              </div>
+              <div class="car">
+                <button class="btn ghost sm" id="btn-emb-prev">‹</button>
+                <span id="emb-label">Emblem</span>
+                <button class="btn ghost sm" id="btn-emb-next">›</button>
+              </div>
+            </div>
+            <div class="upload-row">
+              <button class="btn ghost" id="btn-upload-logo">Upload party logo…</button>
+              <button class="btn ghost subtle" id="btn-clear-logo" style="display:none">Remove logo</button>
+              <input type="file" id="file-logo" accept="image/*" style="display:none">
+            </div>
+            <div class="hint">Tip: the emblem cycles through preset sprites — or upload your own parliament party logo to replace it.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-panel" id="setup-step-2">
+        <h3>Difficulty</h3>
+        <div class="diff-row" id="diff-row">
+          <label class="diff-opt"><input type="radio" name="diff" value="easy"><b>Easy</b><span>160 000 лв start · passive rivals</span></label>
+          <label class="diff-opt"><input type="radio" name="diff" value="normal" checked><b>Normal</b><span>120 000 лв start · aggressive rivals</span></label>
+          <label class="diff-opt"><input type="radio" name="diff" value="hard"><b>Hard</b><span>90 000 лв start · ruthless rivals</span></label>
+        </div>
+        <h3>Briefing</h3>
+        <div id="setup-summary" class="summary-card"></div>
+      </div>
+
+      <div id="setup-error" class="setup-error"></div>
+      <div class="setup-nav">
+        <button id="btn-setup-back" class="btn ghost">‹ Back</button>
+        <button id="btn-setup-next" class="btn primary">Next ›</button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-game" class="screen">
+    <header id="topbar">
+      <div class="tb-left">
+        <button id="btn-start" class="start-btn" title="Game menu — Save / Load / Help / Quit">
+          <svg class="win-flag" viewBox="0 0 24 24" aria-hidden="true"><path fill="#f35325" d="M11.5 3.5h-8v8h8zM20.5 3.5h-8v8h8zM11.5 12.5h-8v8h8zM20.5 12.5h-8v8h8z"/></svg>
+          <span>Start</span>
+        </button>
+        <div class="flag-chip" id="tb-banner"></div>
+        <div class="pm-chip" id="tb-pm"></div>
+      </div>
+      <div class="tb-center">
+        <div class="clock" id="tb-clock">WEEK 1/20</div>
+        <div class="clock-sub" id="tb-days"></div>
+      </div>
+      <div class="tb-right">
+        <div class="stat-chip" id="tb-cash" title="Campaign funds"></div>
+        <div class="stat-chip" id="tb-stamina" title="Stamina points — spent on travel, rallies and more"></div>
+        <div class="stat-chip" id="tb-poll" title="Your national polling"></div>
+        <button class="btn ghost sm" id="btn-help">Help</button>
+        <button class="btn ghost sm" id="btn-debug" style="display:none">Debug</button>
+        <button class="btn ghost sm" id="btn-save">Save</button>
+        <button class="btn ghost sm" id="btn-menu" style="display:none">Menu</button>
+        <span class="chip gold" id="tb-cheat" style="display:none" title="God mode is active">CHEAT</span>
+      </div>
+    </header>
+
+    <div id="game-main">
+      <div id="map-panel" class="window">
+        <div class="title-bar">
+          <span class="title-bar-text">Electoral Map — Bulgaria</span>
+          <div class="title-bar-controls">
+            <button aria-label="Minimize" tabindex="-1"></button>
+            <button aria-label="Maximize" tabindex="-1"></button>
+            <button aria-label="Close" tabindex="-1"></button>
+          </div>
+        </div>
+        <div class="map-body window-body">
+          <div id="map-toolbar">
+            <span class="map-title">Electoral map of Bulgaria · 240 seats · threshold 4%</span>
+            <div id="map-legend"></div>
+          </div>
+          <svg id="bg-map" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+      </div>
+      <aside id="side-panel" class="window">
+        <div class="title-bar">
+          <span class="title-bar-text">District Inspector</span>
+          <div class="title-bar-controls">
+            <button aria-label="Minimize" tabindex="-1"></button>
+            <button aria-label="Maximize" tabindex="-1"></button>
+            <button aria-label="Close" tabindex="-1"></button>
+          </div>
+        </div>
+        <div class="window-body">
+          <div id="district-card"></div>
+          <div id="mods-card" class="side-block">
+            <h4>Active modifiers</h4>
+            <div id="mods-list"><span class="hint">None — for now.</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer id="log-bar" class="window">
+      <div class="title-bar">
+        <span class="title-bar-text">Campaign Log</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="log-body">
+        <div id="log-list"></div>
+        <div class="endturn-wrap">
+          <button id="btn-endturn" class="btn primary big">End Week ▸</button>
+        </div>
+      </div>
+    </footer>
+  </section>
+
+  <section id="screen-election" class="screen">
+    <div class="election-wrap window">
+      <div class="title-bar">
+        <span class="title-bar-text">ELECTION NIGHT</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <h2 class="election-title">ELECTION NIGHT</h2>
+      <div class="election-sub" id="election-sub"></div>
+      <div id="election-results"></div>
+      <h3 class="seats-heading">Seat projection · 240 seats · majority 121</h3>
+      <div id="seat-strip"></div>
+      <div class="center-row">
+        <button id="btn-election-continue" class="btn primary big">Continue ▸</button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-coalition" class="screen">
+    <div class="coalition-wrap window">
+      <div class="title-bar">
+        <span class="title-bar-text">Coalition Negotiations</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <h2>Coalition Negotiations</h2>
+      <div class="coalition-sub">The President has handed you a mandate. Secure at least <b>121 seats</b> to form a government.</div>
+      <div class="tally-block">
+        <div id="coal-tally-bar" class="tally-bar"></div>
+        <div class="tally-nums">
+          <span id="coal-tally-text"></span>
+          <span id="coal-resources"></span>
+        </div>
+      </div>
+      <div id="coalition-cards"></div>
+      <div class="coal-log-wrap">
+        <h4>Negotiation log</h4>
+        <div id="coal-log"></div>
+      </div>
+      <div class="center-row coal-actions">
+        <button id="btn-form-gov" class="btn primary big" disabled>Form Government</button>
+        <button id="btn-minority" class="btn ghost big" style="display:none">Attempt Minority Government</button>
+        <button id="btn-give-up" class="btn ghost big">Give Up Negotiations</button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-end" class="screen">
+    <div class="end-wrap window">
+      <div class="title-bar">
+        <span class="title-bar-text">Election Report</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="window-body">
+      <div id="end-banner" class="banner big-banner"></div>
+      <h2 id="end-title"></h2>
+      <div id="end-text" class="end-text"></div>
+      <div id="end-stats" class="end-stats"></div>
+      <button id="btn-restart" class="btn primary big">New Campaign</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="modal-root"></div>
+</div>
+<script src="mapdata.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
