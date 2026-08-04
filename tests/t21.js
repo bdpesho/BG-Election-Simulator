@@ -129,7 +129,7 @@ const clone=JSON.parse(JSON.stringify(S));
 check("party machine survives save/load round trip",clone.partyMachine.hqLevel===5&&clone.partyMachine.history.length===3&&clone.partyMachine.staff.length===4);
 const stripped=JSON.parse(JSON.stringify(S));
 delete stripped.partyMachine;
-global.localStorage.setItem("bulgaria-decides-save-v5",JSON.stringify(stripped));
+global.localStorage.setItem("121towin-save-v5",JSON.stringify(stripped));
 check("old saves migrate a fresh party machine",(()=>{const ok=g.loadGame();return ok&&!!g.state().partyMachine&&g.state().partyMachine.hqLevel===1&&g.state().partyMachine.staff.length===0;})());
 S=g.state();
 S.eventQueue=[];S.paused=false;

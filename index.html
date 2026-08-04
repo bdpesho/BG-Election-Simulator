@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bulgaria Decides — Parliamentary Campaign Strategy</title>
+<title>121 to Win — Bulgarian Parliamentary Campaign Strategy</title>
 <link rel="stylesheet" href="vendor/xp.css">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -13,8 +13,8 @@
   <section id="screen-title" class="screen active">
     <div class="title-wrap bevel-out">
       <div class="flag-stripe"><span class="fs-w"></span><span class="fs-g"></span><span class="fs-r"></span></div>
-      <h1 class="title-logo">BULGARIA <span>DECIDES</span></h1>
-      <div class="title-sub">Campaign for the 240 seats of the <b>Народно събрание</b> — Narodno Subranie</div>
+      <h1 class="title-logo">121 <span>TO WIN</span></h1>
+      <div class="title-sub">Campaign for the 121 seats of the 240-seat <b>Народно събрание</b> — Bulgaria's answer to 280 to win</div>
       <div class="title-desc">
         20 weeks. 29 electoral districts. A strict 4% threshold. Five rivals who want your voters.
         Build your candidate, raise your banner, hit the trail — and win a 121-seat majority.
@@ -297,11 +297,28 @@
       </div>
       <div class="window-body">
       <h2 class="election-title">ELECTION NIGHT</h2>
-      <div class="election-sub" id="election-sub"></div>
-      <div id="election-results"></div>
+      <div class="election-livebar"><span id="election-clock">08:00</span><span class="live-status" id="election-live">● LIVE</span><span id="election-step">COUNTING BEGINS</span></div>
+      <div id="election-headline" class="election-headline">The first boxes are open. Every vote counts.</div>
+      <div class="election-counters" aria-live="polite">
+        <div class="election-counter"><span>VALID VOTES COUNTED</span><b id="election-votes-counted">0</b><small>domestic count</small></div>
+        <div class="election-counter"><span>VOTING ACTIVITY</span><b id="election-activity">0.0%</b><small>of 6.5M domestic population</small></div>
+      </div>
+      <div class="election-layout">
+        <div>
+          <svg id="election-map" viewBox="30 87 940 446" preserveAspectRatio="xMidYMid meet" aria-label="Election map"></svg>
+        </div>
+        <aside class="exit-polls window">
+          <div class="title-bar"><span class="title-bar-text">Exit Polls</span></div>
+          <div class="window-body">
+            <div class="election-sub" id="election-sub"></div>
+            <div id="election-results"></div>
+          </div>
+        </aside>
+      </div>
       <h3 class="seats-heading">Seat projection · 240 seats · majority 121</h3>
       <div id="seat-strip"></div>
       <div class="center-row">
+        <button id="btn-election-skip" class="btn ghost">Skip to final results</button>
         <button id="btn-election-continue" class="btn primary big">Continue ▸</button>
       </div>
       </div>

@@ -112,7 +112,7 @@ const PHASE_NAMES=["Planning","Execution","Release"];
 const STAFF_ROLES=["Strategist","Spokesperson","Organizer","Fundraiser","Digital Lead","Pollster"];
 const STAFF_NAMES=["Ivan Petrov","Maya Georgieva","Nikola Dimitrov","Elena Hristova","Georgi Marinov","Radka Ivanova","Stoyan Kolev","Petia Yordanova","Krasimir Todorov","Desislava Angelova","Vladimir Atanasov","Silvia Petkova"];
 const CAMPAIGN_NAMES=["For a Strong Border","Clean Sweep","Europe Forward","Pensions First","Our Villages, Our Future","Zero Tolerance","A Fair State","Healthy Nation","Sofia's Promise","Step Forward","The New Deal","Open Doors"];
-const SAVE_KEY="bulgaria-decides-save-v5";
+const SAVE_KEY="121towin-save-v5";
 
 const EMBLEM_IDS=["alarm-clock","anchor","book-open","bookmark","briefcase","castle","crown","diamond-gem","earth","factory","flag","globe","hammer","hand","heart","leaf","moon","robot","rose","shield","skull","snake","star","sword","tree","tree-pine","trophy"];
 const EMBLEM_GLYPHS={"alarm-clock":0xea13,anchor:0xea49,"book-open":0xeab5,bookmark:0xeab7,briefcase:0xeaca,castle:0xeaf1,crown:0xeb4e,"diamond-gem":0xeb57,earth:0xeb61,factory:0xeb6a,flag:0xeb75,globe:0xeb95,hand:0xeba5,heart:0xebb1,leaf:0xebd5,moon:0xec0c,robot:0xec57,shield:0xec78,skull:0xec87,star:0xecb2,sword:0xecc2,tree:0xecf9,"tree-pine":0xecf8,trophy:0xecfb};
@@ -2241,14 +2241,14 @@ function runElection(){
   closeModal();
   const votes={},dvAll=[];
   let total=0,elecWeight=0,turnoutWeighted=0;
-  const turnouts={};
+  const turnouts={},turnoutMode=rng()<.5?"low":"high";
   for(const d of DISTRICTS){
     const sh=districtShares(d,false);
     const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
-    const tb=d.tb||0.45;
-    const t=clamp(tb+(rng()-0.5)*0.08+(ent-1)*0.04,0.25,0.60);
+    const tb=turnoutMode==="low"?.25+rng()*.035:.38+rng()*.22;
+    const t=clamp(tb+(ent-1)*(turnoutMode==="low"?.02:.04),0.25,0.60);
     turnouts[d.id]=t;
-    const elec=d.seats*12500;
+    const elec=d.seats*DOMESTIC_POPULATION_PER_SEAT;
     const V=elec*t;
     elecWeight+=elec;
     turnoutWeighted+=elec*t;
@@ -2257,7 +2257,7 @@ function runElection(){
       if(k==="others")continue;
       dv[k]=sh[k]*V*(0.95+rng()*0.1);
     }
-    dvAll.push({d:d,dv:dv});
+    dvAll.push({d:d,dv:dv,shares:sh,turnout:t,totalVotes:Object.values(dv).reduce((a,b)=>a+b,0)});
     for(const k in dv){votes[k]=(votes[k]||0)+dv[k];total+=dv[k];}
   }
   const turnout=turnoutWeighted/elecWeight;
@@ -2276,37 +2276,116 @@ function runElection(){
     const res=dhondt(qv,item.d.seats);
     for(const k in res)seats[k]=(seats[k]||0)+res[k];
   }
-  S.results={votes:votes,natShare:natShare,qualified:qualified,seats:seats,totalVotes:total,turnout:turnout,turnouts:turnouts};
-  renderElectionScreen();
-  showScreen("election");
+  S.results={votes:votes,natShare:natShare,qualified:qualified,seats:seats,totalVotes:total,turnout:turnout,turnouts:turnouts,turnoutMode:turnoutMode,districts:dvAll.map(item=>({id:item.d.id,shares:item.shares,votes:item.dv,turnout:item.turnout,totalVotes:item.totalVotes}))};
+  startElectionNight();
 }
 
-function renderElectionScreen(){
-  const r=S.results;
-  $("election-sub").textContent="Turnout "+pct(r.turnout,0)+" · "+Math.round(r.totalVotes).toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" valid votes · threshold 4%";
-  const order=Object.keys(r.votes).sort((a,b)=>r.votes[b]-r.votes[a]);
-  const maxShare=r.natShare[order[0]]||1;
-  $("election-results").innerHTML=order.map(k=>{
-    const p=partyOf(k);
-    const qualified=r.qualified.includes(k);
-    const seats=r.seats[k]||0;
-    return '<div class="res-row '+(k==="player"?"you":"")+'">'
-      +'<div class="res-top"><span class="pdot" style="background:'+p.color+'"></span>'
-      +'<span class="rname">'+esc(partyName(p))+'</span>'
-      +'<span class="rflag">'+(qualified?'<span class="chip green">IN PARLIAMENT</span>':'<span class="chip red">BELOW 4%</span>')+'</span>'
-      +'<span class="rpct">'+pct(r.natShare[k])+'</span>'
-      +'<span class="rseats">'+seats+' seats</span></div>'
-      +'<div class="res-bar"><div class="fill" data-w="'+(r.natShare[k]/maxShare*100).toFixed(1)+'" style="background:'+p.color+'"></div></div>'
-      +'</div>';
+const ELECTION_NIGHT_TIMES=["08:00","10:00","12:00","14:00","16:00","20:00"];
+const ELECTION_NIGHT_HEADLINES=["The first boxes are open. Every vote counts.","PB takes an early national lead, but the regional map is anything but settled.","GERB holds the northwest while BSP rallies in the coal belt.","Sofia reports a reformist surge. The seat projection starts to move.","The late-count districts are in. Margins tighten across the country.","The count is complete. Bulgaria has chosen."];
+const ELECTION_NIGHT_DURATION=36000;
+const DOMESTIC_POPULATION_ESTIMATE=6500000;
+const DOMESTIC_POPULATION_PER_SEAT=DOMESTIC_POPULATION_ESTIMATE/TOTAL_SEATS;
+let electionNightTimers=[];
+function electionNightEarlyPoll(){
+  const final=S.results.natShare,out={},targetBsp=.40,targetPb=.07;
+  const otherKeys=Object.keys(final).filter(k=>k!=="bsp"&&k!=="pb"),otherSum=otherKeys.reduce((a,k)=>a+(final[k]||0),0)||1;
+  for(const k of otherKeys)out[k]=(final[k]||0)/otherSum*(1-targetBsp-targetPb);
+  out.bsp=targetBsp;out.pb=targetPb;
+  return out;
+}
+function electionNightPoll(progress,tick){
+  const final=S.results.natShare,early=electionNightEarlyPoll(),out={};
+  // The fictional early-vote narrative is gone by noon. From then on the
+  // bars show the real cached result, including a genuinely strong BSP run.
+  const t=clamp(progress*3,0,1),wave=(tick||0)%11;
+  for(const k in final){const ripple=t<1?Math.sin((wave+k.length)*1.7)*.0015*(1-t):0;out[k]=(early[k]||0)*(1-t)+(final[k]||0)*t+ripple;}
+  const sum=Object.values(out).reduce((a,b)=>a+Math.max(0,b),0)||1;
+  for(const k in out)out[k]=Math.max(0,out[k])/sum;
+  if(t>=1)for(const k in final)out[k]=final[k];
+  return out;
+}
+function electionNightEarlyDistrict(item,ordinal){
+  const shares=item.shares||{},out={};
+  for(const k in shares)out[k]=shares[k]*({bsp:2.5,gerb:1.18,pb:.82,ppdb:1.18}[k]||.92);
+  return out;
+}
+function morningBspDistricts(){
+  return (S.results.districts||[]).slice().sort((a,b)=>(b.shares.bsp||0)-(a.shares.bsp||0)).slice(0,6).map(item=>item.id);
+}
+function electionNightLeader(item,progress,ordinal){
+  if(progress>=1){let final=null,score=-1;for(const k in item.shares)if(k!=="others"&&item.shares[k]>score){final=k;score=item.shares[k];}return final;}
+  if(item.id==="sofia-city"||item.id==="sofia-obl")return item.shares.ppdb!==undefined?"ppdb":electionNightLeader(item,1,ordinal);
+  const early=electionNightEarlyDistrict(item,ordinal),keys=new Set(Object.keys(item.shares).concat(Object.keys(early))),noon=1/3;
+  if(progress<noon&&morningBspDistricts().includes(item.id)&&item.shares.bsp!==undefined)return "bsp";
+  const finalBlend=Math.min(1,progress/noon);let leader=null,score=-1;
+  keys.forEach(k=>{const v=(early[k]||0)*(1-finalBlend)+(item.shares[k]||0)*finalBlend;if(k!=="others"&&v>score){leader=k;score=v;}});
+  return leader;
+}
+function electionNightOrder(){return DISTRICTS.slice().sort((a,b)=>b.seats-a.seats);}
+function electionRegionTooltip(d,item){
+  const votes=item.votes||{},total=item.totalVotes||Object.values(votes).reduce((a,b)=>a+b,0)||1;
+  const rows=Object.keys(votes).sort((a,b)=>votes[b]-votes[a]).map(k=>{
+    const p=partyOf(k);return '<div class="election-tip-row"><span><i style="background:'+p.color+'"></i>'+esc(p.abbr)+'</span><b>'+pct(votes[k]/total)+' <small>'+Math.round(votes[k]).toLocaleString("en-US")+'</small></b></div>';
   }).join("");
-  setTimeout(()=>{document.querySelectorAll(".res-bar .fill").forEach(f=>f.style.width=f.dataset.w+"%");},60);
-  const seatOrder=Object.keys(r.seats).sort((a,b)=>r.seats[b]-r.seats[a]);
-  let cells="";
-  for(const k of seatOrder){
-    const p=partyOf(k);
-    for(let i=0;i<r.seats[k];i++)cells+='<div class="seat-cell" style="background:'+p.color+'" title="'+esc(p.abbr)+'"></div>';
-  }
-  $("seat-strip").innerHTML=cells;
+  return '<div class="preview-title">'+esc(d.name)+' · '+d.seats+' seats</div><div class="preview-note">Final district result · turnout '+pct(item.turnout||0,0)+'</div><div class="preview-main">'+Math.round(total).toLocaleString("en-US")+' valid votes</div><div class="election-tip-list">'+rows+'</div>';
+}
+function renderElectionMap(initial){
+  const svg=$("election-map");if(!svg)return;
+  if(initial){svg.innerHTML=DISTRICTS.map(d=>'<path class="election-region" data-id="'+d.id+'" d="'+(REGION_PATHS[d.id]||"")+'" fill="#c5cbd1"><title>'+esc(d.name)+' — counting</title></path>').join("");}
+  const progress=S.electionNight.progress||0,ordered=electionNightOrder(),byId={};ordered.forEach((d,i)=>byId[d.id]={d:d,order:i});
+  const results={};(S.results.districts||[]).forEach(item=>results[item.id]=item);
+  if(initial)DISTRICTS.forEach(d=>{const node=svg.querySelector('.election-region[data-id="'+d.id+'"]'),item=results[d.id];if(node&&item)wirePreviewTarget(node,()=>electionRegionTooltip(d,item));});
+  // The geometry is visible from the opening frame. Only the colors wait for
+  // the first count, so the map never appears to be drawing itself in.
+  DISTRICTS.forEach(d=>{const node=svg.querySelector('.election-region[data-id="'+d.id+'"]');if(!node)return;const shown=progress>0,item=results[d.id];
+    if(shown){const p=partyOf(electionNightLeader(item,progress,byId[d.id].order)),old=node.dataset.party||"";node.classList.add("revealed");node.classList.remove("unrevealed");node.style.fill=p?p.color:"#c5cbd1";if(old!==p.id){node.classList.remove("leader-change");void node.offsetWidth;node.classList.add("leader-change");}node.dataset.party=p?p.id:"";node.querySelector("title").textContent=d.name+(p?" — "+p.abbr:" — counting");}
+  });
+}
+function ensureElectionChart(){
+  const box=$("election-results");if(box.dataset.ready)return;
+  const order=Object.keys(S.results.votes).sort((a,b)=>S.results.votes[b]-S.results.votes[a]);
+  box.innerHTML=order.map(k=>{const p=partyOf(k);return '<div class="res-row '+(k==="player"?"you":"")+'" data-party="'+k+'"><div class="res-top"><span class="pdot" style="background:'+p.color+'"></span><span class="rname">'+esc(partyName(p))+'</span><span class="rflag"></span><span class="rpct">0%</span><span class="rseats">0 seats</span></div><div class="res-bar"><div class="fill" style="background:'+p.color+';width:0%"></div></div></div>';}).join("");
+  box.dataset.ready="1";
+}
+function updateElectionChart(est,seats,final){
+  const box=$("election-results"),max=Math.max.apply(null,Object.values(est))||1;
+  const rows=Array.from(box.querySelectorAll(".res-row"));
+  rows.sort((a,b)=>(est[b.dataset.party]||0)-(est[a.dataset.party]||0));
+  rows.forEach((row,rank)=>{row.dataset.rank=rank;box.appendChild(row);});
+  rows.forEach(row=>{const k=row.dataset.party,p=row.querySelector(".rpct"),s=row.querySelector(".rseats"),fill=row.querySelector(".fill"),flag=row.querySelector(".rflag"),share=est[k]||0;
+    p.textContent=pct(share);s.textContent=(seats[k]||0)+" seats";fill.style.width=(share/max*100).toFixed(1)+"%";flag.innerHTML=(share>=.04?'<span class="chip green">IN</span>':'<span class="chip red">OUT</span>');
+  });
+}
+function updateElectionSeats(seats){
+  const strip=$("seat-strip"),cells=strip.querySelectorAll(".seat-cell"),order=Object.keys(seats).sort((a,b)=>seats[b]-seats[a]);let at=0;
+  order.forEach(k=>{const p=partyOf(k);for(let i=0;i<(seats[k]||0)&&at<cells.length;i++,at++){cells[at].style.background=p?p.color:"#777";cells[at].title=p?p.abbr:"";}});
+  for(;at<cells.length;at++){cells[at].style.background="#d0d0d0";cells[at].title="";}
+}
+function electionNightClock(progress){
+  const minutes=480+Math.round(clamp(progress,0,1)*720);
+  return String(Math.floor(minutes/60)).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0");
+}
+function finishElectionNight(){
+  electionNightTimers.forEach(id=>clearTimeout(id));electionNightTimers=[];S.electionNight.progress=1;S.electionNight.step=5;S.electionNight.tick++;S.electionNight.revealed=DISTRICTS.map(d=>d.id);
+  renderElectionScreen();
+}
+function advanceElectionNight(){
+  if(!S.electionNight||S.electionNight.progress>=1)return;
+  S.electionNight.elapsed=Math.min(ELECTION_NIGHT_DURATION,S.electionNight.elapsed+250);S.electionNight.progress=S.electionNight.elapsed/ELECTION_NIGHT_DURATION;S.electionNight.step=Math.min(5,Math.floor(S.electionNight.progress*6));S.electionNight.tick++;
+  renderElectionScreen();
+  if(S.electionNight.progress<1)electionNightTimers.push(setTimeout(advanceElectionNight,250));
+}
+function startElectionNight(){
+  electionNightTimers.forEach(id=>clearTimeout(id));electionNightTimers=[];
+  S.electionNight={progress:0,elapsed:0,step:0,tick:0,revealed:[]};renderElectionScreen();showScreen("election");
+  if(typeof window==="undefined")finishElectionNight();else electionNightTimers.push(setTimeout(advanceElectionNight,250));
+}
+function renderElectionScreen(){
+  const r=S.results,night=S.electionNight||{progress:1,step:5,tick:0},progress=night.progress===undefined?1:night.progress,est=progress>=1?r.natShare:electionNightPoll(progress,night.tick),seats=progress>=1?r.seats:projectNationalSeats(est);
+  ensureElectionChart();
+  const counted=Math.round(r.totalVotes*progress),activity=counted/DOMESTIC_POPULATION_ESTIMATE*100;
+  $("election-clock").textContent=electionNightClock(progress);$("election-step").textContent=progress>=1?"FINAL RESULTS":"LIVE COUNT · "+Math.round(progress*100)+"%";$("election-live").textContent=progress>=1?"● FINAL":"● LIVE";$("election-headline").textContent=ELECTION_NIGHT_HEADLINES[Math.min(5,Math.floor(progress*6))];$("election-sub").textContent=(progress>=1?"Final count":"Live count")+" · Turnout "+pct(r.turnout,0)+" · threshold 4%";$("election-votes-counted").textContent=String(counted).replace(/\B(?=(\d{3})+(?!\d))/g," ");$("election-activity").textContent=activity.toFixed(1)+"%";
+  updateElectionChart(est,seats,progress>=1);if(!$("seat-strip").dataset.ready){let cells="";for(let i=0;i<TOTAL_SEATS;i++)cells+='<div class="seat-cell"></div>';$("seat-strip").innerHTML=cells;$("seat-strip").dataset.ready="1";}updateElectionSeats(seats);renderElectionMap(!$("election-map").dataset.ready);$("election-map").dataset.ready="1";$("btn-election-continue").disabled=progress<1;$("btn-election-skip").style.display=progress<1?"":"none";
 }
 
 function startCoalition(){
@@ -2332,6 +2411,100 @@ function startCoalition(){
   S.phase="coalition";
   renderCoalition();
   showScreen("coalition");
+}
+
+/* ---- T27: post-election interview ---- */
+const INTERVIEW_QUOTES={
+  majority:[
+    {t:"We're going to fix the country.",sub:"A historic mandate. No excuses now."},
+    {t:"The people spoke; we listen.",sub:"Humble in victory, clear on the plan."},
+    {t:"Watch us work.",sub:"Results speak louder than promises."}
+  ],
+  first:[
+    {t:"We're looking to form a coalition that will follow our ideas.",sub:"The phones are already ringing."},
+    {t:"A mandate to lead — we'll build the majority.",sub:"Talks begin today."},
+    {t:"The campaign was only the beginning.",sub:"The real battle is in parliament."}
+  ],
+  other:[
+    {t:"We're proud of the campaign we ran.",sub:"Every vote was earned the hard way."},
+    {t:"Now we negotiate.",sub:"A coalition may still be possible."},
+    {t:"We'll hold the government accountable.",sub:"Every single day."}
+  ],
+  none:[
+    {t:"We're just getting started.",sub:"Next time, we'll be back."},
+    {t:"The fight continues.",sub:"A movement doesn't die in one election."}
+  ]
+};
+function leftistParty(){
+  const p=S.party.pos;
+  return !!(p&&p.pensions!==undefined&&p.healthcare!==undefined&&p.pensions>=0.75&&p.healthcare>=0.75);
+}
+function startInterview(){
+  if(typeof window==="undefined"){continueAfterInterview();return;}
+  const r=S.results,ps=r.seats.player||0;
+  const top=Math.max.apply(null,AI_PARTIES.map(p=>r.seats[p.id]||0));
+  const bucket=ps>=MAJORITY?INTERVIEW_QUOTES.majority:ps>=top?INTERVIEW_QUOTES.first:r.qualified.includes("player")?INTERVIEW_QUOTES.other:INTERVIEW_QUOTES.none;
+  const opts=bucket.slice();
+  if(leftistParty())opts.push({t:"We're restoring Bai Tosho's rule! Glory to the National Republic of Bulgaria, comrade!",sub:"Long live the people's democracy.",egg:true});
+  const root=$("modal-root");
+  root.innerHTML='<div class="modal-back"><div class="modal">'
+    +'<div class="ev-head choice"><span>THE MORNING AFTER</span><span class="paused-badge">EXIT INTERVIEW</span></div>'
+    +'<div class="ev-body"><h3>Are you happy about the results? What are your plans right now?</h3>'
+    +'<p>The camera crew has caught you on the stairs of the party headquarters. The whole country is watching.</p>'
+    +'<div class="ev-opts">'+opts.map((o,i)=>'<button class="btn" data-i="'+i+'">'+esc(o.t)+(o.sub?'<small>'+esc(o.sub)+'</small>':"")+'</button>').join("")+'</div></div>'
+    +'</div></div>';
+  root.querySelectorAll(".ev-opts .btn").forEach(b=>{
+    b.onclick=()=>{
+      const o=opts[+b.dataset.i];
+      S.interview={choice:o.t,easterEgg:!!o.egg};
+      log("INTERVIEW — \u201C"+o.t+"\u201D","info");
+      root.innerHTML="";
+      continueAfterInterview();
+    };
+  });
+}
+function continueAfterInterview(){
+  const r=S.results,ps=r.seats.player||0;
+  if(!r.qualified.includes("player"))finishGame("threshold");
+  else if(ps>=MAJORITY)finishGame("majority");
+  else startCoalition();
+}
+
+/* ---- final government formation: random AI coalition / no parliament ---- */
+function partyViewDist(a,b){
+  const act=activeIssueList();
+  let s=0;
+  for(const i of act)s+=Math.abs((a.pos[i.id]||0)-(b.pos[i.id]||0));
+  return act.length?s/act.length:0;
+}
+function incompatiblePair(a,b){
+  return INCOMPAT_PAIRS.some(p=>(p[0]===a&&p[1]===b)||(p[0]===b&&p[1]===a));
+}
+const COALITION_VIEW_MAX=0.45;
+function findAICoalition(){
+  const seats=S.results&&S.results.seats?S.results.seats:{};
+  const ids=Object.keys(seats).filter(k=>k!=="player"&&(seats[k]||0)>0);
+  const singles=ids.filter(k=>seats[k]>=MAJORITY);
+  if(singles.length)return {parties:[singles[0]],seats:seats[singles[0]],pm:singles[0]};
+  const combos=[];
+  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)combos.push([ids[i],ids[j]]);
+  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)for(let k=j+1;k<ids.length;k++)combos.push([ids[i],ids[j],ids[k]]);
+  const valid=combos.filter(c=>{
+    let total=0;
+    for(const p of c)total+=seats[p]||0;
+    if(total<MAJORITY)return false;
+    for(let i=0;i<c.length;i++)for(let j=i+1;j<c.length;j++){
+      if(incompatiblePair(c[i],c[j]))return false;
+      if(partyViewDist(partyOf(c[i]),partyOf(c[j]))>COALITION_VIEW_MAX)return false;
+    }
+    return true;
+  });
+  if(!valid.length)return null;
+  const ordered=c=>c.slice().sort((a,b)=>(seats[b]||0)-(seats[a]||0));
+  const pick=ordered(valid[Math.floor(rng()*valid.length)]);
+  let total=0;
+  for(const p of pick)total+=seats[p]||0;
+  return {parties:pick,seats:total,pm:pick[0]};
 }
 
 function coalitionSeats(){
@@ -2492,6 +2665,20 @@ function renderCoalition(){
 function finishGame(type){
   S.phase="end";
   S.ending=type;
+  S.government=null;
+  if(type==="opposition"||type==="caretaker"){
+    const gov=findAICoalition();
+    if(gov){
+      S.government=gov;
+      S.ending="opposition";
+      log("The country has a government: <b>"+gov.parties.map(p=>partyOf(p).abbr).join(" + ")+"</b> ("+gov.seats+" seats).","info");
+    }else{
+      S.ending="noparliament";
+      log("No coalition could reach "+MAJORITY+" seats — new elections are coming.","bad");
+    }
+  }else if(type==="threshold"){
+    S.government=findAICoalition();
+  }
   closeModal();
   renderEndScreen();
   showScreen("end");
@@ -2508,6 +2695,11 @@ function renderEndScreen(){
   if(S.ending==="threshold"){
     title="Below the 4% Threshold";
     text=S.party.name+" finished with "+pct(r.natShare.player||0)+" of the national vote — short of the 4% barrier. No seats in the Narodno Subranie, no coalition calls, no second chances.\n\n"+S.player.name+" announces 'we will be back' — and means it.";
+    if(S.government){
+      text+="\n\nMeanwhile, "+S.government.parties.map(p=>partyOf(p).abbr).join(" + ")+" form a government with "+S.government.seats+" seats.";
+    }else{
+      text+="\n\nNo two or three parties can reach "+MAJORITY+" seats — the President dissolves parliament. New elections are coming soon.";
+    }
   }else if(S.ending==="majority"){
     title="Single-Party Majority!";
     text="An astonishing result: "+S.party.abbr+" wins "+ps+" seats — an outright majority in the 240-seat Narodno Subranie. No coalition haggling, no concessions.\n\n"+S.player.name+" is elected Prime Minister with a mandate history books will remember.";
@@ -2524,7 +2716,17 @@ function renderEndScreen(){
     text="With "+ps+" seats, "+S.party.abbr+" forms a minority cabinet tolerated by a weary parliament. Every bill will be a knife fight.\n\n"+S.player.name+" becomes Prime Minister — on borrowed time.";
   }else if(S.ending==="opposition"){
     title="Into Opposition";
-    text="Negotiations collapse and the winners form a government without you.\n\n"+S.party.abbr+"'s "+ps+" MPs take the opposition benches. "+S.player.name+" promises to hold them accountable 'every single day'.";
+    const gov=S.government;
+    if(gov){
+      const gtxt=gov.parties.map(p=>partyName(partyOf(p))).join(" and ");
+      text=(S.coalition&&S.coalition.playerFirst?"Despite finishing first, "+S.player.name+" cannot stitch together "+MAJORITY+" seats. Negotiations fail. ":"Negotiations collapse and the winners form a government without you. ")
+        +gtxt+" form a government with "+gov.seats+" seats.\n\n"+S.party.abbr+"'s "+ps+" MPs take the opposition benches. "+S.player.name+" promises to hold them accountable 'every single day'.";
+    }else{
+      text="Negotiations collapse and the winners form a government without you.\n\n"+S.party.abbr+"'s "+ps+" MPs take the opposition benches. "+S.player.name+" promises to hold them accountable 'every single day'.";
+    }
+  }else if(S.ending==="noparliament"){
+    title="No Parliament Formed";
+    text="No two or three parties can bridge their differences to reach "+MAJORITY+" seats. The President dissolves the Narodno Subranie and appoints a caretaker cabinet.\n\nNew elections are coming — sooner than anyone expected, and "+S.player.name+" will be back on the trail.";
   }else{
     title="Mandate Failed";
     text="Despite finishing first, "+S.player.name+" cannot stitch together "+MAJORITY+" seats. The President dissolves the Narodno Subranie and appoints a caretaker government.\n\nSnap elections loom — and your rivals will remember what you promised them.";
@@ -3010,11 +3212,10 @@ function bindUI(){
   if(startBtn)startBtn.onclick=menuModal;
 
   $("btn-election-continue").onclick=()=>{
-    const r=S.results,ps=r.seats.player||0;
-    if(!r.qualified.includes("player"))finishGame("threshold");
-    else if(ps>=MAJORITY)finishGame("majority");
-    else startCoalition();
+    if(!S.interview)startInterview();
+    else continueAfterInterview();
   };
+  $("btn-election-skip").onclick=finishElectionNight;
 
   $("btn-form-gov").onclick=()=>finishGame("coalition");
   $("btn-minority").onclick=()=>finishGame("minority");
@@ -3041,6 +3242,8 @@ if(typeof module!=="undefined"&&module.exports){
     DISTRICTS:DISTRICTS,AI_PARTIES:AI_PARTIES,dhondt:dhondt,TOTAL_SEATS:TOTAL_SEATS,DIFFS:DIFFS,
     state:()=>S,freshState:freshState,startCampaign:startCampaign,endTurn:endTurn,runElection:runElection,
     startCoalition:startCoalition,coalitionSeats:coalitionSeats,fulfillDemand:fulfillDemand,finishGame:finishGame,
+    startInterview:startInterview,continueAfterInterview:continueAfterInterview,leftistParty:leftistParty,
+    findAICoalition:findAICoalition,partyViewDist:partyViewDist,COALITION_VIEW_MAX:COALITION_VIEW_MAX,
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
@@ -3057,6 +3260,7 @@ if(typeof module!=="undefined"&&module.exports){
     setCompassPosition:setCompassPosition,syncCompassFromPlatform,COMPASS_AXES:COMPASS_AXES,
     debateAnswer:debateAnswer,startDebate:startDebate,buildDebateQuestions:buildDebateQuestions,damageControlQuestions:damageControlQuestions,DEBATE_POOL:DEBATE_POOL,
     drawEvent:drawEvent,maybeEvents:maybeEvents,
+    electionNightPoll:electionNightPoll,electionNightClock:electionNightClock,electionNightLeader:electionNightLeader,startElectionNight:startElectionNight,finishElectionNight:finishElectionNight,
     PIG_EVENTS:PIG_EVENTS,PIG_RAID:PIG_RAID,startPigEvent:startPigEvent,renderPigEvent:renderPigEvent,pigAnswer:pigAnswer,
     checkJoin:checkJoin,willOf:willOf,REL_MATRIX:REL_MATRIX,INCOMPAT_PAIRS:INCOMPAT_PAIRS,
     setPlayer:(cfg)=>{
