@@ -544,6 +544,12 @@ input[type=radio],input[type=checkbox]{
 .modal-pad{padding:16px 20px 20px;}
 .modal-pad h3{margin-top:0; color:#000080;}
 .modal-pad p{color:var(--mut); line-height:1.55; font-size:.88rem; margin-bottom:10px;}
+.db-list{max-height:240px; overflow-y:auto; border:1px solid var(--xp-low); background:#fff; margin:0 0 14px;}
+.db-row{display:flex; gap:8px; padding:6px 10px; font-size:.78rem; border-bottom:1px solid #e0e0e0; align-items:baseline;}
+.db-row:last-child{border-bottom:0;}
+.db-row b{color:#000080; min-width:26px;}
+.db-row span:first-of-type{flex:0 0 38%; color:#333;}
+.db-row .db-choice{color:#555; font-size:.76rem;}
 .dbg-status{
   background:#fff; border:1px solid var(--xp-low);
   box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
