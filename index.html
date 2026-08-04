@@ -123,9 +123,13 @@
               <label class="fld"><span>Abbreviation</span>
                 <input type="text" id="in-party-abbr" maxlength="6" value="NRM">
               </label>
-              <label class="fld"><span>Party colour</span>
+              <div class="fld"><span>Party colour</span>
                 <div id="color-swatches" class="swatches"></div>
-              </label>
+                <div class="color-pickers">
+                  <input type="color" id="in-party-color" value="#00966e" title="Pick any colour">
+                  <input type="text" id="in-party-hex" maxlength="7" placeholder="#rrggbb" spellcheck="false">
+                </div>
+              </div>
             </div>
             <label class="fld"><span>Slogan</span>
               <input type="text" id="in-party-slogan" maxlength="48" value="Bulgaria, forward!">

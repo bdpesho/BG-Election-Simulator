@@ -222,6 +222,18 @@ input[type=radio],input[type=checkbox]{
 .swatches{display:flex; gap:7px; flex-wrap:wrap; padding:4px 0;}
 .swatch{width:24px; height:24px; cursor:pointer; border:2px solid #fff; box-shadow:0 0 0 1px #808080;}
 .swatch.sel{outline:2px solid #000080;}
+.color-pickers{display:flex; gap:8px; align-items:center; margin-top:6px;}
+.color-pickers input[type=color]{
+  width:46px; height:30px; padding:2px; background:#fff; border:1px solid var(--xp-low); cursor:pointer;
+  box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+}
+.color-pickers input[type=text]{
+  font-family:inherit; font-size:.88rem; width:110px; padding:5px 8px;
+  background:#fff; color:#000; border:1px solid var(--xp-low);
+  box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+}
+.color-pickers input[type=text].invalid{border-color:#c00000; background:#fdecea;}
+.color-pickers input[type=text]:focus{outline:1px dotted #000; outline-offset:-3px;}
 
 .platform-row{margin:9px 0;}
 .platform-row .pr-top{display:flex; justify-content:space-between; font-size:.8rem; color:var(--mut); margin-bottom:3px;}
@@ -234,9 +246,9 @@ input[type=radio],input[type=checkbox]{
 }
 .banner-emblem{width:52px; height:52px; display:flex; align-items:center; justify-content:center;}
 .banner-emblem svg,.banner-emblem img{max-width:100%; max-height:100%; object-fit:contain; image-rendering:pixelated;}
-.banner-name{font-weight:700; letter-spacing:.06em; font-size:.95rem; text-shadow:1px 1px 0 rgba(0,0,0,.55); text-align:center; padding:0 10px; text-transform:uppercase;}
-.banner-abbr{font-size:.7rem; letter-spacing:.35em; opacity:.9; font-weight:700; text-shadow:1px 1px 0 rgba(0,0,0,.55);}
-.banner-slogan{font-size:.72rem; font-style:italic; opacity:.85; text-shadow:1px 1px 0 rgba(0,0,0,.55);}
+.banner-name{font-weight:700; letter-spacing:.04em; font-size:1rem; text-align:center; padding:0 10px; text-transform:uppercase;}
+.banner-abbr{font-size:.75rem; letter-spacing:.3em; opacity:.92; font-weight:700;}
+.banner-slogan{font-size:.8rem; font-weight:700; opacity:.95; text-align:center; padding:0 14px;}
 .big-banner{width:340px; height:180px; margin:0 auto 18px;}
 .banner-controls{display:flex; flex-direction:column; gap:6px; align-items:center;}
 .car{display:flex; gap:12px; align-items:center;}

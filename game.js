@@ -80,7 +80,7 @@ const TOTAL_SEATS=240;
 const COSTS={rallySP:3,ad:12000,hq:40000,hqIncome:9000,stipend:6000,hqMax:8};
 const SAVE_KEY="bulgaria-decides-save-v4";
 
-const EMBLEM_IDS=["lion","star","rose","fist","sun","eagle","book","gear","flame","scales"];
+const EMBLEM_IDS=["lion","star","rose","fist","sun","eagle","book","gear","flame","scales","mountain","dove","wheat","key","shield","crown","globe","anchor","heart","torch"];
 const PALETTE=["#00966e","#2f6fd6","#d63a3a","#e0a71e","#8e44ad","#17a2b8","#e67e22","#2fa84f","#c2185b","#607d8b"];
 
 /* ---- T4: pixel portrait system (24×24 grids, layered) ---- */
@@ -301,9 +301,17 @@ const BGSTYLES=[
   (c1,c2)=>"background:repeating-linear-gradient(0deg, "+c1+" 0 26px, "+c2+" 26px 52px)",
   (c1,c2)=>"background:linear-gradient(115deg, "+c1+" 0 55%, "+c2+" 55%)",
   (c1,c2)=>"background:radial-gradient(circle at 30% 35%, "+c2+" 0%, "+c1+" 75%)",
-  (c1,c2)=>"background:repeating-linear-gradient(45deg, "+c1+" 0 20px, "+c2+" 20px 40px)"
+  (c1,c2)=>"background:repeating-linear-gradient(45deg, "+c1+" 0 20px, "+c2+" 20px 40px)",
+  (c1,c2)=>"background:repeating-linear-gradient(90deg, "+c1+" 0 10px, "+c2+" 10px 20px)",
+  (c1,c2)=>"background:repeating-conic-gradient("+c1+" 0deg 25%, "+c2+" 25% 50%)",
+  (c1,c2)=>"background:linear-gradient(90deg, "+c1+" 0 50%, "+c2+" 50%)",
+  (c1,c2)=>"background:linear-gradient(45deg, "+c1+" 0 50%, "+c2+" 50%)",
+  (c1,c2)=>"background:radial-gradient(circle at 50% 50%, "+c1+" 0%, "+c2+" 72%)",
+  (c1,c2)=>"background:repeating-conic-gradient("+c1+" 0deg 12deg, "+c2+" 12deg 24deg)",
+  (c1,c2)=>"background:repeating-linear-gradient(0deg, "+c1+" 0 14px, "+c2+" 14px 28px), repeating-linear-gradient(90deg, "+c1+" 0 14px, "+c2+" 14px 28px)",
+  (c1,c2)=>"background:repeating-radial-gradient(circle at 50% 120%, "+c1+" 0 16px, "+c2+" 16px 32px)"
 ];
-const BGSTYLE_NAMES=["Solid","Stripes","Diagonal split","Spotlight","Chevrons"];
+const BGSTYLE_NAMES=["Solid","Stripes","Diagonal split","Spotlight","Chevrons","Pinstripes","Checkerboard","Half & half","Diagonal","Halo","Sunburst","Grid","Waves"];
 
 const CELEBS=["Veselin Marinov","Azis","Kubrat Pulev","Grigor Dimitrov","Maria Ilieva","Ivo Arakov","Vasil Naydenov"];
 const OUTLETS=["Nova TV","bTV","BNT 1","24 Chasa","Capital Daily","Dnevnik.bg","Bulgaria ON AIR"];
@@ -610,19 +618,33 @@ function emblemSVG(id,color,size){
     case "gear":inner='<circle cx="32" cy="32" r="13"/><rect x="29" y="7" width="6" height="10"/><rect x="29" y="47" width="6" height="10"/><rect x="7" y="29" width="10" height="6"/><rect x="47" y="29" width="10" height="6"/><rect x="29" y="7" width="6" height="10" transform="rotate(45 32 32)"/><rect x="29" y="47" width="6" height="10" transform="rotate(45 32 32)"/><rect x="7" y="29" width="10" height="6" transform="rotate(45 32 32)"/><rect x="47" y="29" width="10" height="6" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="6" fill="rgba(0,0,0,.5)"/>';break;
     case "flame":inner='<path d="M32 6 C30 16 20 22 20 34 A12 13 0 0 0 44 34 C44 26 38 21 37 12 C34 17 33 13 32 6 Z"/><circle cx="32" cy="38" r="6" fill="rgba(255,255,255,.35)"/>';break;
     case "scales":inner='<rect x="10" y="14" width="44" height="4" rx="2"/><rect x="30" y="14" width="4" height="36"/><rect x="20" y="50" width="24" height="5" rx="2"/><path d="M13 18 L4 33 A9.5 6 0 0 0 22 33 Z"/><path d="M51 18 L42 33 A9.5 6 0 0 0 60 33 Z"/>';break;
+    case "mountain":inner='<path d="M10 52 L32 14 L54 52 Z"/><path d="M24 52 L36 32 L46 52 Z" fill="rgba(0,0,0,.3)"/>';break;
+    case "dove":inner='<path d="M26 20 Q14 26 16 40 Q18 50 32 52 Q46 50 48 40 Q50 26 38 20 Q32 24 26 20 Z"/><path d="M36 22 Q48 16 56 24 Q48 28 42 30 Q38 26 36 22 Z"/><circle cx="24" cy="30" r="2" fill="rgba(0,0,0,.4)"/>';break;
+    case "wheat":inner='<rect x="31" y="24" width="2" height="32"/><path d="M32 36 Q20 34 16 44 L20 46 Q24 38 32 40 Z"/><path d="M32 30 Q44 28 48 38 L44 40 Q40 32 32 34 Z"/><path d="M25 24 L25 17 Q25 9 32 9 Q39 9 39 17 L39 24 Z"/><circle cx="28" cy="15" r="2" fill="rgba(0,0,0,.35)"/><circle cx="32" cy="13" r="2" fill="rgba(0,0,0,.35)"/><circle cx="36" cy="15" r="2" fill="rgba(0,0,0,.35)"/>';break;
+    case "key":inner='<path fill-rule="evenodd" d="M26 22 A10 10 0 1 0 26 42 A10 10 0 1 0 26 22 Z M26 27 A5 5 0 1 1 26 37 A5 5 0 1 1 26 27 Z"/><rect x="34" y="29" width="18" height="5"/><rect x="44" y="34" width="5" height="8"/><rect x="38" y="34" width="5" height="6"/>';break;
+    case "shield":inner='<path d="M32 6 L54 15 L54 34 Q54 48 32 58 Q10 48 10 34 L10 15 Z"/><path d="M32 14 L47 20 L47 33 Q47 44 32 51 Q17 44 17 33 L17 20 Z" fill="rgba(0,0,0,.22)"/>';break;
+    case "crown":inner='<path d="M14 46 L14 22 L24 36 L32 20 L40 36 L50 22 L50 46 Z"/><rect x="14" y="48" width="36" height="6"/><circle cx="20" cy="19" r="3"/><circle cx="32" cy="15" r="3"/><circle cx="44" cy="19" r="3"/>';break;
+    case "globe":inner='<circle cx="32" cy="32" r="22"/><ellipse cx="32" cy="32" rx="8" ry="22" fill="rgba(0,0,0,.25)"/><path d="M10 32 L54 32" stroke="rgba(0,0,0,.25)" stroke-width="2" fill="none"/>';break;
+    case "anchor":inner='<path fill-rule="evenodd" d="M32 8 A6 6 0 1 0 32 20 A6 6 0 1 0 32 8 Z M32 12 A2 2 0 1 1 32 16 A2 2 0 1 1 32 12 Z"/><rect x="30" y="18" width="4" height="32"/><rect x="20" y="30" width="24" height="4"/><path d="M12 42 Q12 52 22 52 L42 52 Q52 52 52 42 L44 42 Q44 48 38 48 L32 48 L26 48 Q20 48 20 42 Z"/>';break;
+    case "heart":inner='<path d="M32 54 L12 34 Q6 26 12 18 Q18 12 26 16 Q30 18 32 22 Q34 18 38 16 Q46 12 52 18 Q58 26 52 34 Z"/>';break;
+    case "torch":inner='<rect x="30" y="38" width="4" height="18"/><rect x="25" y="32" width="14" height="9" rx="2"/><path d="M32 6 C30 16 22 22 22 30 A10 10 0 0 0 42 30 C42 22 34 16 32 6 Z"/><circle cx="32" cy="33" r="3" fill="rgba(255,255,255,.35)"/>';break;
   }
   return '<svg viewBox="0 0 64 64" width="'+size+'" height="'+size+'"><g fill="'+color+'">'+inner+'</g></svg>';
 }
 
 function bannerInner(){
   const c=S.party.color;
+  const txt=contrast(c);
+  const glow=txt==="#ffffff"
+    ?"text-shadow:0 0 4px rgba(0,0,0,.85), 1px 1px 0 rgba(0,0,0,.6)"
+    :"text-shadow:0 0 4px rgba(255,255,255,.85), 1px 1px 0 rgba(0,0,0,.2)";
   const emb=S.party.logo
     ?'<img src="'+S.party.logo+'" alt="" style="width:52px;height:52px;object-fit:contain">'
-    :emblemSVG(EMBLEM_IDS[S.party.emblemIdx],contrast(c),52);
+    :emblemSVG(EMBLEM_IDS[S.party.emblemIdx],txt,52);
   return '<div class="banner-emblem">'+emb+'</div>'
-    +'<div class="banner-name" style="color:'+contrast(c)+'">'+esc(S.party.name)+'</div>'
-    +'<div class="banner-abbr" style="color:'+contrast(c)+'">'+esc(S.party.abbr)+'</div>'
-    +'<div class="banner-slogan" style="color:'+contrast(c)+'">'+esc(S.party.slogan)+'</div>';
+    +'<div class="banner-name" style="color:'+txt+';'+glow+'">'+esc(S.party.name)+'</div>'
+    +'<div class="banner-abbr" style="color:'+txt+';'+glow+'">'+esc(S.party.abbr)+'</div>'
+    +'<div class="banner-slogan" style="color:'+txt+';'+glow+'">'+esc(S.party.slogan)+'</div>';
 }
 
 function buildEventPool(){
@@ -1740,15 +1762,32 @@ function clearSetupError(){
   if(el){el.style.display="none";el.textContent="";}
 }
 
+function normHex(h){
+  h=String(h||"").trim();
+  if(/^#[0-9a-f]{6}$/i.test(h))return h.toLowerCase();
+  if(/^[0-9a-f]{6}$/i.test(h))return "#"+h.toLowerCase();
+  if(/^#[0-9a-f]{3}$/i.test(h))return "#"+h[1]+h[1]+h[2]+h[2]+h[3]+h[3];
+  return null;
+}
+
+function setPartyColor(hex){
+  const n=normHex(hex);
+  if(!n||!S)return false;
+  S.party.color=n;
+  renderSwatches();
+  renderBannerPreview();
+  return true;
+}
+
 function renderSwatches(){
   $("color-swatches").innerHTML=PALETTE.map(c=>'<div class="swatch '+(S.party.color===c?"sel":"")+'" data-c="'+c+'" style="background:'+c+'"></div>').join("");
   document.querySelectorAll("#color-swatches .swatch").forEach(s=>{
-    s.onclick=()=>{
-      S.party.color=s.dataset.c;
-      renderSwatches();
-      renderBannerPreview();
-    };
+    s.onclick=()=>setPartyColor(s.dataset.c);
   });
+  const ci=$("in-party-color");
+  if(ci)ci.value=S.party.color;
+  const hx=$("in-party-hex");
+  if(hx){hx.value=S.party.color.toUpperCase();hx.classList.remove("invalid");}
 }
 
 function renderPlatformSliders(){
@@ -1931,6 +1970,18 @@ function bindUI(){
     e.target.value="";
   });
   $("btn-clear-logo").onclick=()=>{S.party.logo=null;renderBannerPreview();};
+  $("in-party-color").addEventListener("input",e=>{setPartyColor(e.target.value);});
+  $("in-party-hex").addEventListener("input",e=>{
+    if(!S)return;
+    const v=e.target.value;
+    if(normHex(v)){setPartyColor(v);e.target.classList.remove("invalid");}
+    else e.target.classList.add("invalid");
+  });
+  $("in-party-hex").addEventListener("change",e=>{
+    if(!S)return;
+    if(!normHex(e.target.value))e.target.value=S.party.color.toUpperCase();
+    e.target.classList.remove("invalid");
+  });
   document.querySelectorAll('input[name="diff"]').forEach(r=>{
     r.addEventListener("change",()=>{
       S.difficulty=r.value;
@@ -1984,6 +2035,7 @@ if(typeof module!=="undefined"&&module.exports){
     portraitHTML:portraitHTML,
     SKIN_TONES:SKIN_TONES,HAIR_STYLES:HAIR_STYLES,SUIT_STYLES:SUIT_STYLES,ETHNICITY_NAMES:ETHNICITY_NAMES,
     saveGame:saveGame,loadGame:loadGame,recomputePolls:recomputePolls,
+    setPartyColor:setPartyColor,normHex:normHex,BGSTYLES:BGSTYLES,BGSTYLE_NAMES:BGSTYLE_NAMES,contrast:contrast,EMBLEM_IDS:EMBLEM_IDS,emblemSVG:emblemSVG,
     applyFx:applyFx,logEntriesHTML:logEntriesHTML,EVENT_POOL:()=>EVENT_POOL,
     checkJoin:checkJoin,willOf:willOf,REL_MATRIX:REL_MATRIX,INCOMPAT_PAIRS:INCOMPAT_PAIRS,
     setPlayer:(cfg)=>{
