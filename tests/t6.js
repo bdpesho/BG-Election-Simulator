@@ -28,7 +28,7 @@ function check(name,cond){if(cond){pass++;console.log("PASS | "+name);}else{fail
 function click(el){el.dispatchEvent(new window.MouseEvent("click",{bubbles:true}));}
 
 const CORE=["euro","corruption","energy","judiciary"];
-const KNOWN_FX=["cash","stamina","enthusiasmAll","entDistrict","districtBoost","nationBoost","multiBoost","oppHit","rivalBoost","rel","posShift","attrTemp","mod"];
+const KNOWN_FX=["cash","stamina","enthusiasmAll","entDistrict","districtBoost","nationBoost","multiBoost","oppHit","rivalBoost","partyHit","rel","posShift","attrTemp","mod"];
 
 // ---------- T6: 9-issue platform ----------
 click(document.getElementById("btn-new-game"));

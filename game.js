@@ -20,43 +20,55 @@ ISSUE_POOL.forEach(i=>ISSUE_BY_ID[i.id]=i);
 const MINISTRIES=["Finance","Interior","Foreign Affairs","Justice","Energy","Health","Education","Defence","Agriculture","Transport","Economy","Culture","Environment","Labour & Social Policy","Tourism","Digital Governance"];
 
 const DISTRICTS=[
-  {id:"sofia-city",name:"Sofia City",short:"Sofia City",bg:"София (град)",seats:40,x:176,y:314,w:{euro:.30,corruption:.30,energy:.15,judiciary:.25,pensions:.10,healthcare:.15,defense:.05,rural:.05,migration:.10},ideal:{euro:.85,corruption:.80,energy:.50,judiciary:.75,pensions:.45,healthcare:.70,defense:.45,rural:.30,migration:.70},ent:1.08,lean:{ppdb:.14,gerb:.08,pb:.10}},
-  {id:"sofia-obl",name:"Sofia Oblast",short:"Sofia Prov.",bg:"Софийска област",seats:9,x:245,y:296,w:{euro:.25,corruption:.25,energy:.30,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.65,corruption:.55,energy:.60,judiciary:.50,pensions:.55,healthcare:.60,defense:.55,rural:.65,migration:.55},ent:.92,lean:{gerb:.10}},
-  {id:"plovdiv-city",name:"Plovdiv-Grad",short:"Plovdiv",bg:"Пловдив (град)",seats:17,x:397,y:390,w:{euro:.30,corruption:.25,energy:.20,judiciary:.25,pensions:.10,healthcare:.15,defense:.05,rural:.05,migration:.10},ideal:{euro:.75,corruption:.65,energy:.50,judiciary:.60,pensions:.50,healthcare:.70,defense:.45,rural:.30,migration:.65},ent:1.05,lean:{ppdb:.10,gerb:.08,pb:.06}},
-  {id:"plovdiv-obl",name:"Plovdiv Oblast",short:"Plovdiv Prov.",bg:"Пловдивска област",seats:10,x:398,y:351,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.60,corruption:.50,energy:.65,judiciary:.45,pensions:.60,healthcare:.60,defense:.60,rural:.70,migration:.50},ent:.88,lean:{gerb:.08}},
-  {id:"varna",name:"Varna",short:"Varna",bg:"Варна",seats:13,x:866,y:238,w:{euro:.35,corruption:.30,energy:.15,judiciary:.20,pensions:.10,healthcare:.15,defense:.05,rural:.05,migration:.10},ideal:{euro:.80,corruption:.70,energy:.55,judiciary:.60,pensions:.50,healthcare:.70,defense:.50,rural:.35,migration:.65},ent:1.04,lean:{ppdb:.12,gerb:.06,pb:.06}},
-  {id:"burgas",name:"Burgas",short:"Burgas",bg:"Бургас",seats:11,x:799,y:343,w:{euro:.30,corruption:.25,energy:.25,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.10,migration:.10},ideal:{euro:.70,corruption:.60,energy:.60,judiciary:.50,pensions:.55,healthcare:.65,defense:.60,rural:.50,migration:.55},ent:.98,lean:{gerb:.10}},
-  {id:"blagoevgrad",name:"Blagoevgrad",short:"Blagoevgrad",bg:"Благоевград",seats:8,x:143,y:416,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.60,corruption:.50,energy:.70,judiciary:.45,pensions:.60,healthcare:.60,defense:.65,rural:.70,migration:.45},ent:.90,lean:{dps:.06,gerb:.06}},
-  {id:"stara-zagora",name:"Stara Zagora",short:"Stara Zagora",bg:"Стара Загора",seats:9,x:523,y:353,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.65,corruption:.50,energy:.80,judiciary:.45,pensions:.70,healthcare:.70,defense:.55,rural:.60,migration:.45},ent:.92,lean:{bsp:.14}},
-  {id:"pleven",name:"Pleven",short:"Pleven",bg:"Плевен",seats:9,x:371,y:207,w:{euro:.25,corruption:.25,energy:.30,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.60,corruption:.55,energy:.60,judiciary:.50,pensions:.65,healthcare:.70,defense:.55,rural:.70,migration:.45},ent:.88,lean:{bsp:.10}},
-  {id:"ruse",name:"Ruse",short:"Ruse",bg:"Русе",seats:9,x:572,y:140,w:{euro:.30,corruption:.25,energy:.25,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.10,migration:.10},ideal:{euro:.75,corruption:.60,energy:.50,judiciary:.55,pensions:.60,healthcare:.65,defense:.65,rural:.50,migration:.55},ent:.95,lean:{gerb:.08}},
-  {id:"velikotarnovo",name:"Veliko Tarnovo",short:"V. Tarnovo",bg:"Велико Търново",seats:8,x:523,y:257,w:{euro:.25,corruption:.25,energy:.25,judiciary:.25,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.65,corruption:.60,energy:.55,judiciary:.60,pensions:.65,healthcare:.65,defense:.55,rural:.65,migration:.50},ent:.90,lean:{gerb:.08}},
-  {id:"pazardzhik",name:"Pazardzhik",short:"Pazardzhik",bg:"Пазарджик",seats:8,x:328,y:388,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.55,corruption:.50,energy:.70,judiciary:.45,pensions:.65,healthcare:.65,defense:.60,rural:.70,migration:.45},ent:.86,lean:{dps:.08}},
-  {id:"haskovo",name:"Haskovo",short:"Haskovo",bg:"Хасково",seats:7,x:512,y:428,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.60,corruption:.55,energy:.60,judiciary:.50,pensions:.65,healthcare:.65,defense:.60,rural:.70,migration:.45},ent:.88,lean:{bsp:.06}},
-  {id:"shumen",name:"Shumen",short:"Shumen",bg:"Шумен",seats:7,x:718,y:228,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.55,corruption:.45,energy:.70,judiciary:.40,pensions:.65,healthcare:.60,defense:.60,rural:.70,migration:.40},ent:.84,lean:{dps:.10,aps:.06}},
-  {id:"sliven",name:"Sliven",short:"Sliven",bg:"Сливен",seats:7,x:627,y:316,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.45,energy:.75,judiciary:.40,pensions:.65,healthcare:.60,defense:.60,rural:.70,migration:.40},ent:.84,lean:{vaz:.12,velichie:.05}},
-  {id:"dobrich",name:"Dobrich",short:"Dobrich",bg:"Добрич",seats:7,x:853,y:183,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.55,corruption:.50,energy:.70,judiciary:.45,pensions:.65,healthcare:.65,defense:.60,rural:.70,migration:.45},ent:.84,lean:{bsp:.08}},
-  {id:"vratsa",name:"Vratsa",short:"Vratsa",bg:"Враца",seats:6,x:212,y:237,w:{euro:.20,corruption:.25,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.55,energy:.65,judiciary:.45,pensions:.70,healthcare:.70,defense:.55,rural:.75,migration:.40},ent:.80,lean:{bsp:.12}},
-  {id:"montana",name:"Montana",short:"Montana",bg:"Монтана",seats:6,x:162,y:206,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.45,corruption:.50,energy:.70,judiciary:.40,pensions:.70,healthcare:.70,defense:.55,rural:.75,migration:.40},ent:.78,lean:{bsp:.14}},
-  {id:"kyustendil",name:"Kyustendil",short:"Kyustendil",bg:"Кюстендил",seats:5,x:81,y:376,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.55,corruption:.50,energy:.65,judiciary:.45,pensions:.65,healthcare:.65,defense:.60,rural:.70,migration:.45},ent:.82,lean:{gerb:.08}},
-  {id:"pernik",name:"Pernik",short:"Pernik",bg:"Перник",seats:5,x:133,y:328,w:{euro:.20,corruption:.25,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.55,corruption:.55,energy:.70,judiciary:.45,pensions:.65,healthcare:.65,defense:.60,rural:.70,migration:.45},ent:.84,lean:{bsp:.12}},
-  {id:"lovech",name:"Lovech",short:"Lovech",bg:"Ловеч",seats:5,x:386,y:248,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.60,corruption:.50,energy:.60,judiciary:.50,pensions:.65,healthcare:.70,defense:.55,rural:.75,migration:.40},ent:.84,lean:{bsp:.08}},
-  {id:"gabrovo",name:"Gabrovo",short:"Gabrovo",bg:"Габрово",seats:5,x:478,y:287,w:{euro:.25,corruption:.25,energy:.25,judiciary:.25,pensions:.15,healthcare:.15,defense:.10,rural:.15,migration:.10},ideal:{euro:.65,corruption:.60,energy:.55,judiciary:.55,pensions:.65,healthcare:.65,defense:.55,rural:.65,migration:.50},ent:.88,lean:{ppdb:.06}},
-  {id:"kardzhali",name:"Kardzhali",short:"Kardzhali",bg:"Кърджали",seats:5,x:484,y:473,w:{euro:.15,corruption:.15,energy:.50,judiciary:.20,pensions:.10,healthcare:.15,defense:.05,rural:.20,migration:.15},ideal:{euro:.60,corruption:.40,energy:.80,judiciary:.40,pensions:.60,healthcare:.65,defense:.45,rural:.80,migration:.55},ent:.90,lean:{dps:.30,aps:.18}},
-  {id:"yambol",name:"Yambol",short:"Yambol",bg:"Ямбол",seats:4,x:652,y:346,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.45,energy:.70,judiciary:.40,pensions:.65,healthcare:.60,defense:.60,rural:.70,migration:.40},ent:.80,lean:{vaz:.10,velichie:.05}},
-  {id:"targovishte",name:"Targovishte",short:"Targovishte",bg:"Търговище",seats:4,x:627,y:231,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.45,energy:.70,judiciary:.40,pensions:.65,healthcare:.60,defense:.60,rural:.75,migration:.45},ent:.80,lean:{dps:.14,aps:.08}},
-  {id:"razgrad",name:"Razgrad",short:"Razgrad",bg:"Разград",seats:4,x:657,y:188,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.45,energy:.70,judiciary:.40,pensions:.65,healthcare:.60,defense:.60,rural:.75,migration:.45},ent:.80,lean:{dps:.16,aps:.10}},
-  {id:"silistra",name:"Silistra",short:"Silistra",bg:"Силистра",seats:4,x:768,y:101,w:{euro:.20,corruption:.20,energy:.40,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.50,corruption:.45,energy:.70,judiciary:.40,pensions:.65,healthcare:.65,defense:.60,rural:.75,migration:.40},ent:.78,lean:{vaz:.08}},
-  {id:"smolyan",name:"Smolyan",short:"Smolyan",bg:"Смолян",seats:4,x:382,y:482,w:{euro:.25,corruption:.20,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.60,corruption:.50,energy:.60,judiciary:.50,pensions:.65,healthcare:.65,defense:.65,rural:.75,migration:.45},ent:.82,lean:{bsp:.06}},
-  {id:"vidin",name:"Vidin",short:"Vidin",bg:"Видин",seats:4,x:109,y:120,w:{euro:.20,corruption:.25,energy:.35,judiciary:.20,pensions:.15,healthcare:.15,defense:.10,rural:.20,migration:.10},ideal:{euro:.45,corruption:.55,energy:.65,judiciary:.45,pensions:.70,healthcare:.70,defense:.60,rural:.80,migration:.40},ent:.76,lean:{bsp:.12}}
+  {id:"sofia-city",name:"Sofia City",short:"Sofia City",bg:"София (град)",seats:40,x:176,y:314,w:{"euro":0.28,"corruption":0.28,"energy":0.1,"judiciary":0.22,"pensions":0.07,"healthcare":0.12,"defense":0.04,"rural":0.03,"migration":0.1},ideal:{"euro":0.9,"corruption":0.85,"energy":0.45,"judiciary":0.85,"pensions":0.45,"healthcare":0.75,"defense":0.45,"rural":0.15,"migration":0.7},ent:1.08,lean:{"ppdb":0.16,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.95,"turkish":0.005,"roma":0.015},geo:{"proEU":0.92,"proRussia":0.15,"proNATO":0.9,"proUS":0.8,"nationalism":0.3,"urbanization":0.97},tb:0.524},
+  {id:"sofia-obl",name:"Sofia Oblast",short:"Sofia Prov.",bg:"Софийска област",seats:9,x:245,y:296,w:{"euro":0.18,"corruption":0.18,"energy":0.22,"judiciary":0.14,"pensions":0.14,"healthcare":0.14,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.68,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.6,"healthcare":0.7,"defense":0.58,"rural":0.7,"migration":0.55},ent:0.92,lean:{"ppdb":0.08,"gerb":0.12,"pb":0.1},eth:{"bulgarian":0.9,"turkish":0.015,"roma":0.05},geo:{"proEU":0.68,"proRussia":0.35,"proNATO":0.65,"proUS":0.6,"nationalism":0.48,"urbanization":0.55},tb:0.56},
+  {id:"plovdiv-city",name:"Plovdiv-Grad",short:"Plovdiv",bg:"Пловдив (град)",seats:17,x:397,y:390,w:{"euro":0.27,"corruption":0.26,"energy":0.14,"judiciary":0.2,"pensions":0.08,"healthcare":0.13,"defense":0.04,"rural":0.04,"migration":0.1},ideal:{"euro":0.8,"corruption":0.75,"energy":0.5,"judiciary":0.7,"pensions":0.5,"healthcare":0.75,"defense":0.48,"rural":0.2,"migration":0.62},ent:1.05,lean:{"ppdb":0.12,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.035},geo:{"proEU":0.85,"proRussia":0.25,"proNATO":0.82,"proUS":0.75,"nationalism":0.35,"urbanization":0.85},tb:0.522},
+  {id:"plovdiv-obl",name:"Plovdiv Oblast",short:"Plovdiv Prov.",bg:"Пловдивска област",seats:10,x:398,y:351,w:{"euro":0.18,"corruption":0.16,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.13,"defense":0.08,"rural":0.24,"migration":0.1},ideal:{"euro":0.62,"corruption":0.52,"energy":0.7,"judiciary":0.47,"pensions":0.65,"healthcare":0.72,"defense":0.62,"rural":0.75,"migration":0.5},ent:0.88,lean:{"gerb":0.1,"pb":0.08,"dps":0.06},eth:{"bulgarian":0.82,"turkish":0.1,"roma":0.04},geo:{"proEU":0.62,"proRussia":0.42,"proNATO":0.6,"proUS":0.55,"nationalism":0.55,"urbanization":0.5},tb:0.481},
+  {id:"varna",name:"Varna",short:"Varna",bg:"Варна",seats:13,x:866,y:238,w:{"euro":0.3,"corruption":0.26,"energy":0.12,"judiciary":0.18,"pensions":0.07,"healthcare":0.14,"defense":0.05,"rural":0.04,"migration":0.1},ideal:{"euro":0.85,"corruption":0.78,"energy":0.55,"judiciary":0.68,"pensions":0.48,"healthcare":0.75,"defense":0.5,"rural":0.25,"migration":0.65},ent:1.04,lean:{"ppdb":0.12,"pb":0.1,"gerb":0.06},eth:{"bulgarian":0.86,"turkish":0.07,"roma":0.03},geo:{"proEU":0.88,"proRussia":0.25,"proNATO":0.85,"proUS":0.78,"nationalism":0.4,"urbanization":0.88},tb:0.509},
+  {id:"burgas",name:"Burgas",short:"Burgas",bg:"Бургас",seats:11,x:799,y:343,w:{"euro":0.22,"corruption":0.2,"energy":0.2,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.13,"rural":0.1,"migration":0.12},ideal:{"euro":0.75,"corruption":0.65,"energy":0.62,"judiciary":0.55,"pensions":0.58,"healthcare":0.7,"defense":0.7,"rural":0.35,"migration":0.55},ent:0.98,lean:{"pb":0.1,"gerb":0.08,"dps":0.08},eth:{"bulgarian":0.74,"turkish":0.13,"roma":0.04},geo:{"proEU":0.8,"proRussia":0.35,"proNATO":0.78,"proUS":0.7,"nationalism":0.5,"urbanization":0.8},tb:0.5},
+  {id:"blagoevgrad",name:"Blagoevgrad",short:"Blagoevgrad",bg:"Благоевград",seats:8,x:143,y:416,w:{"euro":0.18,"corruption":0.16,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.12,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.72,"judiciary":0.48,"pensions":0.62,"healthcare":0.68,"defense":0.7,"rural":0.72,"migration":0.48},ent:0.9,lean:{"gerb":0.08,"pb":0.08,"dps":0.05},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.03},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.58,"proUS":0.52,"nationalism":0.55,"urbanization":0.68},tb:0.488},
+  {id:"stara-zagora",name:"Stara Zagora",short:"Stara Zagora",bg:"Стара Загора",seats:9,x:523,y:353,w:{"euro":0.15,"corruption":0.16,"energy":0.34,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.07,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.85,"judiciary":0.48,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.62,"migration":0.45},ent:0.92,lean:{"bsp":0.16,"pb":0.08,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.03,"roma":0.06},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.75},tb:0.511},
+  {id:"pleven",name:"Pleven",short:"Pleven",bg:"Плевен",seats:9,x:371,y:207,w:{"euro":0.18,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.16,"healthcare":0.13,"defense":0.07,"rural":0.2,"migration":0.1},ideal:{"euro":0.62,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.72,"migration":0.45},ent:0.88,lean:{"bsp":0.12,"gerb":0.08,"pb":0.05},eth:{"bulgarian":0.88,"turkish":0.06,"roma":0.04},geo:{"proEU":0.62,"proRussia":0.42,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.7},tb:0.474},
+  {id:"ruse",name:"Ruse",short:"Ruse",bg:"Русе",seats:9,x:572,y:140,w:{"euro":0.22,"corruption":0.2,"energy":0.18,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.17,"rural":0.1,"migration":0.12},ideal:{"euro":0.78,"corruption":0.65,"energy":0.55,"judiciary":0.58,"pensions":0.62,"healthcare":0.7,"defense":0.75,"rural":0.52,"migration":0.58},ent:0.95,lean:{"gerb":0.1,"pb":0.08,"dps":0.06},eth:{"bulgarian":0.83,"turkish":0.07,"roma":0.05},geo:{"proEU":0.82,"proRussia":0.4,"proNATO":0.75,"proUS":0.68,"nationalism":0.55,"urbanization":0.78},tb:0.459},
+  {id:"velikotarnovo",name:"Veliko Tarnovo",short:"V. Tarnovo",bg:"Велико Търново",seats:8,x:523,y:257,w:{"euro":0.18,"corruption":0.18,"energy":0.2,"judiciary":0.16,"pensions":0.14,"healthcare":0.13,"defense":0.09,"rural":0.16,"migration":0.1},ideal:{"euro":0.68,"corruption":0.62,"energy":0.58,"judiciary":0.6,"pensions":0.7,"healthcare":0.7,"defense":0.58,"rural":0.68,"migration":0.5},ent:0.9,lean:{"gerb":0.08,"bsp":0.08,"pb":0.06},eth:{"bulgarian":0.86,"turkish":0.04,"roma":0.04},geo:{"proEU":0.7,"proRussia":0.4,"proNATO":0.65,"proUS":0.6,"nationalism":0.52,"urbanization":0.72},tb:0.498},
+  {id:"pazardzhik",name:"Pazardzhik",short:"Pazardzhik",bg:"Пазарджик",seats:8,x:328,y:388,w:{"euro":0.15,"corruption":0.16,"energy":0.3,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.18,"migration":0.14},ideal:{"euro":0.58,"corruption":0.52,"energy":0.75,"judiciary":0.48,"pensions":0.68,"healthcare":0.7,"defense":0.62,"rural":0.72,"migration":0.45},ent:0.86,lean:{"dps":0.1,"bsp":0.08,"pb":0.06},eth:{"bulgarian":0.8,"turkish":0.08,"roma":0.07},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.52,"proUS":0.48,"nationalism":0.55,"urbanization":0.62},tb:0.46},
+  {id:"haskovo",name:"Haskovo",short:"Haskovo",bg:"Хасково",seats:7,x:512,y:428,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.12,"healthcare":0.12,"defense":0.1,"rural":0.16,"migration":0.15},ideal:{"euro":0.6,"corruption":0.55,"energy":0.72,"judiciary":0.5,"pensions":0.68,"healthcare":0.7,"defense":0.65,"rural":0.72,"migration":0.45},ent:0.88,lean:{"dps":0.1,"bsp":0.08,"gerb":0.06},eth:{"bulgarian":0.74,"turkish":0.19,"roma":0.03},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.5,"proUS":0.45,"nationalism":0.55,"urbanization":0.6},tb:0.493},
+  {id:"shumen",name:"Shumen",short:"Shumen",bg:"Шумен",seats:7,x:718,y:228,w:{"euro":0.14,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.09,"rural":0.22,"migration":0.14},ideal:{"euro":0.55,"corruption":0.48,"energy":0.75,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.48},ent:0.84,lean:{"dps":0.12,"aps":0.07,"vaz":0.08},eth:{"bulgarian":0.61,"turkish":0.29,"roma":0.04},geo:{"proEU":0.55,"proRussia":0.5,"proNATO":0.48,"proUS":0.44,"nationalism":0.62,"urbanization":0.62},tb:0.385},
+  {id:"sliven",name:"Sliven",short:"Sliven",bg:"Сливен",seats:7,x:627,y:316,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.48,"corruption":0.48,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.35},ent:0.84,lean:{"vaz":0.16,"velichie":0.07,"bsp":0.08},eth:{"bulgarian":0.74,"turkish":0.07,"roma":0.13},geo:{"proEU":0.48,"proRussia":0.58,"proNATO":0.42,"proUS":0.38,"nationalism":0.72,"urbanization":0.65},tb:0.398},
+  {id:"dobrich",name:"Dobrich",short:"Dobrich",bg:"Добрич",seats:7,x:853,y:183,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.12},ideal:{"euro":0.55,"corruption":0.52,"energy":0.72,"judiciary":0.48,"pensions":0.72,"healthcare":0.68,"defense":0.62,"rural":0.85,"migration":0.45},ent:0.84,lean:{"bsp":0.1,"gerb":0.08,"dps":0.06},eth:{"bulgarian":0.76,"turkish":0.11,"roma":0.06},geo:{"proEU":0.62,"proRussia":0.48,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.68},tb:0.404},
+  {id:"vratsa",name:"Vratsa",short:"Vratsa",bg:"Враца",seats:6,x:212,y:237,w:{"euro":0.14,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.1},ideal:{"euro":0.5,"corruption":0.55,"energy":0.68,"judiciary":0.48,"pensions":0.78,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.4},ent:0.8,lean:{"bsp":0.14,"gerb":0.06,"vaz":0.05},eth:{"bulgarian":0.83,"turkish":0.01,"roma":0.1},geo:{"proEU":0.52,"proRussia":0.52,"proNATO":0.48,"proUS":0.44,"nationalism":0.6,"urbanization":0.58},tb:0.53},
+  {id:"montana",name:"Montana",short:"Montana",bg:"Монтана",seats:6,x:162,y:206,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.24,"migration":0.1},ideal:{"euro":0.48,"corruption":0.52,"energy":0.75,"judiciary":0.42,"pensions":0.8,"healthcare":0.72,"defense":0.58,"rural":0.88,"migration":0.4},ent:0.78,lean:{"bsp":0.16,"vaz":0.06},eth:{"bulgarian":0.8,"turkish":0.02,"roma":0.11},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.58},tb:0.521},
+  {id:"kyustendil",name:"Kyustendil",short:"Kyustendil",bg:"Кюстендил",seats:5,x:81,y:376,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.11,"rural":0.18,"migration":0.1},ideal:{"euro":0.55,"corruption":0.52,"energy":0.8,"judiciary":0.48,"pensions":0.75,"healthcare":0.7,"defense":0.65,"rural":0.78,"migration":0.45},ent:0.82,lean:{"gerb":0.08,"bsp":0.08,"vaz":0.06},eth:{"bulgarian":0.88,"turkish":0.005,"roma":0.08},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.65},tb:0.442},
+  {id:"pernik",name:"Pernik",short:"Pernik",bg:"Перник",seats:5,x:133,y:328,w:{"euro":0.14,"corruption":0.18,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.55,"corruption":0.55,"energy":0.78,"judiciary":0.48,"pensions":0.75,"healthcare":0.68,"defense":0.6,"rural":0.75,"migration":0.45},ent:0.84,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.9,"turkish":0.01,"roma":0.04},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.52,"proUS":0.48,"nationalism":0.58,"urbanization":0.7},tb:0.544},
+  {id:"lovech",name:"Lovech",short:"Lovech",bg:"Ловеч",seats:5,x:386,y:248,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.17,"healthcare":0.13,"defense":0.08,"rural":0.22,"migration":0.1},ideal:{"euro":0.58,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.75,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.4},ent:0.84,lean:{"bsp":0.1,"gerb":0.08},eth:{"bulgarian":0.84,"turkish":0.03,"roma":0.1},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.58,"proUS":0.52,"nationalism":0.52,"urbanization":0.58},tb:0.491},
+  {id:"gabrovo",name:"Gabrovo",short:"Gabrovo",bg:"Габрово",seats:5,x:478,y:287,w:{"euro":0.19,"corruption":0.19,"energy":0.18,"judiciary":0.17,"pensions":0.13,"healthcare":0.13,"defense":0.08,"rural":0.18,"migration":0.1},ideal:{"euro":0.7,"corruption":0.62,"energy":0.58,"judiciary":0.58,"pensions":0.68,"healthcare":0.7,"defense":0.6,"rural":0.68,"migration":0.5},ent:0.88,lean:{"gerb":0.08,"ppdb":0.06},eth:{"bulgarian":0.91,"turkish":0.03,"roma":0.04},geo:{"proEU":0.75,"proRussia":0.38,"proNATO":0.7,"proUS":0.65,"nationalism":0.55,"urbanization":0.7},tb:0.487},
+  {id:"kardzhali",name:"Kardzhali",short:"Kardzhali",bg:"Кърджали",seats:5,x:484,y:473,w:{"euro":0.12,"corruption":0.12,"energy":0.36,"judiciary":0.14,"pensions":0.08,"healthcare":0.12,"defense":0.06,"rural":0.2,"migration":0.22},ideal:{"euro":0.6,"corruption":0.45,"energy":0.85,"judiciary":0.42,"pensions":0.62,"healthcare":0.7,"defense":0.48,"rural":0.82,"migration":0.55},ent:0.9,lean:{"dps":0.34,"aps":0.2},eth:{"bulgarian":0.26,"turkish":0.66,"roma":0.02},geo:{"proEU":0.62,"proRussia":0.4,"proNATO":0.48,"proUS":0.45,"nationalism":0.45,"urbanization":0.55},tb:0.298},
+  {id:"yambol",name:"Yambol",short:"Yambol",bg:"Ямбол",seats:4,x:652,y:346,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.45,"corruption":0.45,"energy":0.78,"judiciary":0.4,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.75,"migration":0.35},ent:0.8,lean:{"vaz":0.14,"velichie":0.06,"bsp":0.08},eth:{"bulgarian":0.85,"turkish":0.05,"roma":0.07},geo:{"proEU":0.45,"proRussia":0.6,"proNATO":0.42,"proUS":0.38,"nationalism":0.74,"urbanization":0.62},tb:0.483},
+  {id:"targovishte",name:"Targovishte",short:"Targovishte",bg:"Търговище",seats:4,x:627,y:231,w:{"euro":0.13,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.22,"migration":0.18},ideal:{"euro":0.52,"corruption":0.45,"energy":0.75,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.6,"rural":0.8,"migration":0.5},ent:0.8,lean:{"dps":0.16,"aps":0.1},eth:{"bulgarian":0.53,"turkish":0.36,"roma":0.04},geo:{"proEU":0.55,"proRussia":0.5,"proNATO":0.48,"proUS":0.44,"nationalism":0.6,"urbanization":0.55},tb:0.414},
+  {id:"razgrad",name:"Razgrad",short:"Razgrad",bg:"Разград",seats:4,x:657,y:188,w:{"euro":0.13,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.22,"migration":0.18},ideal:{"euro":0.5,"corruption":0.45,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.8,"migration":0.52},ent:0.8,lean:{"dps":0.18,"aps":0.12},eth:{"bulgarian":0.41,"turkish":0.5,"roma":0.04},geo:{"proEU":0.52,"proRussia":0.55,"proNATO":0.45,"proUS":0.42,"nationalism":0.65,"urbanization":0.55},tb:0.369},
+  {id:"silistra",name:"Silistra",short:"Silistra",bg:"Силистра",seats:4,x:768,y:101,w:{"euro":0.13,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.11,"rural":0.22,"migration":0.14},ideal:{"euro":0.5,"corruption":0.5,"energy":0.75,"judiciary":0.45,"pensions":0.75,"healthcare":0.68,"defense":0.65,"rural":0.88,"migration":0.5},ent:0.78,lean:{"dps":0.1,"bsp":0.08,"vaz":0.06},eth:{"bulgarian":0.67,"turkish":0.21,"roma":0.05},geo:{"proEU":0.55,"proRussia":0.52,"proNATO":0.5,"proUS":0.45,"nationalism":0.6,"urbanization":0.55},tb:0.439},
+  {id:"smolyan",name:"Smolyan",short:"Smolyan",bg:"Смолян",seats:4,x:382,y:482,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.15,"healthcare":0.13,"defense":0.13,"rural":0.24,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.68,"healthcare":0.7,"defense":0.7,"rural":0.85,"migration":0.48},ent:0.82,lean:{"bsp":0.08,"gerb":0.06,"dps":0.06},eth:{"bulgarian":0.93,"turkish":0.05,"roma":0.015},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.6,"proUS":0.55,"nationalism":0.55,"urbanization":0.65},tb:0.555},
+  {id:"vidin",name:"Vidin",short:"Vidin",bg:"Видин",seats:4,x:109,y:120,w:{"euro":0.13,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.09,"rural":0.24,"migration":0.1},ideal:{"euro":0.45,"corruption":0.52,"energy":0.68,"judiciary":0.48,"pensions":0.82,"healthcare":0.72,"defense":0.62,"rural":0.9,"migration":0.4},ent:0.76,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.89,"turkish":0.01,"roma":0.07},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.6},tb:0.461}
 ];
+
+/* T15: geopolitical axes + demographics — derived so eth (census) stays the single source of truth.
+   Axes: proEU, proRussia, proNATO, proUS, nationalism, turkishMinority, urbanization.
+   Demographics: turkishShare, romaShare (mirror eth). */
+DISTRICTS.forEach(d=>{
+  const e=d.eth||{};
+  const g=d.geo||(d.geo={});
+  if(g.turkishMinority===undefined)g.turkishMinority=e.turkish||0;
+  if(g.turkishShare===undefined)g.turkishShare=e.turkish||0;
+  if(g.romaShare===undefined)g.romaShare=e.roma||0;
+});
+
 const DIST_BY_ID={};
 DISTRICTS.forEach(d=>DIST_BY_ID[d.id]=d);
 
 const AI_PARTIES=[
   {id:"gerb",name:"GERB",abbr:"GERB",color:"#0066b3",leader:"Boyko Borisov",ideo:"Center-right incumbent (GERB–SDS)",pos:{euro:.80,corruption:.45,energy:.50,judiciary:.40,pensions:.45,healthcare:.40,defense:.70,rural:.40,migration:.55},appeal:.86,favMinistry:"Finance",topIssue:"euro"},
   {id:"pb",name:"Progresivna Balgariya",abbr:"PB",color:"#e67e22",leader:"Rumen Radev",ideo:"Centre-left populist, anti-oligarch",pos:{euro:.55,corruption:.85,energy:.75,judiciary:.70,pensions:.75,healthcare:.80,defense:.45,rural:.60,migration:.45},appeal:.92,mainRival:true,favMinistry:"Justice",topIssue:"corruption"},
-  {id:"ppdb",name:"Produlzhavame promyanata – Demokratichna Balgariya",abbr:"PP-DB",color:"#2fa84f",leader:"Assen Vassilev",ideo:"Reformist anti-corruption",pos:{euro:.90,corruption:.90,energy:.35,judiciary:.90,pensions:.50,healthcare:.65,defense:.55,rural:.45,migration:.50},appeal:.80,favMinistry:"Justice",topIssue:"corruption"},
+  {id:"ppdb",name:"Produlzhavame promyanata – Demokratichna Balgariya",abbr:"PP-DB",color:"#2fa84f",leader:"Assen Vassilev",ideo:"Reformist anti-corruption",pos:{euro:.90,corruption:.90,energy:.35,judiciary:.90,pensions:.50,healthcare:.65,defense:.55,rural:.45,migration:.50},appeal:.80,favMinistry:"Justice",topIssue:"corruption",focus:["sofia-city","sofia-obl","burgas","varna","plovdiv-city","plovdiv-obl"]},
   {id:"dps",name:"Dvizhenie za prava i svobodi",abbr:"DPS",color:"#8e44ad",leader:"Delyan Peevski",ideo:"Minority interests",pos:{euro:.60,corruption:.35,energy:.75,judiciary:.40,pensions:.70,healthcare:.70,defense:.30,rural:.75,migration:.65},appeal:.60,favMinistry:"Agriculture",topIssue:"energy"},
   {id:"vaz",name:"Vazrazhdane",abbr:"VRZ",color:"#e0a71e",leader:"Kostadin Kostadinov",ideo:"Nationalist, anti-EU",pos:{euro:.10,corruption:.60,energy:.60,judiciary:.30,pensions:.60,healthcare:.40,defense:.90,rural:.65,migration:.05},appeal:.56,favMinistry:"Interior",topIssue:"euro"},
   {id:"bsp",name:"Bulgarska sotsialisticheska partiya – Obedinena levitsa",abbr:"BSP",color:"#e41e20",leader:"Krum Zarkov",ideo:"Socialist, centre-left",pos:{euro:.50,corruption:.55,energy:.85,judiciary:.50,pensions:.90,healthcare:.90,defense:.35,rural:.70,migration:.40},appeal:.218,favMinistry:"Labour & Social Policy",topIssue:"energy"},
@@ -83,14 +95,17 @@ const REL_MATRIX={
   velichie:{gerb:-1,pb:-1,ppdb:-2,bsp:-1,dps:-1,vaz:1,itn:0,mech:1,aps:0}
 };
 
-const DIFFS={easy:{cash:160000,aggr:.6},normal:{cash:120000,aggr:.85},hard:{cash:90000,aggr:1.15}};
+const DIFFS={easy:{cash:160000,aggr:.6,edge:1.08},normal:{cash:120000,aggr:.85,edge:1.00},hard:{cash:90000,aggr:1.15,edge:0.93}};
+const PERFORMANCE_PARTIES=["bsp","itn"];
+const PERFORMANCE_PROTECTED=["gerb","pb","ppdb","dps","vaz","mech","aps","velichie"];
 const ELECTION_DATE="Sunday, 19 April";
 const MAJORITY=121;
 const TOTAL_SEATS=240;
 const COSTS={rallySP:3,ad:12000,hq:40000,hqIncome:9000,stipend:6000,hqMax:8};
 const SAVE_KEY="bulgaria-decides-save-v5";
 
-const EMBLEM_IDS=["lion","star","rose","fist","sun","eagle","book","gear","flame","scales","mountain","dove","wheat","key","shield","crown","globe","anchor","heart","torch"];
+const EMBLEM_IDS=["alarm-clock","anchor","book-open","bookmark","briefcase","castle","crown","diamond-gem","earth","factory","flag","globe","hammer","hand","heart","leaf","moon","robot","rose","shield","skull","snake","star","sword","tree","tree-pine","trophy"];
+const EMBLEM_GLYPHS={"alarm-clock":0xea13,anchor:0xea49,"book-open":0xeab5,bookmark:0xeab7,briefcase:0xeaca,castle:0xeaf1,crown:0xeb4e,"diamond-gem":0xeb57,earth:0xeb61,factory:0xeb6a,flag:0xeb75,globe:0xeb95,hand:0xeba5,heart:0xebb1,leaf:0xebd5,moon:0xec0c,robot:0xec57,shield:0xec78,skull:0xec87,star:0xecb2,sword:0xecc2,tree:0xecf9,"tree-pine":0xecf8,trophy:0xecfb};
 const PALETTE=["#00966e","#2f6fd6","#d63a3a","#e0a71e","#8e44ad","#17a2b8","#e67e22","#2fa84f","#c2185b","#607d8b"];
 
 /* ---- T4: pixel portrait system (24×24 grids, layered) ---- */
@@ -103,10 +118,7 @@ const HAIR_STYLE_NAMES={short:"Short",side:"Side part",long:"Long",bun:"Bun",cur
 const SUIT_STYLES=["classic","open","vest","blouse"];
 const SUIT_STYLE_NAMES={classic:"Classic + tie",open:"Open collar",vest:"Vest",blouse:"Shirt only"};
 const ETHNICITY_NAMES={bulgarian:"Bulgarian",turkish:"Turkish minority",roma:"Roma"};
-const TURKISH_STRONG=["kardzhali","razgrad","targovishte","shumen"];
-const NATIONALIST_STRONG=["sliven","yambol"];
 const POVERTY_DISTRICTS=["vidin","montana","vratsa","silistra"];
-const URBAN_DISTRICTS=["sofia-city","plovdiv-city","varna"];
 
 const FACE_GRID=[
 "........................",
@@ -307,19 +319,19 @@ const PRESET_LEADERS=[
 ];
 
 const BGSTYLES=[
-  (c1)=>"background:linear-gradient(160deg, "+c1+", "+shade(c1,.68)+")",
-  (c1,c2)=>"background:repeating-linear-gradient(0deg, "+c1+" 0 26px, "+c2+" 26px 52px)",
-  (c1,c2)=>"background:linear-gradient(115deg, "+c1+" 0 55%, "+c2+" 55%)",
-  (c1,c2)=>"background:radial-gradient(circle at 30% 35%, "+c2+" 0%, "+c1+" 75%)",
-  (c1,c2)=>"background:repeating-linear-gradient(45deg, "+c1+" 0 20px, "+c2+" 20px 40px)",
-  (c1,c2)=>"background:repeating-linear-gradient(90deg, "+c1+" 0 10px, "+c2+" 10px 20px)",
-  (c1,c2)=>"background:repeating-conic-gradient("+c1+" 0deg 25%, "+c2+" 25% 50%)",
-  (c1,c2)=>"background:linear-gradient(90deg, "+c1+" 0 50%, "+c2+" 50%)",
-  (c1,c2)=>"background:linear-gradient(45deg, "+c1+" 0 50%, "+c2+" 50%)",
-  (c1,c2)=>"background:radial-gradient(circle at 50% 50%, "+c1+" 0%, "+c2+" 72%)",
-  (c1,c2)=>"background:repeating-conic-gradient("+c1+" 0deg 12deg, "+c2+" 12deg 24deg)",
-  (c1,c2)=>"background:repeating-linear-gradient(0deg, "+c1+" 0 14px, "+c2+" 14px 28px), repeating-linear-gradient(90deg, "+c1+" 0 14px, "+c2+" 14px 28px)",
-  (c1,c2)=>"background:repeating-radial-gradient(circle at 50% 120%, "+c1+" 0 16px, "+c2+" 16px 32px)"
+  (c1)=>"background:linear-gradient(180deg, "+shade(c1,1.16)+" 0 10%, "+c1+" 10% 90%, "+shade(c1,.72)+" 90% 100%)",
+  (c1,c2)=>"background:linear-gradient(180deg, "+c1+" 0 32%, "+c2+" 32% 68%, "+shade(c1,.78)+" 68% 100%)",
+  (c1,c2)=>"background:linear-gradient(135deg, "+c1+" 0 58%, "+c2+" 58% 72%, "+c1+" 72% 100%)",
+  (c1,c2)=>"background:radial-gradient(circle at 28% 25%, "+c2+" 0 12%, "+c1+" 58%, "+shade(c1,.72)+" 100%)",
+  (c1,c2)=>"background:repeating-linear-gradient(135deg, transparent 0 10px, "+c2+" 10px 14px, transparent 14px 24px), "+c1,
+  (c1,c2)=>"background:repeating-linear-gradient(90deg, "+c1+" 0 18px, "+c2+" 18px 21px, "+c1+" 21px 39px)",
+  (c1,c2)=>"background:linear-gradient(90deg, "+c1+" 0 50%, "+c2+" 50%), repeating-linear-gradient(0deg, transparent 0 15px, rgba(255,255,255,.16) 15px 16px)",
+  (c1,c2)=>"background:linear-gradient(90deg, "+c1+" 0 47%, "+shade(c2,.72)+" 47% 53%, "+c2+" 53% 100%)",
+  (c1,c2)=>"background:linear-gradient(45deg, "+c1+" 0 46%, "+c2+" 46% 54%, "+c1+" 54% 100%)",
+  (c1,c2)=>"background:radial-gradient(circle at 50% 50%, "+c2+" 0 18%, "+c1+" 18% 76%, "+shade(c1,.70)+" 76% 100%)",
+  (c1,c2)=>"background:conic-gradient(from 225deg at 50% 50%, "+c1+" 0 12.5%, "+c2+" 12.5% 25%, "+c1+" 25% 37.5%, "+c2+" 37.5% 50%, "+c1+" 50% 62.5%, "+c2+" 62.5% 75%, "+c1+" 75% 87.5%, "+c2+" 87.5% 100%)",
+  (c1,c2)=>"background:linear-gradient(0deg, rgba(255,255,255,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px), "+c1+";background-size:18px 18px,18px 18px,auto",
+  (c1,c2)=>"background:repeating-linear-gradient(0deg, "+c1+" 0 18px, "+c2+" 18px 22px, "+c1+" 22px 40px)"
 ];
 const BGSTYLE_NAMES=["Solid","Stripes","Diagonal split","Spotlight","Chevrons","Pinstripes","Checkerboard","Half & half","Diagonal","Halo","Sunburst","Grid","Waves"];
 
@@ -416,16 +428,17 @@ function freshState(){
   return {
     phase:"setup",setupStep:0,
     player:{name:"",face:0,photo:null,appearance:defaultAppearance(),attrs:{stamina:5,charisma:5,intelligence:5}},
-    party:{name:"National Renewal Movement",abbr:"NRM",color:"#00966e",slogan:"Bulgaria, forward!",bgStyle:0,emblemIdx:0,logo:null,pos:{euro:.60,corruption:.60,energy:.60,judiciary:.60,pensions:.60,healthcare:.60,defense:.50,rural:.60,migration:.50}},
+    party:{name:"National Renewal Movement",abbr:"NRM",color:"#00966e",slogan:"Bulgaria, forward!",bgStyle:0,emblemIdx:0,logo:null,compass:{x:0,y:0},pos:{euro:.60,corruption:.60,energy:.60,judiciary:.60,pensions:.60,healthcare:.60,defense:.50,rural:.60,migration:.50}},
     difficulty:"normal",
     week:1,cash:0,stamina:0,location:"sofia-city",selDistrict:"sofia-city",
     hq:{},boost:{},enthusiasm:{},modifiers:[],rel:{},touched:[],ralliesThisTurn:0,
     pollsPrev:null,pollNat:{},districtPoll:{},
     activeIssues:[],
     debateWeek:15,debateDone:false,debate:null,
+    pigWeek:18,pigPending:false,pigDone:false,pigRaid:false,
     log:[],stats:{rallies:0,ads:0,hqs:0,travels:0},
     eventBag:[],eventCursor:0,paused:false,eventQueue:[],
-    results:null,coalition:null,ending:null,
+    results:null,coalition:null,ending:null,perfMod:{},
     cheat:false,cheatFloor:false
   };
 }
@@ -525,7 +538,7 @@ function pollNoiseFor(dId,pId){
   if(S.hq&&S.hq[dId])noise*=0.5;
   return noise;
 }
-function districtShares(d,noisy){
+function districtShares(d,noisy,boostOv){
   const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
   const scores={};
   for(const p of allParties()){
@@ -533,12 +546,15 @@ function districtShares(d,noisy){
     const ln=d.lean&&d.lean[p.id]?d.lean[p.id]:0;
     sc*=1+ln;
     sc*=ent;
-    const b=S.boost[d.id]&&S.boost[d.id][p.id]?S.boost[d.id][p.id]:0;
+    const performance=S&&S.perfMod&&S.perfMod[p.id];
+    if(performance)sc*=performance.factor||(1+performance.value);
+    const b=boostOv&&boostOv[p.id]!==undefined?boostOv[p.id]:(S.boost[d.id]&&S.boost[d.id][p.id]?S.boost[d.id][p.id]:0);
     sc*=1+b;
     if(p.id==="player"){
       sc*=1+modSum("appealMult");
       const cm=candidateModifiers(d);
       if(cm&&(cm.appealMult||cm.entBonus))sc*=1+cm.appealMult+cm.entBonus;
+      sc*=DIFFS[S.difficulty].edge;
     }
     scores[p.id]=Math.max(0.001,sc);
   }
@@ -618,25 +634,53 @@ function candidateModifiers(d){
   const app=S&&S.player&&S.player.appearance;
   if(!app)return{appealMult:0,entBonus:0};
   const out={appealMult:0,entBonus:0};
+  const g=d.geo||{};
   if(app.ethnicity==="turkish"){
-    if(TURKISH_STRONG.indexOf(d.id)>=0)out.appealMult+=0.06;
-    if(NATIONALIST_STRONG.indexOf(d.id)>=0)out.appealMult-=0.05;
+    if(g.turkishMinority>=0.28)out.appealMult+=0.06;
+    if(g.nationalism>=0.68)out.appealMult-=0.05;
   }else if(app.ethnicity==="roma"){
     if(POVERTY_DISTRICTS.indexOf(d.id)>=0)out.entBonus+=0.07;
   }
   if(app.gender==="female"){
-    if(URBAN_DISTRICTS.indexOf(d.id)>=0)out.entBonus+=0.03;
+    if(g.urbanization>=0.85)out.entBonus+=0.03;
   }
   return out;
+}
+
+function districtsWhere(axis,min,max){
+  max=max===undefined?1:max;
+  return DISTRICTS.filter(d=>{
+    const v=d.geo&&d.geo[axis];
+    return typeof v==="number"&&v>=min&&v<=max;
+  }).map(d=>d.id);
+}
+
+function rollPerformance(){
+  S.perfMod={};
+  for(const id of PERFORMANCE_PARTIES){
+    const r=rng();
+    if(r<.15)S.perfMod[id]={value:.04+rng()*.03,factor:3.8+rng()*1.2,type:"surge"};
+    else if(r<.25)S.perfMod[id]={value:-.03,factor:.97,type:"slump"};
+  }
+}
+function performanceLines(){
+  return Object.keys(S.perfMod||{}).map(id=>{
+    const p=partyOf(id),m=S.perfMod[id];
+    return p.abbr+" is "+(m.type==="surge"?"in exceptional form this campaign":"having an unusually difficult campaign");
+  });
+}
+function performanceInspectorLine(){
+  const lines=performanceLines();
+  return lines.length?'<div class="dc-note" style="margin-top:6px">Campaign form: '+lines.map(esc).join(" · ")+".</div>":"";
 }
 
 function identityEffectLines(){
   const app=S&&S.player&&S.player.appearance;
   if(!app)return[];
   const lines=[];
-  if(app.ethnicity==="turkish")lines.push("Turkish minority: +6% appeal in Kardzhali, Razgrad, Targovishte, Shumen; −5% in Sliven, Yambol");
+  if(app.ethnicity==="turkish")lines.push("Turkish minority: +6% appeal in districts with a high Turkish share (≥28%: Kardzhali, Razgrad, Targovishte, Shumen); −5% in nationalist strongholds (nationalism ≥68%: Sliven, Yambol)");
   if(app.ethnicity==="roma")lines.push("Roma: +7% voter enthusiasm in Vidin, Montana, Vratsa, Silistra");
-  if(app.gender==="female")lines.push("Female candidate: +3% enthusiasm in Sofia, Plovdiv, Varna");
+  if(app.gender==="female")lines.push("Female candidate: +3% enthusiasm in highly urban districts (urbanization ≥85%: Sofia, Plovdiv, Varna)");
   return lines;
 }
 function portraitHTML(){
@@ -646,30 +690,14 @@ function portraitHTML(){
 
 function emblemSVG(id,color,size){
   size=size||48;
-  let inner="";
-  switch(id){
-    case "lion":inner='<path d="M32 8 L36 17 L45 11 L45 21 L55 19 L51 28 L60 32 L51 36 L55 45 L45 43 L45 53 L36 47 L32 56 L28 47 L19 53 L19 43 L9 45 L13 36 L4 32 L13 28 L9 19 L19 21 L19 11 L28 17 Z"/><circle cx="32" cy="32" r="13"/><circle cx="27" cy="29" r="2" fill="rgba(0,0,0,.55)"/><circle cx="37" cy="29" r="2" fill="rgba(0,0,0,.55)"/><path d="M28 37 L36 37 L32 42 Z" fill="rgba(0,0,0,.45)"/>';break;
-    case "star":inner='<polygon points="32,10 37.6,26.3 54.8,26.6 41,36.9 46.1,53.4 32,43.5 17.9,53.4 23,36.9 9.2,26.6 26.4,26.3"/>';break;
-    case "rose":inner='<circle cx="43" cy="34" r="7"/><circle cx="37.5" cy="43.5" r="7"/><circle cx="26.5" cy="43.5" r="7"/><circle cx="21" cy="34" r="7"/><circle cx="26.5" cy="24.5" r="7"/><circle cx="37.5" cy="24.5" r="7"/><circle cx="32" cy="34" r="6" fill="rgba(0,0,0,.35)"/>';break;
-    case "fist":inner='<rect x="24" y="10" width="16" height="11" rx="5"/><rect x="20" y="19" width="24" height="9" rx="4"/><rect x="20" y="28" width="24" height="9" rx="4"/><rect x="22" y="37" width="20" height="8" rx="4"/><rect x="26" y="43" width="12" height="13" rx="4"/>';break;
-    case "sun":inner='<circle cx="32" cy="34" r="10"/><g stroke="'+color+'" stroke-width="4" stroke-linecap="round"><line x1="47" y1="34" x2="55" y2="34"/><line x1="42.6" y1="44.6" x2="48.3" y2="50.3"/><line x1="32" y1="49" x2="32" y2="57"/><line x1="21.4" y1="44.6" x2="15.7" y2="50.3"/><line x1="17" y1="34" x2="9" y2="34"/><line x1="21.4" y1="23.4" x2="15.7" y2="17.7"/><line x1="32" y1="19" x2="32" y2="11"/><line x1="42.6" y1="23.4" x2="48.3" y2="17.7"/></g>';break;
-    case "eagle":inner='<path d="M32 12 L38 23 L56 14 L46 29 L58 37 L42 37 L44 52 L32 42 L20 52 L22 37 L6 37 L18 29 L8 14 L26 23 Z"/>';break;
-    case "book":inner='<path d="M32 18 C26 13 15 13 9 16 L9 46 C15 43 26 43 32 48 C38 43 49 43 55 46 L55 16 C49 13 38 13 32 18 Z"/><path d="M32 18 L32 48" stroke="rgba(0,0,0,.45)" stroke-width="2.5" fill="none"/>';break;
-    case "gear":inner='<circle cx="32" cy="32" r="13"/><rect x="29" y="7" width="6" height="10"/><rect x="29" y="47" width="6" height="10"/><rect x="7" y="29" width="10" height="6"/><rect x="47" y="29" width="10" height="6"/><rect x="29" y="7" width="6" height="10" transform="rotate(45 32 32)"/><rect x="29" y="47" width="6" height="10" transform="rotate(45 32 32)"/><rect x="7" y="29" width="10" height="6" transform="rotate(45 32 32)"/><rect x="47" y="29" width="10" height="6" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="6" fill="rgba(0,0,0,.5)"/>';break;
-    case "flame":inner='<path d="M32 6 C30 16 20 22 20 34 A12 13 0 0 0 44 34 C44 26 38 21 37 12 C34 17 33 13 32 6 Z"/><circle cx="32" cy="38" r="6" fill="rgba(255,255,255,.35)"/>';break;
-    case "scales":inner='<rect x="10" y="14" width="44" height="4" rx="2"/><rect x="30" y="14" width="4" height="36"/><rect x="20" y="50" width="24" height="5" rx="2"/><path d="M13 18 L4 33 A9.5 6 0 0 0 22 33 Z"/><path d="M51 18 L42 33 A9.5 6 0 0 0 60 33 Z"/>';break;
-    case "mountain":inner='<path d="M10 52 L32 14 L54 52 Z"/><path d="M24 52 L36 32 L46 52 Z" fill="rgba(0,0,0,.3)"/>';break;
-    case "dove":inner='<path d="M26 20 Q14 26 16 40 Q18 50 32 52 Q46 50 48 40 Q50 26 38 20 Q32 24 26 20 Z"/><path d="M36 22 Q48 16 56 24 Q48 28 42 30 Q38 26 36 22 Z"/><circle cx="24" cy="30" r="2" fill="rgba(0,0,0,.4)"/>';break;
-    case "wheat":inner='<rect x="31" y="24" width="2" height="32"/><path d="M32 36 Q20 34 16 44 L20 46 Q24 38 32 40 Z"/><path d="M32 30 Q44 28 48 38 L44 40 Q40 32 32 34 Z"/><path d="M25 24 L25 17 Q25 9 32 9 Q39 9 39 17 L39 24 Z"/><circle cx="28" cy="15" r="2" fill="rgba(0,0,0,.35)"/><circle cx="32" cy="13" r="2" fill="rgba(0,0,0,.35)"/><circle cx="36" cy="15" r="2" fill="rgba(0,0,0,.35)"/>';break;
-    case "key":inner='<path fill-rule="evenodd" d="M26 22 A10 10 0 1 0 26 42 A10 10 0 1 0 26 22 Z M26 27 A5 5 0 1 1 26 37 A5 5 0 1 1 26 27 Z"/><rect x="34" y="29" width="18" height="5"/><rect x="44" y="34" width="5" height="8"/><rect x="38" y="34" width="5" height="6"/>';break;
-    case "shield":inner='<path d="M32 6 L54 15 L54 34 Q54 48 32 58 Q10 48 10 34 L10 15 Z"/><path d="M32 14 L47 20 L47 33 Q47 44 32 51 Q17 44 17 33 L17 20 Z" fill="rgba(0,0,0,.22)"/>';break;
-    case "crown":inner='<path d="M14 46 L14 22 L24 36 L32 20 L40 36 L50 22 L50 46 Z"/><rect x="14" y="48" width="36" height="6"/><circle cx="20" cy="19" r="3"/><circle cx="32" cy="15" r="3"/><circle cx="44" cy="19" r="3"/>';break;
-    case "globe":inner='<circle cx="32" cy="32" r="22"/><ellipse cx="32" cy="32" rx="8" ry="22" fill="rgba(0,0,0,.25)"/><path d="M10 32 L54 32" stroke="rgba(0,0,0,.25)" stroke-width="2" fill="none"/>';break;
-    case "anchor":inner='<path fill-rule="evenodd" d="M32 8 A6 6 0 1 0 32 20 A6 6 0 1 0 32 8 Z M32 12 A2 2 0 1 1 32 16 A2 2 0 1 1 32 12 Z"/><rect x="30" y="18" width="4" height="32"/><rect x="20" y="30" width="24" height="4"/><path d="M12 42 Q12 52 22 52 L42 52 Q52 52 52 42 L44 42 Q44 48 38 48 L32 48 L26 48 Q20 48 20 42 Z"/>';break;
-    case "heart":inner='<path d="M32 54 L12 34 Q6 26 12 18 Q18 12 26 16 Q30 18 32 22 Q34 18 38 16 Q46 12 52 18 Q58 26 52 34 Z"/>';break;
-    case "torch":inner='<rect x="30" y="38" width="4" height="18"/><rect x="25" y="32" width="14" height="9" rx="2"/><path d="M32 6 C30 16 22 22 22 30 A10 10 0 0 0 42 30 C42 22 34 16 32 6 Z"/><circle cx="32" cy="33" r="3" fill="rgba(255,255,255,.35)"/>';break;
-  }
-  return '<svg viewBox="0 0 64 64" width="'+size+'" height="'+size+'"><g fill="'+color+'">'+inner+'</g></svg>';
+  const custom={
+    hammer:'<path d="M3 4h11v2h3v3h-3v2h-5v3h-2v2H5v2H3v-4h2v-2h2V9H3zM11 12h3v3h2v2h2v2h-3v-2h-2v-2h-2z"/>',
+    rose:'<path d="M10 2h5v2h3v3h-2v3h-2v2h-2v3h2v2h2v2h-2v-2H9v-2h2v-3H9v-2H7V7H5V4h3V2zm-3 3v2h3v2h2V5H9V3H8v2zm8 0h3v2h-3zm-8 3h2v2H7zm8 9h2v2h-2zM3 20h8v2H3z"/>' ,
+    snake:'<path d="M4 3h6v2H6v3h4v2H6v3h5v2H4v-2H2v-5h2V6H2V3zm7 11h7v2h4v5h-2v1h-6v-2h6v-2h-9zm5-8h4v2h2v4h-2v-2h-4z"/>'
+  };
+  if(custom[id])return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" shape-rendering="crispEdges"><g fill="'+color+'">'+custom[id]+'</g></svg>';
+  const glyph=String.fromCodePoint(EMBLEM_GLYPHS[id]||EMBLEM_GLYPHS.star);
+  return '<span class="party-emblem" aria-hidden="true" style="color:'+color+';font-size:'+size+'px">'+glyph+'</span>';
 }
 
 function bannerInner(){
@@ -765,7 +793,100 @@ const DEBATE_POOL=[
 
 function buildDebateQuestions(){
   const valid=DEBATE_POOL.filter(q=>!q.issue||issActive(q.issue));
-  return shuffle(valid).slice(0,8);
+  const active=activeIssueList().map(i=>i.id);
+  const issue=active.slice().sort((a,b)=>
+    Math.abs((S.party.pos[b]===undefined ? .5 : S.party.pos[b])-.5)-
+    Math.abs((S.party.pos[a]===undefined ? .5 : S.party.pos[a])-.5)
+  )[0];
+  const ambush=damageControlQuestions(issue).slice(0,2);
+  return shuffle(ambush.concat(shuffle(valid).slice(0,6)));
+}
+
+/* T32: the strongest platform stance gets two unavoidable, least-bad ambushes. */
+const DAMAGE_CONTROL_LABELS={
+  euro:"euro adoption",corruption:"anticorruption",energy:"energy prices",judiciary:"judicial independence",
+  pensions:"pensions",healthcare:"public healthcare",defense:"national defense",rural:"rural investment",migration:"migration policy"
+};
+function damageControlQuestions(issue){
+  if(!issue)return [];
+  const value=S.party.pos[issue]===undefined ? .5 : S.party.pos[issue];
+  const stance=value>=.5?"your firm support for":"your opposition to";
+  const subject=DAMAGE_CONTROL_LABELS[issue]||issue;
+  const prefix="You have made "+stance+" "+subject+" a central platform promise. ";
+  return [
+    {damageControl:true,issue:issue,q:prefix+"Critics say it will hurt ordinary families. How do you answer?",a:[
+      {t:"Admit the risk and apologise",sub:"A small national loss, but no one can call it evasive",fx:{nationBoost:-.006,enthusiasmAll:-.01}},
+      {t:"Pay for a serious rebuttal",sub:"The response costs campaign money",fx:{cash:-15000}},
+      {t:"Blame the old parties",sub:"Your coalition options take a hit",fx:{rel:{gerb:-8,ppdb:-8}}},
+      {t:"Make a joke and move on",sub:"The clip is humiliating",fx:{nationBoost:-.012}}
+    ]},
+    {damageControl:true,issue:issue,q:prefix+"An expert says your numbers do not add up. What do you say on live television?",a:[
+      {t:"Say you got the numbers wrong",sub:"Honest, but damaging",fx:{nationBoost:-.01}},
+      {t:"Commission an expensive review",sub:"It drains the campaign account",fx:{cash:-20000}},
+      {t:"Question the expert's motives",sub:"Rivals will remember the attack",fx:{rel:{ppdb:-10,bsp:-6}}},
+      {t:"Refuse to answer",sub:"The silence becomes the headline",fx:{enthusiasmAll:-.015}}
+    ]}
+  ];
+}
+
+/* ---- T31: "The Pig attacks!" — late-campaign Deyan Peevski event ---- */
+const PIG_RAID={
+  kind:"good",title:"BREAKING: The Pig Arrested!",
+  text:"Agents of Interpol, the FBI and the CIA raid The Pig's Black Sea villa at dawn. Bribes, offshore ledgers, vote-buying records — all of it on camera. DPS headquarters is silent.",
+  opts:[
+    {label:"Let the justice system work",sub:"DPS approval collapses nationwide",fx:{partyHit:{party:"dps",v:-.85},nationBoost:.005,rel:{dps:-30}}},
+    {label:"Gloat publicly",sub:"The collapse is total, but gloating costs you",fx:{partyHit:{party:"dps",v:-.85},nationBoost:-.01,rel:{dps:-40}}}
+  ]
+};
+const PIG_EVENTS=[
+  {kind:"bad",title:"The Pig attacks: vote-buying",text:"Sources say The Pig bought a ton of votes in Kardzhali. Reporters shove microphones at you: 'What's your reaction, sir?'",opts:[
+    {label:"Denounce him loudly",sub:"Strong words, DPS relations crater",fx:{nationBoost:.008,rel:{dps:-15}}},
+    {label:"Demand an official investigation",sub:"High ground, but your name gets dragged in",fx:{mod:{name:"Investigation politics",desc:"National appeal −3% for 3 weeks",turns:3,bad:true,effects:{appealMult:-.03}},rel:{dps:-10}}},
+    {label:"Say it's not our business",sub:"Looks like you're looking away",fx:{nationBoost:-.01}}
+  ]},
+  {kind:"bad",title:"The Pig attacks: the Hitler remark",text:"The Pig came out and publicly stated you are worse than Hitler when it comes to minorities. The clip is everywhere.",opts:[
+    {label:"Stay calm and dignified",sub:"The insult backfires on him, +1%",fx:{nationBoost:.01,rel:{dps:-15}}},
+    {label:"Attack him back personally",sub:"The mud fight drags you down",fx:{rel:{dps:-20},mod:{name:"Mud fight",desc:"National appeal −4% for 3 weeks",turns:3,bad:true,effects:{appealMult:-.04}}}},
+    {label:"Sue him for libel",sub:"Legal costs, but you look serious",fx:{cash:-20000,nationBoost:.005}}
+  ]},
+  {kind:"bad",title:"The Pig attacks: the ad wave",text:"The Pig's media machine unleashes a brutal attack-ad wave against you in every region he controls.",opts:[
+    {label:"Answer with positive ads",sub:"Costly, but it works",fx:{cash:-15000,nationBoost:.005}},
+    {label:"Ignore them",sub:"The ads do their damage",fx:{nationBoost:-.012}},
+    {label:"Hit back with opposition research",sub:"A small counter-blow",fx:{oppHit:{party:"dps",v:.05},rel:{dps:-15}}}
+  ]},
+  {kind:"bad",title:"The Pig ambushes you live",text:"The Pig ambushes you on live TV: 'This puppet? This nothing? Look at him sweat!' The studio watches you.",opts:[
+    {label:"Smile and pivot to policy",sub:"Grace under fire, +0.5%",fx:{nationBoost:.005,attrTemp:{attr:"charisma",v:1,turns:2}}},
+    {label:"Get rattled on air",sub:"Worst-case damage control",fx:{nationBoost:-.02}},
+    {label:"Punchline: 'The Pig would know about mud-slinging'",sub:"The clip goes viral, DPS furious",fx:{nationBoost:.008,rel:{dps:-12}}}
+  ]}
+];
+
+function startPigEvent(){
+  const ev=S.pigRaid?PIG_RAID:pick(PIG_EVENTS);
+  renderPigEvent(ev);
+}
+function renderPigEvent(ev){
+  S.paused=true;
+  log("The Pig strikes — <b>"+esc(ev.title)+"</b> ("+(ev.kind==="good"?"raid":"attack")+").",ev.kind==="good"?"good":"bad");
+  if(typeof window==="undefined"){
+    applyFx(ev.opts[0].fx,"PIG EVENT");
+    S.paused=false;
+    updateAll();
+    return;
+  }
+  const root=$("modal-root");
+  const optsHtml=ev.opts.map((o,i)=>'<button class="btn" data-ai="'+i+'">'+esc(o.label)+(o.sub?'<small>'+esc(o.sub)+'</small>':"")+'</button>').join("");
+  root.innerHTML='<div class="modal-back"><div class="modal">'
+    +'<div class="ev-head '+(ev.kind==="good"?"good":"bad")+'"><span>'+(ev.kind==="good"?"BREAKING NEWS":"THE PIG ATTACKS")+'</span><span class="paused-badge">GAME PAUSED</span></div>'
+    +'<div class="ev-body"><h3>'+esc(ev.title)+'</h3><p>'+esc(ev.text)+'</p><div class="ev-opts">'+optsHtml+'</div></div>'
+    +'</div></div>';
+  root.querySelectorAll("[data-ai]").forEach(b=>{b.onclick=()=>pigAnswer(ev,+b.dataset.ai);});
+}
+function pigAnswer(ev,ai){
+  applyFx(ev.opts[ai].fx,"PIG EVENT");
+  $("modal-root").innerHTML="";
+  S.paused=false;
+  updateAll();
 }
 
 function buildEventPool(){
@@ -788,6 +909,15 @@ function buildEventPool(){
     P.push({kind:"bad",title:"Rival ad blitz in "+d.name,text:"A rival party buys every billboard and radio slot in "+d.name+".",opts:[{label:"Nothing we can do",fx:{districtBoost:{d:d.id,v:-.03}}}]});
     P.push({kind:"bad",title:"Donor controversy — "+d.name,text:"A local donor in "+d.name+" turns out to owe money to half the town. The gift is returned, with costs.",opts:[{label:"Damage control",fx:{cash:-12000}}]});
     P.push({kind:"bad",title:"Storm cancels rally in "+d.name,text:"Torrential rain washes out your planned rally in "+d.name+".",opts:[{label:"Reschedule",fx:{districtBoost:{d:d.id,v:-.02},entDistrict:{d:d.id,v:-.03}}}]});
+    if((d.geo&&d.geo.proRussia)>=0.5)P.push({kind:"choice",title:"Oligarch courts you in "+d.name,text:"A businessman with deep ties to Moscow wants to 'invest' in your campaign in "+d.name+". He mentions old friends in the Kremlin.",opts:[
+      {label:"Take the money",sub:"+40 000 лв, questions will follow",fx:{cash:40000,mod:{name:"Oligarch money",desc:"National appeal −4% for 4 weeks",turns:4,bad:true,effects:{appealMult:-.04}}}},
+      {label:"Decline publicly",sub:"Clean hands, reformers warm to you",fx:{nationBoost:.004,rel:{ppdb:6}}}
+    ]});
+    if((d.geo&&d.geo.proEU)>=0.75)P.push({kind:"good",title:"EU grant for "+d.name,text:"A European fund approves an infrastructure project in "+d.name+" — your campaign takes the credit and a modest windfall.",opts:[{label:"Cut the ribbon",fx:{cash:15000,districtBoost:{d:d.id,v:.02},rel:{ppdb:8}}}]});
+    if((d.geo&&d.geo.nationalism)>=0.6)P.push({kind:"choice",title:"Patriotic association in "+d.name,text:"A nationalist veterans' association in "+d.name+" offers its endorsement — at a price of rhetoric.",opts:[
+      {label:"Accept their endorsement",sub:"Nationalists warm to you",fx:{rel:{vaz:10,velichie:8},nationBoost:.004}},
+      {label:"Politely decline",sub:"Reformers approve",fx:{rel:{ppdb:6},nationBoost:.003}}
+    ]});
   }
   const gRival=pick(AI_PARTIES);
   P.push({kind:"good",title:"Major donor steps forward",text:"A wealthy donor impressed by your message wires a large sum to the campaign.",opts:[{label:"Accept",fx:{cash:rnd(40,60)*1000}}]});
@@ -984,7 +1114,7 @@ function buildEventPool(){
     {label:"Face the students",sub:"They grill you; +1%",fx:{nationBoost:.01,attrTemp:{attr:"intelligence",v:1,turns:2}}},
     {label:"Cancel politely",sub:"Students feel snubbed",fx:{nationBoost:-.006}}
   ]});
-  P.push({kind:"choice",title:"Chamber of commerce dinner",text:"The Chamber of Commerce wants a private dinner and a 'business-friendly' commitment.",opts:[
+  if(issActive("pensions"))P.push({kind:"choice",title:"Chamber of commerce dinner",text:"The Chamber of Commerce wants a private dinner and a 'business-friendly' commitment.",opts:[
     {label:"Pledge lighter taxes",sub:"Donors cheer; shift your stance",fx:{cash:25000,posShift:{issue:"pensions",delta:-.05},rel:{gerb:8}}},
     {label:"Keep your promises",sub:"They stay polite but cool",fx:{rel:{gerb:-6}}}
   ]});
@@ -1008,7 +1138,7 @@ function buildEventPool(){
     {label:"Panel and punchlines",sub:"Young voters notice, +1%",fx:{nationBoost:.01,rel:{ppdb:6}}},
     {label:"Skip it",sub:"",fx:{}}
   ]});
-  P.push({kind:"choice",title:"Pensioners' lunch",text:"A community centre invites you to lunch with 300 pensioners.",opts:[
+  if(issActive("pensions"))P.push({kind:"choice",title:"Pensioners' lunch",text:"A community centre invites you to lunch with 300 pensioners.",opts:[
     {label:"Sit with them",sub:"They talk, you listen, +1%",fx:{nationBoost:.01,posShift:{issue:"pensions",delta:.04}}},
     {label:"A quick wave",sub:"They remember the wave",fx:{nationBoost:-.004}}
   ]});
@@ -1077,6 +1207,15 @@ function applyFx(fx,prefix){
     for(const d of ds)addBoost(d.id,pid,fx.rivalBoost.v);
     log(tag+"<b>"+partyOf(pid).abbr+"</b> gains support in "+fx.rivalBoost.n+" districts.","bad");
   }
+  if(fx.partyHit){
+    const pid=fx.partyHit.party;
+    for(const d of DISTRICTS){
+      if(!S.boost[d.id])S.boost[d.id]={};
+      const cur=S.boost[d.id][pid]||0;
+      S.boost[d.id][pid]=Math.max(-0.9,cur+fx.partyHit.v);
+    }
+    log(tag+"<b>"+partyOf(pid).abbr+"</b> is hit nationwide ("+(fx.partyHit.v>0?"+":"")+pts(fx.partyHit.v)+" pts).",fx.partyHit.v<0?"good":"bad");
+  }
   if(fx.rel){
     for(const k in fx.rel)S.rel[k]=(S.rel[k]||0)+fx.rel[k];
     log(tag+"Relationship: "+Object.keys(fx.rel).map(k=>"<b>"+partyOf(k).abbr+"</b> "+(fx.rel[k]>0?"+":"")+fx.rel[k]).join(", ")+".",Object.keys(fx.rel).some(k=>fx.rel[k]<0)?"bad":"good");
@@ -1108,7 +1247,7 @@ function drawEvent(){
 }
 function maybeEvents(){
   const r=rng();
-  const n=r<0.12?2:(r<0.72?1:0);
+  const n=r<0.08?2:(r<0.80?1:0);
   for(let i=0;i<n;i++)S.eventQueue.push(drawEvent());
   if(S.eventQueue.length)showNextEvent();
 }
@@ -1117,6 +1256,7 @@ function showNextEvent(){
   S.paused=true;
   const nxt=S.eventQueue.shift();
   if(nxt==="__DEBATE__"){startDebate();return;}
+  if(nxt==="__PIG__"){startPigEvent();return;}
   renderEventModal(EVENT_POOL[nxt]);
 }
 
@@ -1438,6 +1578,9 @@ function renderDistrictCard(){
   $("district-card").querySelectorAll(".insp-tab").forEach(b=>{
     b.onclick=()=>setInspectorTab(b.dataset.tab);
   });
+  $("district-card").querySelectorAll("[data-act]").forEach(b=>{
+    wirePreviewTarget(b,()=>previewForButton(b));
+  });
 }
 
 function setInspectorTab(t){
@@ -1453,6 +1596,7 @@ function renderDistrictDetail(){
   const sh=S.districtPoll[d.id]||districtShares(d,true);
   const rows=Object.keys(sh).filter(k=>k!=="others").map(k=>({k:k,v:sh[k]})).sort((a,b)=>b.v-a.v);
   const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
+  const entDisp=clamp(Math.round((ent-0.5)/0.9*100),0,100);
   let issues="";
   const aw=activeWeights(d);
   for(const iid in aw){
@@ -1466,6 +1610,21 @@ function renderDistrictDetail(){
     const p=partyOf(r.k);
     return '<div class="poll-row '+(r.k==="player"?"you":"")+'"><span class="pdot" style="background:'+p.color+'"></span><span class="pname">'+esc(p.abbr)+'</span><span class="pval">'+pct(r.v)+'</span></div>';
   }).join("");
+  const eth=d.eth||{};
+  let ethLine="";
+  if(eth.turkish||eth.roma){
+    const parts=[];
+    if(eth.turkish>0.005)parts.push("Turkish "+(eth.turkish*100).toFixed(0)+"%");
+    if(eth.roma>0.005)parts.push("Roma "+(eth.roma*100).toFixed(0)+"%");
+    if(parts.length)ethLine='<div class="dc-note" style="margin-top:6px">Ethnicity: '+parts.join(" · ")+'</div>';
+  }
+  ethLine+=performanceInspectorLine();
+  const g3=d.geo||{};
+  const GEO_LABELS=[["proEU","Pro-EU"],["proRussia","Pro-Russia"],["proNATO","Pro-NATO"],["proUS","Pro-US"],["nationalism","Nationalism"],["turkishMinority","Turkish"],["urbanization","Urban"]];
+  const geoTop=GEO_LABELS.map(([k,l])=>({k,l,v:g3[k]||0})).sort((a,b)=>b.v-a.v).slice(0,3);
+  const geoLine=geoTop.length
+    ?'<div class="dc-geo">'+geoTop.map(gg=>'<div class="geo-chip" title="'+esc(gg.l)+'"><span>'+esc(gg.l)+'</span><div class="bar"><div class="fill" style="width:'+(gg.v*100)+'%"></div></div><em>'+Math.round(gg.v*100)+'%</em></div>').join("")+'</div>'
+    :"";
   let actions="";
   if(!here){
     const c=travelCost(S.location,d.id);
@@ -1479,11 +1638,13 @@ function renderDistrictDetail(){
     else actions+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
   }
   return '<div class="dc-head"><div><b>'+esc(d.name)+'</b><div class="dc-bg">'+esc(d.bg)+'</div></div><span class="seat-chip">'+d.seats+' seats</span></div>'
-    +'<div class="dc-enthusiasm"><div class="mini-label"><span>Voter enthusiasm</span><span>'+Math.round(ent*100)+'%</span></div>'
-    +'<div class="bar"><div class="fill" style="width:'+clamp(ent/1.4*100,0,100)+'%;background:var(--acc)"></div></div></div>'
+    +'<div class="dc-enthusiasm"><div class="mini-label"><span>Voter enthusiasm</span><span>'+entDisp+'%</span></div>'
+    +'<div class="bar"><div class="fill" style="width:'+entDisp+'%;background:var(--acc)"></div></div></div>'
     +issues
+    +geoLine
     +'<div class="mini-label" style="margin-top:8px"><span>Poll · your share: <b style="color:var(--gold)">'+pct(sh.player||0)+'</b></span></div>'
     +polls
+    +ethLine
     +'<div class="dc-actions">'+actions+'</div>'
     +'<div class="dc-note">'+(here?"You are campaigning here now.":"Your candidate is in <b>"+DIST_BY_ID[S.location].name+"</b>.")+' Rallies are strongest on high-weight issues close to the district stance. HQs pay '+fmtMoney(COSTS.hqIncome)+'/week.</div>';
 }
@@ -1592,17 +1753,140 @@ function travelTo(id){
   updateAll();
 }
 
+function rallyGainFor(d,issueId){
+  const w=d.w[issueId];
+  const fit=1-Math.abs(S.party.pos[issueId]-d.ideal[issueId]);
+  const diminish=1/(1+S.ralliesThisTurn*0.5);
+  return (0.055+getAttr("charisma")*0.0075)*(1+modSum("rallyMult"))*(0.5+w*1.5*fit)*diminish;
+}
+function adGainFor(d){
+  const cur=S.boost[d.id]&&S.boost[d.id].player?S.boost[d.id].player:0;
+  return (0.05+getAttr("intelligence")*0.004)*(1+modSum("adMult"))*(1/(1+3*cur));
+}
+
+/* ---- T12: expected-effects preview (pure helpers, never mutate state) ---- */
+function shareWithPlayerBoost(d,extra){
+  const cur=S.boost[d.id]&&S.boost[d.id].player?S.boost[d.id].player:0;
+  return districtShares(d,true,{player:cur+extra}).player;
+}
+function previewRally(issueId){
+  const d=DIST_BY_ID[S.location];
+  const gain=rallyGainFor(d,issueId);
+  const before=shareWithPlayerBoost(d,0);
+  const after=shareWithPlayerBoost(d,gain);
+  const yd=after-before;
+  return {district:d.id,youDelta:yd,rivalDelta:-yd,spCost:COSTS.rallySP,cashCost:0,notes:"+4% voter enthusiasm in "+d.short};
+}
+function previewAd(){
+  const d=DIST_BY_ID[S.location];
+  const gain=adGainFor(d);
+  const before=shareWithPlayerBoost(d,0);
+  const after=shareWithPlayerBoost(d,gain);
+  const yd=after-before;
+  return {district:d.id,youDelta:yd,rivalDelta:-yd,spCost:0,cashCost:COSTS.ad,notes:""};
+}
+function previewHQ(){
+  const d=DIST_BY_ID[S.location];
+  const gain=0.006;
+  const before=shareWithPlayerBoost(d,0);
+  const after=shareWithPlayerBoost(d,gain);
+  const yd=after-before;
+  return {district:d.id,youDelta:yd,rivalDelta:-yd,spCost:0,cashCost:COSTS.hq,notes:"+"+fmtMoney(COSTS.hqIncome)+"/week income · +0.6 pts/week local growth"};
+}
+function previewTravel(destId){
+  const d=DIST_BY_ID[destId];
+  const sh=S.districtPoll[d.id]||districtShares(d,true);
+  const rows=Object.keys(sh).filter(k=>k!=="others").sort((a,b)=>sh[b]-sh[a]);
+  const leader=rows.length?partyOf(rows[0]):null;
+  const topLine=leader?" · leader <b>"+esc(leader.abbr)+"</b> "+pct(sh[rows[0]]):"";
+  return {district:d.id,youDelta:0,rivalDelta:0,spCost:travelCost(S.location,destId),cashCost:0,notes:"Poll there: YOU <b>"+pct(sh.player||0)+"</b>"+topLine};
+}
+function previewLine(p){
+  const band=pts(pollNoise());
+  const act=p.youDelta>=0?"YOU ≈ +":"YOU ≈ ";
+  const sig=p.youDelta>=0?"+":"−";
+  let line;
+  if(p.spCost&&!p.cashCost)line=act+pts(p.youDelta)+" pts (±"+band+" noise), rivals "+sig+pts(Math.abs(p.rivalDelta))+" pts · −"+p.spCost+" SP";
+  else if(p.cashCost&&!p.spCost)line=act+pts(p.youDelta)+" pts (±"+band+" noise), rivals "+sig+pts(Math.abs(p.rivalDelta))+" pts · −"+fmtMoney(p.cashCost);
+  else if(p.spCost&&p.cashCost)line="−"+p.spCost+" SP · −"+fmtMoney(p.cashCost);
+  else if(p.spCost)line="−"+p.spCost+" SP";
+  else line=act+pts(p.youDelta)+" pts (±"+band+" noise), rivals "+sig+pts(Math.abs(p.rivalDelta))+" pts";
+  return '<div class="preview-title">'+esc(DIST_BY_ID[p.district].short)+'</div>'
+    +(p.notes?'<div class="preview-note">'+p.notes+'</div>':"")
+    +'<div class="preview-main">'+line+'</div>'
+    +'<div class="preview-hint">Estimate only — real polls are never exact.</div>';
+}
+function previewForButton(b){
+  if(!S||S.phase!=="campaign")return "";
+  const act=b.dataset.act;
+  if(act==="travel")return previewLine(previewTravel(DIST_BY_ID[S.selDistrict].id));
+  if(act==="rally")return previewLine(previewRally(b.dataset.issue));
+  if(act==="ad")return previewLine(previewAd());
+  if(act==="hq")return previewLine(previewHQ());
+  return "";
+}
+
+/* ---- T12: floating tooltip window (follows the cursor, classic Windows style) ---- */
+let tipEl=null,tipTimer=null,tipVisible=false;
+function getTip(){
+  if(!tipEl){
+    tipEl=document.createElement("div");
+    tipEl.id="preview-tip";
+    tipEl.style.position="fixed";
+    tipEl.style.pointerEvents="none";
+    document.body.appendChild(tipEl);
+  }
+  return tipEl;
+}
+function positionTip(e){
+  const tip=getTip();
+  let x=e.clientX+16,y=e.clientY+16;
+  const w=tip.offsetWidth,h=tip.offsetHeight;
+  if(x+w>window.innerWidth-8)x=window.innerWidth-w-8;
+  if(y+h>window.innerHeight-8)y=e.clientY-h-16;
+  if(x<8)x=8;
+  if(y<8)y=8;
+  tip.style.left=x+"px";
+  tip.style.top=y+"px";
+}
+function tipShowAt(e,html){
+  if(!html)return;
+  const tip=getTip();
+  tip.innerHTML=html;
+  tip.style.display="block";
+  positionTip(e);
+  tipVisible=true;
+}
+function tipHide(){
+  if(tipTimer){clearTimeout(tipTimer);tipTimer=null;}
+  tipVisible=false;
+  if(tipEl)tipEl.style.display="none";
+}
+function wirePreviewTarget(b,htmlFn){
+  let holdTimer=null;
+  const enter=e=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipTimer=setTimeout(()=>tipShowAt(e,htmlFn()),200);};
+  const move=e=>{if(tipVisible)positionTip(e);};
+  const leave=()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipHide();};
+  b.addEventListener("mouseenter",enter);
+  b.addEventListener("mousemove",move);
+  b.addEventListener("mouseleave",leave);
+  b.addEventListener("focus",enter);
+  b.addEventListener("blur",leave);
+  b.addEventListener("pointerdown",e=>{
+    if(tipTimer){clearTimeout(tipTimer);tipTimer=null;}
+    holdTimer=setTimeout(()=>tipShowAt(e,htmlFn()),500);
+  });
+  b.addEventListener("pointerup",()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipHide();});
+  b.addEventListener("pointerleave",()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}});
+}
+
 function doRally(issueId){
   if(S.paused||S.stamina<COSTS.rallySP)return;
   if(!issActive(issueId))return;
   const d=DIST_BY_ID[S.location];
   if(!S.districtPoll||!S.districtPoll[d.id])recomputePolls();
   const before={...S.districtPoll[d.id]};
-  const w=d.w[issueId];
-  const fit=1-Math.abs(S.party.pos[issueId]-d.ideal[issueId]);
-  const diminish=1/(1+S.ralliesThisTurn*0.5);
-  const power=(0.055+getAttr("charisma")*0.0075)*(1+modSum("rallyMult"));
-  const gain=power*(0.5+w*1.5*fit)*diminish;
+  const gain=rallyGainFor(d,issueId);
   addBoost(d.id,"player",gain);
   S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+0.04,0.5,1.4);
   S.stamina-=COSTS.rallySP;
@@ -1623,8 +1907,7 @@ function buyAd(){
   const d=DIST_BY_ID[S.location];
   if(!S.districtPoll||!S.districtPoll[d.id])recomputePolls();
   const before={...S.districtPoll[d.id]};
-  const cur=S.boost[d.id]&&S.boost[d.id].player?S.boost[d.id].player:0;
-  const gain=(0.05+getAttr("intelligence")*0.004)*(1+modSum("adMult"))*(1/(1+3*cur));
+  const gain=adGainFor(d);
   S.cash-=COSTS.ad;
   addBoost(d.id,"player",gain);
   S.stats.ads++;
@@ -1658,7 +1941,8 @@ function aiTurn(){
   for(const p of AI_PARTIES){
     let pts=Math.round(aggr*(2+p.appeal*4))+(p.mainRival?2:0);
     if(pts<=0)continue;
-    const scored=DISTRICTS.map(d=>{
+    const candidates=p.focus?DISTRICTS.filter(d=>p.focus.indexOf(d.id)>=0):DISTRICTS;
+    const scored=candidates.map(d=>{
       const sh=sharesCache[d.id];
       let top=0;
       for(const k in sh){if(k!=="others"&&sh[k]>top)top=sh[k];}
@@ -1671,6 +1955,7 @@ function aiTurn(){
     scored.sort((a,b)=>b.v-a.v);
     const top3=scored.slice(0,3);
     if(p.mainRival)mainRivalTargets=top3.map(t=>t.d.short);
+    if(p.id==="ppdb"&&top3.length)log("<b>PP-DB</b> campaigns this week in "+top3.map(t=>t.d.short).join(", ")+" — city focus only.","info");
     const wsum=top3.reduce((s,t)=>s+t.v,0)||1;
     for(const t of top3)addBoost(t.d.id,p.id,(pts*t.v/wsum)*0.013);
   }
@@ -1703,6 +1988,7 @@ function endTurn(){
   saveGame();
   if(S.week>20){runElection();return;}
   if(S.week>=S.debateWeek&&!S.debateDone){S.eventQueue.push("__DEBATE__");S.debateDone=true;}
+  if(S.week>=S.pigWeek&&S.pigPending&&!S.pigDone){S.eventQueue.push("__PIG__");S.pigDone=true;}
   maybeEvents();
   updateAll();
 }
@@ -1725,13 +2011,19 @@ function dhondt(votes,seats){
 function runElection(){
   S.phase="election";
   closeModal();
-  const turnout=0.55+rng()*0.10;
   const votes={},dvAll=[];
-  let total=0;
+  let total=0,elecWeight=0,turnoutWeighted=0;
+  const turnouts={};
   for(const d of DISTRICTS){
     const sh=districtShares(d,false);
     const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
-    const V=d.seats*12500*turnout*(0.85+0.15*ent);
+    const tb=d.tb||0.45;
+    const t=clamp(tb+(rng()-0.5)*0.08+(ent-1)*0.04,0.25,0.60);
+    turnouts[d.id]=t;
+    const elec=d.seats*12500;
+    const V=elec*t;
+    elecWeight+=elec;
+    turnoutWeighted+=elec*t;
     const dv={};
     for(const k in sh){
       if(k==="others")continue;
@@ -1740,6 +2032,7 @@ function runElection(){
     dvAll.push({d:d,dv:dv});
     for(const k in dv){votes[k]=(votes[k]||0)+dv[k];total+=dv[k];}
   }
+  const turnout=turnoutWeighted/elecWeight;
   const natShare={};
   for(const k in votes)natShare[k]=votes[k]/total;
   if(S.cheatFloor){
@@ -1755,14 +2048,14 @@ function runElection(){
     const res=dhondt(qv,item.d.seats);
     for(const k in res)seats[k]=(seats[k]||0)+res[k];
   }
-  S.results={votes:votes,natShare:natShare,qualified:qualified,seats:seats,totalVotes:total,turnout:turnout};
+  S.results={votes:votes,natShare:natShare,qualified:qualified,seats:seats,totalVotes:total,turnout:turnout,turnouts:turnouts};
   renderElectionScreen();
   showScreen("election");
 }
 
 function renderElectionScreen(){
   const r=S.results;
-  $("election-sub").textContent="Turnout "+pct(r.turnout*100,0)+" · "+Math.round(r.totalVotes).toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" valid votes · threshold 4%";
+  $("election-sub").textContent="Turnout "+pct(r.turnout,0)+" · "+Math.round(r.totalVotes).toString().replace(/\B(?=(\d{3})+(?!\d))/g," ")+" valid votes · threshold 4%";
   const order=Object.keys(r.votes).sort((a,b)=>r.votes[b]-r.votes[a]);
   const maxShare=r.natShare[order[0]]||1;
   $("election-results").innerHTML=order.map(k=>{
@@ -1921,6 +2214,17 @@ function renderCoalition(){
       +'</div>';
   }
   $("coalition-cards").innerHTML=cards;
+  document.querySelectorAll("#coalition-cards .demand-chip").forEach(ch=>{
+    wirePreviewTarget(ch,()=>{
+      const [pid,di]=ch.dataset.demand.split(":");
+      const dm=S.coalition.parties[pid].demands[+di];
+      if(!dm)return "";
+      const cost=dm.type==="cash"?"−"+fmtMoney(dm.amount):"−"+dm.cpCost+" CP";
+      return '<div class="preview-title">'+esc(partyOf(pid).abbr)+' — demand</div>'
+        +'<div class="preview-main">'+esc(dm.type==="ministry"?"Cabinet: "+dm.name:dm.type==="policy"?"Policy: "+dm.name:"Funds: "+fmtMoney(dm.amount))+'</div>'
+        +'<div class="preview-note">'+cost+' · +'+dm.will+' willingness</div>';
+    });
+  });
   $("btn-form-gov").disabled=total<MAJORITY;
   $("btn-minority").style.display=(ps>=100&&ps<MAJORITY&&total<MAJORITY)?"":"none";
   document.querySelectorAll("#coalition-cards [data-demand]").forEach(b=>{
@@ -2145,6 +2449,87 @@ function renderSwatches(){
   if(hx){hx.value=S.party.color.toUpperCase();hx.classList.remove("invalid");}
 }
 
+const COMPASS_AXES={
+  euro:[.52,.02],corruption:[.22,-.34],energy:[-.34,.20],judiciary:[.18,-.40],
+  pensions:[-.38,.12],healthcare:[-.08,.45],defense:[.28,.48],rural:[-.24,-.10],migration:[.24,.42]
+};
+function clampCompass(x,y){return{x:clamp(x,-1,1),y:clamp(y,-1,1)};}
+function compassLabel(x,y){
+  const horizontal=x<-.2?"Left":x>.2?"Right":"Center";
+  const vertical=y<-.2?"Libertarian":y>.2?"Authoritarian":"Center";
+  return vertical+" "+horizontal;
+}
+function renderCompass(){
+  const el=$("political-compass");
+  if(!el||!S)return;
+  if(!S.party.compass)S.party.compass={x:0,y:0};
+  const pos=clampCompass(S.party.compass.x,S.party.compass.y);
+  S.party.compass=pos;
+  const marker=$("compass-marker");
+  if(marker){marker.style.left=((pos.x+1)*50)+"%";marker.style.top=((1-pos.y)*50)+"%";marker.title=compassLabel(pos.x,pos.y);}
+  const readout=$("compass-position");
+  if(readout)readout.textContent=compassLabel(pos.x,pos.y)+" · "+(pos.x>=0?"economic right":"economic left")+" · "+(pos.y>=0?"more authority":"more liberty");
+  if(!el.dataset.bound){
+    el.dataset.bound="1";
+    let dragging=false;
+    const dragPosition=e=>{
+      const r=el.getBoundingClientRect();
+      if(!r.width||!r.height)return;
+      setCompassPosition((e.clientX-r.left)/r.width*2-1,1-(e.clientY-r.top)/r.height*2);
+    };
+    el.addEventListener("click",e=>{
+      if(!dragging)dragPosition(e);
+    });
+    el.addEventListener("pointerdown",e=>{
+      dragging=true;
+      el.classList.add("dragging");
+      if(el.setPointerCapture)el.setPointerCapture(e.pointerId);
+      dragPosition(e);
+      e.preventDefault();
+    });
+    el.addEventListener("pointermove",e=>{if(dragging)dragPosition(e);});
+    const stopDrag=()=>{dragging=false;el.classList.remove("dragging");};
+    el.addEventListener("pointerup",stopDrag);
+    el.addEventListener("pointercancel",stopDrag);
+    el.addEventListener("lostpointercapture",stopDrag);
+    el.addEventListener("keydown",e=>{
+      if(!["ArrowLeft","ArrowRight","ArrowUp","ArrowDown"].includes(e.key))return;
+      e.preventDefault();
+      const step=e.shiftKey?.2:.05,p=S.party.compass||{x:0,y:0};
+      setCompassPosition(p.x+(e.key==="ArrowRight"?step:e.key==="ArrowLeft"?-step:0),p.y+(e.key==="ArrowUp"?step:e.key==="ArrowDown"?-step:0));
+    });
+  }
+}
+function applyCompassToPlatform(){
+  const p=S.party.compass||{x:0,y:0};
+  for(const issue of ISSUE_POOL){
+    const axis=COMPASS_AXES[issue.id]||[0,0];
+    S.party.pos[issue.id]=clamp(.5+axis[0]*p.x+axis[1]*p.y,0,1);
+  }
+}
+function setCompassPosition(x,y){
+  if(!S)return;
+  S.party.compass=clampCompass(x,y);
+  applyCompassToPlatform();
+  document.querySelectorAll("#platform-sliders input").forEach(inp=>{
+    const v=Math.round(S.party.pos[inp.dataset.issue]*100);
+    inp.value=v;
+    const label=$("plv-"+inp.dataset.issue);
+    if(label)label.textContent=v;
+  });
+  renderCompass();
+}
+function syncCompassFromPlatform(){
+  if(!S)return;
+  let rx=0,ry=0,xx=0,xy=0,yy=0;
+  for(const issue of ISSUE_POOL){
+    const axis=COMPASS_AXES[issue.id]||[0,0],delta=(S.party.pos[issue.id]||0)-.5;
+    rx+=delta*axis[0];ry+=delta*axis[1];xx+=axis[0]*axis[0];xy+=axis[0]*axis[1];yy+=axis[1]*axis[1];
+  }
+  const det=xx*yy-xy*xy;
+  S.party.compass=det?clampCompass((rx*yy-ry*xy)/det,(ry*xx-rx*xy)/det):{x:0,y:0};
+  renderCompass();
+}
 function renderPlatformSliders(){
   const act=activeIssueList();
   $("platform-sliders").innerHTML=act.map(i=>
@@ -2156,9 +2541,11 @@ function renderPlatformSliders(){
     inp.addEventListener("input",()=>{
       S.party.pos[inp.dataset.issue]=+inp.value/100;
       $("plv-"+inp.dataset.issue).textContent=inp.value;
+      syncCompassFromPlatform();
     });
     $("plv-"+inp.dataset.issue).textContent=inp.value;
   });
+  syncCompassFromPlatform();
 }
 
 function renderBannerPreview(){
@@ -2229,6 +2616,10 @@ function startCampaign(){
   S.debateWeek=14+rnd(0,2);
   S.debateDone=false;
   S.debate=null;
+  S.pigWeek=17+rnd(0,1);
+  S.pigPending=rng()<0.80;
+  S.pigDone=false;
+  S.pigRaid=rng()<0.025;
   S.phase="campaign";
   S.week=1;
   S.cash=DIFFS[S.difficulty].cash;
@@ -2236,12 +2627,15 @@ function startCampaign(){
   S.location="sofia-city";
   S.selDistrict="sofia-city";
   S.hq={};S.boost={};S.enthusiasm={};S.modifiers=[];S.rel={};S.touched=[];S.ralliesThisTurn=0;
+  S.paused=false;
+  rollPerformance();
   S.log=[];
   S.stats={rallies:0,ads:0,hqs:0,travels:0};
   for(const d of DISTRICTS){
     S.enthusiasm[d.id]=d.ent;
     S.boost[d.id]={};
     for(const p of AI_PARTIES){
+      if(p.focus&&p.focus.indexOf(d.id)<0)continue;
       if(d.lean&&d.lean[p.id])S.boost[d.id][p.id]=d.lean[p.id]*0.3;
     }
   }
@@ -2256,6 +2650,7 @@ function startCampaign(){
   showScreen("game");
   log("The campaign begins. "+ELECTION_DATE+" is 20 weeks away. First stop: <b>Sofia</b>.","info");
   log("National poll: <b>"+esc(S.party.abbr)+"</b> at "+pct(S.pollNat.player||0)+". Threshold: 4%.","info");
+  for(const line of performanceLines())log("CAMPAIGN FORM — <b>"+esc(line)+"</b>.","info");
   if(S.cheat)log("CHEAT MODE ENABLED — the gods smile upon <b>"+esc(S.player.name)+"</b>.","info");
   updateAll();
   saveGame();
@@ -2388,19 +2783,22 @@ if(typeof document!=="undefined"){
 
 if(typeof module!=="undefined"&&module.exports){
   module.exports={
-    DISTRICTS:DISTRICTS,AI_PARTIES:AI_PARTIES,dhondt:dhondt,TOTAL_SEATS:TOTAL_SEATS,
+    DISTRICTS:DISTRICTS,AI_PARTIES:AI_PARTIES,dhondt:dhondt,TOTAL_SEATS:TOTAL_SEATS,DIFFS:DIFFS,
     state:()=>S,freshState:freshState,startCampaign:startCampaign,endTurn:endTurn,runElection:runElection,
     startCoalition:startCoalition,coalitionSeats:coalitionSeats,fulfillDemand:fulfillDemand,finishGame:finishGame,
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
-    candidateModifiers:candidateModifiers,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
+    previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
+    candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
     portraitHTML:portraitHTML,
     SKIN_TONES:SKIN_TONES,HAIR_STYLES:HAIR_STYLES,SUIT_STYLES:SUIT_STYLES,ETHNICITY_NAMES:ETHNICITY_NAMES,
     saveGame:saveGame,loadGame:loadGame,recomputePolls:recomputePolls,
     setPartyColor:setPartyColor,normHex:normHex,BGSTYLES:BGSTYLES,BGSTYLE_NAMES:BGSTYLE_NAMES,contrast:contrast,EMBLEM_IDS:EMBLEM_IDS,emblemSVG:emblemSVG,
     applyFx:applyFx,logEntriesHTML:logEntriesHTML,EVENT_POOL:()=>EVENT_POOL,
     activeIssueList:activeIssueList,activeWeights:activeWeights,issActive:issActive,ISSUE_POOL:ISSUE_POOL,drawActiveIssues:drawActiveIssues,
-    debateAnswer:debateAnswer,startDebate:startDebate,buildDebateQuestions:buildDebateQuestions,DEBATE_POOL:DEBATE_POOL,
+    setCompassPosition:setCompassPosition,syncCompassFromPlatform,COMPASS_AXES:COMPASS_AXES,
+    debateAnswer:debateAnswer,startDebate:startDebate,buildDebateQuestions:buildDebateQuestions,damageControlQuestions:damageControlQuestions,DEBATE_POOL:DEBATE_POOL,
     drawEvent:drawEvent,maybeEvents:maybeEvents,
+    PIG_EVENTS:PIG_EVENTS,PIG_RAID:PIG_RAID,startPigEvent:startPigEvent,renderPigEvent:renderPigEvent,pigAnswer:pigAnswer,
     checkJoin:checkJoin,willOf:willOf,REL_MATRIX:REL_MATRIX,INCOMPAT_PAIRS:INCOMPAT_PAIRS,
     setPlayer:(cfg)=>{
       if(!S)S=freshState();
@@ -2408,6 +2806,7 @@ if(typeof module!=="undefined"&&module.exports){
       if(cfg.name)S.player.name=cfg.name;
       if(cfg.pos)Object.assign(S.party.pos,cfg.pos);
       if(cfg.abbr)S.party.abbr=cfg.abbr;
+      if(cfg.difficulty)S.difficulty=cfg.difficulty;
     }
   };
 }

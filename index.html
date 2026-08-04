@@ -131,14 +131,12 @@
                 </div>
               </div>
             </div>
-            <label class="fld"><span>Slogan</span>
-              <input type="text" id="in-party-slogan" maxlength="48" value="Bulgaria, forward!">
-            </label>
-            <h3>Platform <em class="hint">districts vote where you stand closest to them</em></h3>
-            <div id="platform-sliders"></div>
-          </div>
-          <div class="col">
-            <h3>Banner workshop</h3>
+             <label class="fld"><span>Slogan</span>
+               <input type="text" id="in-party-slogan" maxlength="48" value="Bulgaria, forward!">
+             </label>
+           </div>
+           <div class="col">
+             <h3>Banner workshop</h3>
             <div class="banner-stage" id="banner-preview"></div>
             <div class="banner-controls">
               <div class="car">
@@ -157,10 +155,34 @@
               <button class="btn ghost subtle" id="btn-clear-logo" style="display:none">Remove logo</button>
               <input type="file" id="file-logo" accept="image/*" style="display:none">
             </div>
-            <div class="hint">Tip: the emblem cycles through preset sprites — or upload your own parliament party logo to replace it.</div>
-          </div>
-        </div>
-      </div>
+             <div class="hint">Tip: the emblem cycles through preset sprites — or upload your own parliament party logo to replace it.</div>
+           </div>
+         </div>
+         <section class="platform-section">
+           <h3>Platform <em class="hint">districts vote where you stand closest to them</em></h3>
+           <div class="platform-controls">
+             <div class="compass-wrap">
+               <div class="compass-copy"><b>Political Compass</b><span>Click a quadrant or any point to set your platform</span></div>
+               <div id="political-compass" class="political-compass" role="application" tabindex="0" aria-label="Political Compass">
+                 <div class="compass-quadrant compass-auth-left"><span>Authoritarian<br>Left</span></div>
+                 <div class="compass-quadrant compass-auth-right"><span>Authoritarian<br>Right</span></div>
+                 <div class="compass-quadrant compass-lib-left"><span>Libertarian<br>Left</span></div>
+                 <div class="compass-quadrant compass-lib-right"><span>Libertarian<br>Right</span></div>
+                 <div class="compass-hit-area" aria-hidden="true"></div>
+                 <div class="compass-axis compass-axis-v"></div><div class="compass-axis compass-axis-h"></div>
+                 <div id="compass-marker" class="compass-marker" aria-hidden="true"></div>
+                 <span class="compass-label compass-label-top">AUTHORITY</span><span class="compass-label compass-label-bottom">LIBERTY</span>
+                 <span class="compass-label compass-label-left">LEFT</span><span class="compass-label compass-label-right">RIGHT</span>
+               </div>
+               <div id="compass-position" class="compass-position" aria-live="polite"></div>
+             </div>
+             <div class="platform-slider-panel">
+               <h3>Platform sliders</h3>
+               <div id="platform-sliders"></div>
+             </div>
+           </div>
+         </section>
+       </div>
 
       <div class="setup-panel" id="setup-step-2">
         <h3>Difficulty</h3>

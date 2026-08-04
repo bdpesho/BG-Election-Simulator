@@ -30,11 +30,19 @@ for(let wk=1;wk<=20;wk++){
 S=g.state();
 if(!S.debateDone)throw new Error("debate never fired");
 console.log("debate: fired once, resolved headless");
+if(S.pigPending!==S.pigDone)throw new Error("pig event fired status mismatch: pending="+S.pigPending+" done="+S.pigDone);
+console.log("pig event: "+(S.pigPending?"fired once, resolved headless":"not scheduled this run"));
 if(S.phase!=="election")throw new Error("election not reached: "+S.phase);
 const r=S.results;
 const sum=Object.values(r.seats).reduce((a,b)=>a+b,0);
 if(sum!==240)throw new Error("seat sum "+sum);
 console.log("seat sum:",sum);
+const ts=Object.values(r.turnouts||{});
+if(ts.length){
+  const lo=Math.min.apply(null,ts),hi=Math.max.apply(null,ts);
+  if(lo<0.25||hi>0.60)throw new Error("turnout out of range: "+lo+"-"+hi);
+  console.log("turnout per region:",(lo*100).toFixed(0)+"–"+(hi*100).toFixed(0)+"%");
+}
 console.log("player:",((r.natShare.player*100).toFixed(1))+"%",r.seats.player||0,"seats");
 if((r.seats.player||0)>0&&(r.seats.player||0)<121){
   g.startCoalition();

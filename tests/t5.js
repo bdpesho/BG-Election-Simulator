@@ -98,9 +98,11 @@ check("EMBLEM_IDS expanded (≥20)",g.EMBLEM_IDS.length>=20);
 let allEmblemsOk=true;
 for(const id of g.EMBLEM_IDS){
   const svg=g.emblemSVG(id,"#ffffff",52);
-  if(svg.indexOf("<svg")!==0||svg.indexOf("<g")<0)allEmblemsOk=false;
+  const custom=["hammer","rose","snake"].includes(id);
+  if(custom?(svg.indexOf("<svg")!==0||svg.indexOf("shape-rendering=\"crispEdges\"")<0):(svg.indexOf("<span")!==0||svg.indexOf("party-emblem")<0||svg.indexOf("font-size:52px")<0)||svg.indexOf("stroke")>=0||svg.indexOf("<rect")>=0)allEmblemsOk=false;
 }
-check("every emblem id renders",allEmblemsOk);
+check("every emblem id renders directly over the banner",allEmblemsOk);
+check("campaign emblem size stays compact",g.emblemSVG(g.EMBLEM_IDS[0],"#ffffff",26).indexOf("font-size:26px")>=0);
 const embLabel=document.getElementById("emb-label");
 const embStart=embLabel.textContent;
 let embSeen=new Set(),embClicks=0;
