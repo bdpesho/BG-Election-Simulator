@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "node tests/smoke.js && node tests/map_geometry.js && node tests/map_dom.js && node tests/inspector.js && node tests/t4.js && node tests/t5.js && node tests/t6.js && node tests/t12.js && node tests/t31.js && node tests/t32.js && node tests/t33.js && node tests/t36.js && node tests/t29.js && node tests/t15.js && node tests/t34.js && node tests/t25.js"
+    "test": "node tests/smoke.js && node tests/map_geometry.js && node tests/map_dom.js && node tests/inspector.js && node tests/t4.js && node tests/t5.js && node tests/t6.js && node tests/t12.js && node tests/t31.js && node tests/t32.js && node tests/t33.js && node tests/t36.js && node tests/t29.js && node tests/t15.js && node tests/t34.js && node tests/t21.js && node tests/t25.js"
   },
   "keywords": [
     "game",

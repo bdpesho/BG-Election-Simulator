@@ -421,6 +421,30 @@ input[type=radio],input[type=checkbox]{
 .insp-tab:focus{outline:1px dotted #000; outline-offset:-3px;}
 .dc-empty{padding:20px 8px; text-align:center; color:#555; font-size:.85rem;}
 
+/* ---- T21: party machine ---- */
+.pm-head{margin-bottom:6px;}
+.pm-sec{border-top:1px solid var(--xp-low); margin-top:10px; padding-top:8px;}
+.pm-sec .mini-label{margin-bottom:6px;}
+.pm-staff{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 0; border-bottom:1px dashed #c9c9c9; font-size:.8rem;}
+.pm-staff span{display:block; color:#555; font-size:.72rem;}
+.pm-form{display:flex; flex-direction:column; gap:5px;}
+.pm-form select,.pm-form input{font:inherit; padding:4px 6px; border:1px solid var(--xp-low); background:#fff;}
+.pm-form input{color:#333;}
+.pm-camp{border:1px solid var(--xp-low); background:#fff; box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff; padding:7px 9px; margin-bottom:7px;}
+.pm-camp-top{display:flex; justify-content:space-between; gap:8px; font-size:.82rem;}
+.pm-camp-top span{color:#555; font-size:.72rem; text-align:right;}
+.pm-phases{display:flex; gap:3px; margin:6px 0;}
+.pm-phase{flex:1; text-align:center; font-size:.68rem; padding:2px 0; border:1px solid var(--xp-low); color:#777; background:var(--xp-face2); white-space:nowrap; overflow:hidden;}
+.pm-phase.done{background:#e6f4ea; border-color:#1c7a3c; color:#1c7a3c;}
+.pm-phase.cur{background:#fff2c0; border-color:#c8a000; color:#7a5d00; font-weight:700;}
+.pm-alloc{display:flex; align-items:center; gap:4px; font-size:.76rem; color:#555;}
+.pm-alloc .btn.sm{min-width:0; padding:2px 9px;}
+.pm-alloc .btn.sm.sel{background:#000080; color:#fff;}
+.pm-hist{font-size:.78rem; padding:4px 0; border-bottom:1px dashed #c9c9c9;}
+.pm-hist b{font-size:.8rem;}
+.pm-hist span{color:#555; font-size:.7rem;}
+.pm-hist-result{color:#8a6d00; font-weight:700; font-size:.76rem;}
+
 /* ---- national polling estimate ---- */
 .np-head{margin-bottom:6px;}
 .np-sum{font-size:.82rem; margin:6px 0 10px;}

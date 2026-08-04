@@ -50,9 +50,17 @@ check("campaign screen active",document.getElementById("screen-game").classList.
 
 // 4. inspector tabs
 const tabs=document.querySelectorAll(".insp-tab");
-check("two inspector tabs",tabs.length===2);
+check("three inspector tabs",tabs.length===3);
 check("district view by default",document.querySelector("#district-card .dc-head b")!==null);
 check("sofia selected on map",document.querySelectorAll(".node.sel").length===1);
+
+// 4b. party machine tab
+click(tabBy("party"));
+check("party tab active",tabBy("party").classList.contains("active"));
+check("map selection cleared on party tab",document.querySelectorAll(".node.sel").length===0);
+check("party machine head renders",document.querySelector(".pm-head")!==null);
+check("party machine form renders",document.querySelector(".pm-form")!==null&&document.querySelectorAll(".pm-form select").length===3);
+check("party machine energy bar renders",document.querySelector(".pm-head .bar .fill")!==null);
 
 // 5. national polling tab
 click(tabBy("national"));

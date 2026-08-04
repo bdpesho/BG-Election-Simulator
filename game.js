@@ -101,7 +101,17 @@ const PERFORMANCE_PROTECTED=["gerb","pb","ppdb","dps","vaz","mech","aps","velich
 const ELECTION_DATE="Sunday, 19 April";
 const MAJORITY=121;
 const TOTAL_SEATS=240;
-const COSTS={rallySP:3,ad:12000,hq:40000,hqIncome:9000,stipend:6000,hqMax:8};
+const COSTS={rallySP:3,ad:12000,hq:40000,hqIncome:9000,stipend:6000,hqMax:8,
+  campaignNational:20000,campaignDistrict:8000,
+  hireCost:12000,hireCostInc:6000,trainCost:8000,
+  upkeepBase:1000,upkeepPerLvl:500,
+  hqUpgrade:[30000,50000,75000,100000]};
+const PARTY_HQ_MAX=5;
+const CAMPAIGN_CAP=3;
+const PHASE_NAMES=["Planning","Execution","Release"];
+const STAFF_ROLES=["Strategist","Spokesperson","Organizer","Fundraiser","Digital Lead","Pollster"];
+const STAFF_NAMES=["Ivan Petrov","Maya Georgieva","Nikola Dimitrov","Elena Hristova","Georgi Marinov","Radka Ivanova","Stoyan Kolev","Petia Yordanova","Krasimir Todorov","Desislava Angelova","Vladimir Atanasov","Silvia Petkova"];
+const CAMPAIGN_NAMES=["For a Strong Border","Clean Sweep","Europe Forward","Pensions First","Our Villages, Our Future","Zero Tolerance","A Fair State","Healthy Nation","Sofia's Promise","Step Forward","The New Deal","Open Doors"];
 const SAVE_KEY="bulgaria-decides-save-v5";
 
 const EMBLEM_IDS=["alarm-clock","anchor","book-open","bookmark","briefcase","castle","crown","diamond-gem","earth","factory","flag","globe","hammer","hand","heart","leaf","moon","robot","rose","shield","skull","snake","star","sword","tree","tree-pine","trophy"];
@@ -318,6 +328,8 @@ const PRESET_LEADERS=[
   {name:"Stefan Kolev",face:3,attrs:{stamina:6,charisma:6,intelligence:6},tag:"Business founder",ethnicity:"roma"}
 ];
 
+const CANDIDATE_NAMES=["Aleksandar Vasilev","Elena Dimitrova","Georgi Ivanov","Maria Stoyanova","Stefan Kolev","Ralitsa Petkova","Dimitar Georgiev","Krasimira Todorova","Boris Angelov","Yana Hristova","Nikola Stoyanov","Vesela Marinova","Kamen Radev","Iliana Krusteva"];
+
 const BGSTYLES=[
   (c1)=>"background:linear-gradient(180deg, "+shade(c1,1.16)+" 0 10%, "+c1+" 10% 90%, "+shade(c1,.72)+" 90% 100%)",
   (c1,c2)=>"background:linear-gradient(180deg, "+c1+" 0 32%, "+c2+" 32% 68%, "+shade(c1,.78)+" 68% 100%)",
@@ -424,6 +436,18 @@ function labelPos(d){
 let S=null;
 let EVENT_POOL=[];
 
+function defaultPartyMachine(){
+  return{hqLevel:1,energy:6,staff:[],campaigns:[],history:[]};
+}
+function partyEnergyMax(){return 6+(S.partyMachine.hqLevel-1)*2;}
+function partyStaffCap(){return 2+S.partyMachine.hqLevel;}
+function partyUpkeep(){return S.partyMachine.staff.reduce((a,s)=>a+COSTS.upkeepBase+(s.level-1)*COSTS.upkeepPerLvl,0);}
+function partyQuality(){const st=S.partyMachine.staff;if(!st.length)return 1;const avg=st.reduce((a,s)=>a+s.level,0)/st.length;return 1+0.12*(avg-1);}
+function partyHqUpgradeCost(){return S.partyMachine.hqLevel>=PARTY_HQ_MAX?null:COSTS.hqUpgrade[S.partyMachine.hqLevel-1];}
+function partyHireCost(){return COSTS.hireCost+S.partyMachine.staff.length*COSTS.hireCostInc;}
+function partyTrainCost(s){return COSTS.trainCost*s.level;}
+function stanceLabel(stance,iss){return(stance==="pro"?"PRO ":"ANTI ")+(stance==="pro"?iss.hi:iss.lo);}
+
 function freshState(){
   return {
     phase:"setup",setupStep:0,
@@ -432,11 +456,12 @@ function freshState(){
     difficulty:"normal",
     week:1,cash:0,stamina:0,location:"sofia-city",selDistrict:"sofia-city",
     hq:{},boost:{},enthusiasm:{},modifiers:[],rel:{},touched:[],ralliesThisTurn:0,
+    partyMachine:defaultPartyMachine(),
     pollsPrev:null,pollNat:{},districtPoll:{},
     activeIssues:[],
     debateWeek:15,debateDone:false,debate:null,
     pigWeek:18,pigPending:false,pigDone:false,pigRaid:false,
-    log:[],stats:{rallies:0,ads:0,hqs:0,travels:0},
+    log:[],stats:{rallies:0,ads:0,hqs:0,travels:0,campaigns:0},
     eventBag:[],eventCursor:0,paused:false,eventQueue:[],
     results:null,coalition:null,ending:null,perfMod:{},
     cheat:false,cheatFloor:false
@@ -1439,6 +1464,7 @@ function loadGame(){
     if(!raw)return false;
     S=JSON.parse(raw);
     if(!S.player.appearance)S.player.appearance=Object.assign(defaultAppearance(),FACES[S.player.face||0]||{});
+    if(!S.partyMachine)S.partyMachine=defaultPartyMachine();
     if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
     if(!S.debateWeek)S.debateWeek=15;
     if(!S.eventBag||!S.eventBag.length){buildEventPool();S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
@@ -1561,9 +1587,10 @@ function renderDistrictCard(){
   const tabs='<div class="insp-tabs">'
     +'<button class="insp-tab'+(inspectorTab==="district"?" active":"")+'" data-tab="district">District</button>'
     +'<button class="insp-tab'+(inspectorTab==="national"?" active":"")+'" data-tab="national">National Polls</button>'
+    +'<button class="insp-tab'+(inspectorTab==="party"?" active":"")+'" data-tab="party">Party Machine</button>'
     +'</div>';
   $("district-card").innerHTML='<div class="side-block">'+tabs
-    +(inspectorTab==="national"?renderNationalPolls():renderDistrictDetail())
+    +(inspectorTab==="national"?renderNationalPolls():inspectorTab==="party"?renderPartyMachine():renderDistrictDetail())
     +'</div>';
   $("district-card").querySelectorAll("[data-act]").forEach(b=>{
     b.onclick=()=>{
@@ -1573,6 +1600,17 @@ function renderDistrictCard(){
       else if(act==="rally")doRally(b.dataset.issue);
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
+    };
+  });
+  $("district-card").querySelectorAll("[data-pm]").forEach(b=>{
+    b.onclick=()=>{
+      const pm=b.dataset.pm;
+      if(pm==="hq")upgradePartyHQ();
+      else if(pm==="hire")hireStaff();
+      else if(pm==="train")trainStaff(b.dataset.sid);
+      else if(pm==="alloc")allocateStaff(b.dataset.cid,parseInt(b.dataset.n,10));
+      else if(pm==="launch")launchCampaign({issue:$("pm-issue").value,stance:$("pm-stance").value,target:$("pm-target").value,name:$("pm-name").value});
+      updateAll();
     };
   });
   $("district-card").querySelectorAll(".insp-tab").forEach(b=>{
@@ -1585,8 +1623,72 @@ function renderDistrictCard(){
 
 function setInspectorTab(t){
   inspectorTab=t;
-  if(t==="national"&&S.selDistrict){S.selDistrict=null;redrawMap();}
+  if(t!=="district"&&S.selDistrict){S.selDistrict=null;redrawMap();}
   renderDistrictCard();
+}
+
+function renderPartyMachine(){
+  const pm=S.partyMachine;
+  const maxE=partyEnergyMax();
+  const cap=partyStaffCap();
+  const upCost=partyHqUpgradeCost();
+  const upkeep=partyUpkeep();
+  let out='<div class="pm-head">'
+    +'<div class="mini-label"><span>Party HQ — level '+pm.hqLevel+'/'+PARTY_HQ_MAX+'</span>'
+    +(upCost?'<button class="btn sm" data-pm="hq" '+((S.cash<upCost||S.paused)?"disabled":"")+'>Upgrade '+fmtMoney(upCost)+'</button>':'<span class="chip green">MAX LEVEL</span>')+'</div>'
+    +'<div class="mini-label" style="margin-top:6px"><span>Staff energy</span><span>'+pm.energy+'/'+maxE+' this week</span></div>'
+    +'<div class="bar"><div class="fill" style="width:'+(maxE>0?pm.energy/maxE*100:0)+'%;background:var(--acc)"></div></div>'
+    +(upkeep>0?'<div class="dc-note">Staff upkeep: '+fmtMoney(upkeep)+'/week.</div>':'')
+    +'</div>';
+  out+='<div class="pm-sec"><div class="mini-label"><span>Staff '+pm.staff.length+'/'+cap+'</span>'
+    +(pm.staff.length<cap?'<button class="btn sm" data-pm="hire" '+((S.cash<partyHireCost()||S.paused)?"disabled":"")+'>Hire '+fmtMoney(partyHireCost())+'</button>':'')+'</div>';
+  if(!pm.staff.length)out+='<div class="dc-note">No staff yet. Hire organizers to staff campaigns — the machine runs on people.</div>';
+  else{
+    for(const s of pm.staff){
+      out+='<div class="pm-staff"><div><b>'+esc(s.name)+'</b><span>'+s.role+' · level '+s.level+' · '+fmtMoney(COSTS.upkeepBase+(s.level-1)*COSTS.upkeepPerLvl)+'/wk</span></div>'
+        +(s.level<3?'<button class="btn sm" data-pm="train" data-sid="'+s.id+'" '+((S.cash<partyTrainCost(s)||S.paused)?"disabled":"")+'>Train '+fmtMoney(partyTrainCost(s))+'</button>':'<span class="chip green">MAXED</span>')+'</div>';
+    }
+  }
+  out+='</div>';
+  const issues=activeIssueList();
+  const issOpts=issues.map(i=>'<option value="'+i.id+'">'+i.name+'</option>').join("");
+  const distOpts='<option value="national">National ('+fmtMoney(COSTS.campaignNational)+')</option>'
+    +DISTRICTS.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(d=>'<option value="'+d.id+'">'+d.name+' ('+fmtMoney(COSTS.campaignDistrict)+')</option>').join("");
+  out+='<div class="pm-sec"><div class="mini-label"><span>New campaign</span></div>'
+    +'<div class="pm-form">'
+    +'<select id="pm-issue">'+issOpts+'</select>'
+    +'<select id="pm-stance"><option value="pro">PRO — toward the high stance</option><option value="anti">ANTI — toward the low stance</option></select>'
+    +'<select id="pm-target">'+distOpts+'</select>'
+    +'<input id="pm-name" type="text" maxlength="28" placeholder="Campaign name (optional)">'
+    +'<button class="btn wide" data-pm="launch" '+((S.cash<COSTS.campaignDistrict||S.paused||pm.campaigns.length>=CAMPAIGN_CAP)?"disabled":"")+'>Launch campaign</button>'
+    +'</div></div>';
+  if(pm.campaigns.length){
+    out+='<div class="pm-sec"><div class="mini-label"><span>Active campaigns</span></div>';
+    for(const c of pm.campaigns){
+      const iss=ISSUE_BY_ID[c.issue];
+      const cur=c.alloc[c.phase]||0;
+      out+='<div class="pm-camp">'
+        +'<div class="pm-camp-top"><b>'+esc(c.name)+'</b><span>'+stanceLabel(c.stance,iss)+' · '+(c.target==="national"?"National":DIST_BY_ID[c.target].name)+'</span></div>'
+        +'<div class="pm-phases">'+PHASE_NAMES.map((pn,i)=>'<span class="pm-phase'+(i<c.phase?" done":(i===c.phase?" cur":""))+'">'+pn+(i===c.phase?" — "+cur+" staff":'')+'</span>').join("")+'</div>';
+      if(c.phase<3&&!S.paused){
+        out+='<div class="pm-alloc"><span>Staff this phase:</span>'
+          +[0,1,2,3].map(n=>'<button class="btn sm'+(n===cur?" sel":"")+'" data-pm="alloc" data-cid="'+c.id+'" data-n="'+n+'" '+((n>Math.min(3,pm.staff.length,pm.energy)||S.paused)?"disabled":"")+'>'+n+'</button>').join("")
+          +'</div>';
+      }
+      out+='</div>';
+    }
+    out+='</div>';
+  }
+  if(pm.history.length){
+    out+='<div class="pm-sec"><div class="mini-label"><span>Released</span></div>';
+    for(const h of pm.history){
+      out+='<div class="pm-hist"><div><b>'+esc(h.name)+'</b><span>week '+h.week+' · '+stanceLabel(h.stance,ISSUE_BY_ID[h.issue])+' · '+(h.target==="national"?"national":DIST_BY_ID[h.target].name)+' · '+h.staffWeeks+' staff-weeks</span></div>'
+        +'<div class="pm-hist-result">'+((h.swing>=0?"+":"")+h.swing.toFixed(1)+" pts")+' · revenue +'+fmtMoney(h.rev)+'</div></div>';
+    }
+    out+='</div>';
+  }
+  out+='<div class="dc-note">Campaigns run Planning → Execution → Release, one phase per week; staff energy refills weekly. More staff-weeks → stronger release, and revenue funds the next campaign. Your platform stance matching the campaign direction boosts its effect.</div>';
+  return out;
 }
 
 function renderDistrictDetail(){
@@ -1933,6 +2035,131 @@ function buildHQ(){
   updateAll();
 }
 
+/* ---- T21: party machine — campaigns, staff, HQ upgrades ---- */
+function suggestCampaignName(){return pick(CAMPAIGN_NAMES);}
+function launchCampaign(spec){
+  if(!S||S.phase!=="campaign"||S.paused)return null;
+  const iss=spec&&spec.issue?ISSUE_BY_ID[spec.issue]:null;
+  const stance=spec&&spec.stance;
+  if(!iss||!issActive(iss.id)||(stance!=="pro"&&stance!=="anti"))return null;
+  if(S.partyMachine.campaigns.length>=CAMPAIGN_CAP)return null;
+  const target=spec&&spec.target==="national"?"national":(spec&&DIST_BY_ID[spec.target]?spec.target:null);
+  if(!target)return null;
+  const cost=target==="national"?COSTS.campaignNational:COSTS.campaignDistrict;
+  if(S.cash<cost)return null;
+  const name=String(spec.name||"").trim().slice(0,28)||suggestCampaignName();
+  S.cash-=cost;
+  const c={id:uid(),name:name,issue:iss.id,stance:stance,target:target,cost:cost,alloc:[0,0,0],phase:0,created:S.week};
+  S.partyMachine.campaigns.push(c);
+  log("Campaign <b>"+esc(name)+"</b> launched — "+stanceLabel(stance,iss)+" ("+(target==="national"?"nationwide":DIST_BY_ID[target].name)+"), "+fmtMoney(cost)+", 3-week run.","info");
+  return c;
+}
+function allocateStaff(cid,n){
+  if(!S||S.phase!=="campaign"||S.paused)return false;
+  const c=S.partyMachine.campaigns.find(x=>x.id===cid);
+  if(!c||c.phase>=3)return false;
+  n=Math.floor(n);
+  if(n<0||n>3||n>Math.min(3,S.partyMachine.staff.length,S.partyMachine.energy))return false;
+  S.partyMachine.energy-=n-c.alloc[c.phase];
+  c.alloc[c.phase]=n;
+  return true;
+}
+function hireStaff(){
+  if(!S||S.phase!=="campaign"||S.paused)return null;
+  const pm=S.partyMachine;
+  if(pm.staff.length>=partyStaffCap())return null;
+  const cost=partyHireCost();
+  if(S.cash<cost)return null;
+  const avail=STAFF_NAMES.filter(n=>!pm.staff.some(x=>x.name===n));
+  S.cash-=cost;
+  const s={id:uid(),name:pick(avail.length?avail:STAFF_NAMES),role:pick(STAFF_ROLES),level:1};
+  pm.staff.push(s);
+  log("Hired <b>"+esc(s.name)+"</b> ("+s.role+", level "+s.level+"). Upkeep "+fmtMoney(COSTS.upkeepBase)+"/week.","good");
+  return s;
+}
+function trainStaff(sid){
+  if(!S||S.phase!=="campaign"||S.paused)return false;
+  const s=S.partyMachine.staff.find(x=>x.id===sid);
+  if(!s||s.level>=3)return false;
+  const cost=partyTrainCost(s);
+  if(S.cash<cost)return false;
+  S.cash-=cost;
+  s.level++;
+  log("<b>"+esc(s.name)+"</b> trained to level "+s.level+" ("+fmtMoney(cost)+").","good");
+  return true;
+}
+function upgradePartyHQ(){
+  if(!S||S.phase!=="campaign"||S.paused)return false;
+  const cost=partyHqUpgradeCost();
+  if(!cost||S.cash<cost)return false;
+  S.cash-=cost;
+  S.partyMachine.hqLevel++;
+  S.partyMachine.energy=partyEnergyMax();
+  log("Party HQ upgraded to level "+S.partyMachine.hqLevel+": staff energy "+partyEnergyMax()+"/week, staff cap "+partyStaffCap()+".","good");
+  return true;
+}
+function releaseCampaign(c){
+  const pm=S.partyMachine;
+  const iss=ISSUE_BY_ID[c.issue];
+  const staffWeeks=c.alloc[0]+c.alloc[1]+c.alloc[2];
+  const fit=c.stance==="pro"?S.party.pos[c.issue]:1-S.party.pos[c.issue];
+  const power=(0.6+0.35*staffWeeks)*(0.6+0.4*fit)*partyQuality();
+  const dir=c.stance==="pro"?1:-1;
+  let reached="";
+  if(c.target==="national"){
+    const ranked=DISTRICTS.slice().sort((a,b)=>dir*b.ideal[c.issue]-dir*a.ideal[c.issue]).slice(0,12);
+    for(const d of ranked){
+      addBoost(d.id,"player",power*0.13);
+      S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+0.04*partyQuality(),0.5,1.4);
+    }
+    for(const d of DISTRICTS)addBoost(d.id,"player",power*0.015);
+    reached=ranked.map(d=>d.short).join(", ");
+  }else{
+    const d=DIST_BY_ID[c.target];
+    addBoost(d.id,"player",power*0.35);
+    S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+0.06*partyQuality(),0.5,1.4);
+    reached=d.name;
+  }
+  if(power>=2.5)addModifier({name:"Media buzz: "+c.name,desc:"Ad power +15% for 2 weeks",turns:2,effects:{adMult:.15}});
+  const rev=Math.round(c.cost*0.4+power*(c.target==="national"?4500:2200)+rnd(0,3000));
+  S.cash+=rev;
+  S.stats.campaigns=(S.stats.campaigns||0)+1;
+  pm.campaigns=pm.campaigns.filter(x=>x.id!==c.id);
+  const natBefore=S.pollNat&&S.pollNat.player?S.pollNat.player:0;
+  recomputePolls();
+  const swing=((S.pollNat.player||0)-natBefore)*100;
+  pm.history.unshift({name:c.name,issue:c.issue,stance:c.stance,target:c.target,staffWeeks:staffWeeks,cost:c.cost,rev:rev,swing:swing,week:S.week,reached:reached});
+  if(pm.history.length>10)pm.history.pop();
+  log("Campaign <b>"+esc(c.name)+"</b> released"+(c.target==="national"?" — reached: "+reached+".":" in <b>"+reached+"</b>.")+" YOU "+(swing>=0?"+":"")+swing.toFixed(1)+" pts national · revenue <b>+"+fmtMoney(rev)+"</b>.","good");
+}
+function partyMachineTick(){
+  const pm=S.partyMachine;
+  pm.energy=partyEnergyMax();
+  const up=partyUpkeep();
+  if(up>0)S.cash-=up;
+  const finishing=[];
+  for(const c of pm.campaigns){
+    if(c.phase>=3)continue;
+    const w=c.alloc[c.phase]||0;
+    if(c.phase===0)log("<b>"+esc(c.name)+"</b> — planning complete ("+w+" staff-weeks). Next: execution.","info");
+    else if(c.phase===1)log("<b>"+esc(c.name)+"</b> — execution wrapped ("+w+" staff-weeks). The release is being prepared.","info");
+    c.phase++;
+    if(c.phase===3)finishing.push(c);
+  }
+  for(const c of finishing)releaseCampaign(c);
+  if(S.week>=4&&S.week<=18&&S.week%3===0)aiFlavorCampaign();
+}
+function aiFlavorCampaign(){
+  const issue=activeIssueList();
+  if(!issue.length)return;
+  const p=pick(AI_PARTIES);
+  const i=pick(issue);
+  const stance=Math.random()<0.5?"pro":"anti";
+  const where=Math.random()<0.5?"nationwide":"in the border districts";
+  log("<b>"+p.abbr+"</b> kicks off a new campaign: <b>"+esc(pick(CAMPAIGN_NAMES))+"</b> — "+stanceLabel(stance,i)+" push "+where+".","info");
+}
+
+
 function aiTurn(){
   const aggr=DIFFS[S.difficulty].aggr;
   const sharesCache={};
@@ -1978,6 +2205,7 @@ function endTurn(){
   S.cash+=Math.round(income);
   log("Week "+S.week+" income: <b>"+fmtMoney(income)+"</b> (state subsidy "+fmtMoney(COSTS.stipend)+(hqCount>0?" + "+hqCount+" HQ "+fmtMoney(hqIncome):"")+").","info");
   for(const dId in S.hq)addBoost(dId,"player",0.006);
+  partyMachineTick();
   aiTurn();
   expireModifiers();
   S.pollsPrev=S.pollNat;
@@ -2586,9 +2814,10 @@ function readImage(file,maxSide,cb){
 
 function initSetup(){
   S=freshState();
+  randomizeNewGame();
   drawActiveIssues();
   buildEventPool();
-  $("in-cand-name").value="";
+  $("in-cand-name").value=S.player.name;
   renderPresetLeaders();
   renderFaceGrid();
   renderAppearanceUI();
@@ -2602,6 +2831,32 @@ function initSetup(){
   renderBannerPreview();
   showScreen("setup");
   gotoStep(0);
+}
+
+function randomizeNewGame(){
+  const app=defaultAppearance();
+  app.skin=rnd(0,SKIN_TONES.length-1);
+  app.hairColor=pick(HAIR_COLORS);
+  app.hairStyle=pick(HAIR_STYLES);
+  app.suitColor=pick(SUIT_COLORS);
+  app.shirtColor=pick(SHIRT_COLORS);
+  app.suitStyle=pick(SUIT_STYLES);
+  app.gender=Math.random()<0.5?"male":"female";
+  app.ethnicity=pick(["bulgarian","bulgarian","bulgarian","turkish","roma"]);
+  app.glasses=Math.random()<0.3;
+  app.bg=pick(FACES.map(f=>f.bg));
+  S.player.appearance=app;
+  S.player.face=-1;
+  S.player.photo=null;
+  const a=[rnd(1,8),rnd(1,8),rnd(1,8)];
+  while(a[0]+a[1]+a[2]>15){
+    a[a.indexOf(Math.max.apply(null,a))]--;
+  }
+  S.player.attrs={stamina:a[0],charisma:a[1],intelligence:a[2]};
+  S.player.name=pick(CANDIDATE_NAMES);
+  S.party.color=pick(PALETTE);
+  S.party.bgStyle=rnd(0,BGSTYLES.length-1);
+  S.party.emblemIdx=rnd(0,EMBLEM_IDS.length-1);
 }
 
 function startCampaign(){
@@ -2630,7 +2885,7 @@ function startCampaign(){
   S.paused=false;
   rollPerformance();
   S.log=[];
-  S.stats={rallies:0,ads:0,hqs:0,travels:0};
+  S.stats={rallies:0,ads:0,hqs:0,travels:0,campaigns:0};
   for(const d of DISTRICTS){
     S.enthusiasm[d.id]=d.ent;
     S.boost[d.id]={};
@@ -2790,7 +3045,11 @@ if(typeof module!=="undefined"&&module.exports){
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
     portraitHTML:portraitHTML,
+    defaultPartyMachine:defaultPartyMachine,launchCampaign:launchCampaign,allocateStaff:allocateStaff,hireStaff:hireStaff,trainStaff:trainStaff,upgradePartyHQ:upgradePartyHQ,
+    partyEnergyMax:partyEnergyMax,partyStaffCap:partyStaffCap,partyUpkeep:partyUpkeep,partyQuality:partyQuality,partyHireCost:partyHireCost,partyTrainCost:partyTrainCost,partyHqUpgradeCost:partyHqUpgradeCost,
+    releaseCampaign:releaseCampaign,partyMachineTick:partyMachineTick,aiFlavorCampaign:aiFlavorCampaign,stanceLabel:stanceLabel,renderPartyMachine:renderPartyMachine,CAMPAIGN_CAP:CAMPAIGN_CAP,PHASE_NAMES:PHASE_NAMES,
     SKIN_TONES:SKIN_TONES,HAIR_STYLES:HAIR_STYLES,SUIT_STYLES:SUIT_STYLES,ETHNICITY_NAMES:ETHNICITY_NAMES,
+    PALETTE:PALETTE,HAIR_COLORS:HAIR_COLORS,SUIT_COLORS:SUIT_COLORS,SHIRT_COLORS:SHIRT_COLORS,
     saveGame:saveGame,loadGame:loadGame,recomputePolls:recomputePolls,
     setPartyColor:setPartyColor,normHex:normHex,BGSTYLES:BGSTYLES,BGSTYLE_NAMES:BGSTYLE_NAMES,contrast:contrast,EMBLEM_IDS:EMBLEM_IDS,emblemSVG:emblemSVG,
     applyFx:applyFx,logEntriesHTML:logEntriesHTML,EVENT_POOL:()=>EVENT_POOL,

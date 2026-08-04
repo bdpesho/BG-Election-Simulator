@@ -30,6 +30,17 @@ function click(el){el.dispatchEvent(new window.MouseEvent("click",{bubbles:true}
 // open the setup screen so S exists with party state
 click(document.getElementById("btn-new-game"));
 
+// 0. new-game randomization invariants (banner + character)
+const r0=g.state();
+check("random color from palette",g.PALETTE.indexOf(r0.party.color)>=0);
+check("random bg style in range",r0.party.bgStyle>=0&&r0.party.bgStyle<g.BGSTYLES.length);
+check("random emblem in range",r0.party.emblemIdx>=0&&r0.party.emblemIdx<g.EMBLEM_IDS.length);
+check("random attrs within budget",r0.player.attrs.stamina>=1&&r0.player.attrs.stamina<=8&&r0.player.attrs.charisma>=1&&r0.player.attrs.charisma<=8&&r0.player.attrs.intelligence>=1&&r0.player.attrs.intelligence<=8&&r0.player.attrs.stamina+r0.player.attrs.charisma+r0.player.attrs.intelligence<=15);
+const rApp=r0.player.appearance;
+check("random appearance complete",rApp&&rApp.skin>=0&&rApp.skin<g.SKIN_TONES.length&&g.HAIR_COLORS.indexOf(rApp.hairColor)>=0&&g.HAIR_STYLES.indexOf(rApp.hairStyle)>=0&&g.SUIT_STYLES.indexOf(rApp.suitStyle)>=0&&["male","female"].indexOf(rApp.gender)>=0);
+check("random candidate name",r0.player.name.length>0);
+check("randomized banner renders in preview",document.getElementById("banner-preview").innerHTML.length>0);
+
 // helper to grab the live game state through the exported API (state isn't exposed on window,
 // but setPartyColor/renderSwatches touch the DOM we can read)
 const hexField=document.getElementById("in-party-hex");
