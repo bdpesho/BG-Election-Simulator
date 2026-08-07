@@ -115,35 +115,7 @@ const CAMPAIGN_NAMES=["For a Strong Border","Clean Sweep","Europe Forward","Pens
 const SAVE_KEY="121towin-save-v6";
 
 const EMBLEM_IDS=["alarm-clock","anchor","book-open","bookmark","briefcase","castle","crown","diamond-gem","earth","factory","flag","globe","hammer","hand","heart","leaf","moon","robot","rose","shield","skull","snake","star","sword","tree","tree-pine","trophy"];
-const EMBLEM_SVGS={
-  "alarm-clock":'<path d="M6 4 4 2 2 4l3 3m13-3 2-2 2 2-3 3M12 5a7 7 0 1 0 0 14 7 7 0 1 0 0-14m0 4v4l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>',
-  anchor:'<path d="M10 2h4v8h3v3h-3v5h3v2H7v-2h3v-5H7v-3h3V2m-6 8H2v3h3a7 7 0 0 0 14 0h3v-3h-2a10 10 0 0 1-16 0"/>',
-  "book-open":'<path d="M3 4h4c2 0 4 1 5 3 1-2 3-3 5-3h4v16h-4c-2 0-4 1-5 3-1-2-3-3-5-3H3V4m9 3v16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-  bookmark:'<path d="M5 3h14v18l-7-4-7 4V3m3 3h8v2H8V6"/>',
-  briefcase:'<path d="M8 6V4h8v2h4v14H4V6h4m2-2h4v2h-4v-2m-6 7h16m-9-2h4v4h-4v-4"/>',
-  castle:'<path d="M3 21V8l3 2V6l3 2V4h6v4l3-2v4l3-2v13H3m7-2v-5h4v5"/>',
-  crown:'<path d="m3 6 5 4 4-7 4 7 5-4-2 14H5L3 6m4 11h10"/>',
-  "diamond-gem":'<path d="M4 4h16l3 5-11 12L1 9l3-5m0 0 8 17m8-17-8 17M1 9h22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
-  earth:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="currentColor" stroke-width="1.5"/>',
-  factory:'<path d="M3 21V9l6 3V8l6 3V6h6v15H3m4-4h2v2H7v-2m4 0h2v2h-2v-2m4 0h2v2h-2v-2m4 0h2v2h-2v-2"/>',
-  flag:'<path d="M5 22V3h2v2h12l-3 4 3 4H7v9H5"/>',
-  globe:'<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" fill="none" stroke="currentColor" stroke-width="1.5"/>',
-  hammer:'<path d="M3 4h11v2h3v3h-3v2h-5v3h-2v2H5v2H3v-4h2v-2h2V9H3zM11 12h3v3h2v2h2v2h-3v-2h-2v-2h-2z"/>',
-  hand:'<path d="M5 12V7a2 2 0 0 1 4 0v3-7a2 2 0 0 1 4 0v7-5a2 2 0 0 1 4 0v7-3a2 2 0 0 1 4 0v5c0 5-3 8-8 8h-3c-4 0-7-3-7-7v-3h2"/>',
-  heart:'<path d="M12 21S3 15 3 9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 12-9 12"/>',
-  leaf:'<path d="M21 3C11 3 4 7 4 14c0 3 2 5 5 5 7 0 10-7 12-16M3 21c3-6 7-9 13-12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>',
-  moon:'<path d="M20 15a8 8 0 0 1-11-11 9 9 0 1 0 11 11"/>',
-  robot:'<path d="M7 7h10a3 3 0 0 1 3 3v8H4v-8a3 3 0 0 1 3-3m5-5v5m-8 7H2m20 0h-2M8 12h2v2H8v-2m6 0h2v2h-2v-2m-5 6v3h6v-3"/>',
-  rose:'<path d="M10 2h5v2h3v3h-2v3h-2v2h-2v3h2v2h2v2h-2v-2H9v-2h2v-3H9v-2H7V7H5V4h3V2m-3 3v2h3v2h2V5H9V3H8v2m8 0h3v2h-3m-8 3h2v2H7m8 7h2v2h-2M3 20h8v2H3z"/>',
-  shield:'<path d="M12 2 20 5v6c0 5-3 9-8 11-5-2-8-6-8-11V5l8-3m0 4v12"/>',
-  skull:'<path d="M12 3a8 8 0 0 0-8 8c0 3 2 5 4 6v3h8v-3c2-1 4-3 4-6a8 8 0 0 0-8-8m-3 7h2v2H9v-2m4 0h2v2h-2v-2m-2 5h2v2h-2v-2"/>',
-  snake:'<path d="M4 3h6v2H6v3h4v2H6v3h5v2H4v-2H2v-5h2V6H2V3m7 11h7v2h4v5h-2v1h-6v-2h6v-2H9v-4m7-8h4v2h2v4h-2v-2h-4z"/>',
-  star:'<path d="m12 2 3 6 7 1-5 5 1 8-6-3-6 3 1-8-5-5 7-1 3-6"/>',
-  sword:'<path d="m4 20 7-7 2 2-7 7H4v-2m8-9 7-7 2 2-7 7-2-2m-2 1 4 4-2 2-4-4 2-2"/>',
-  tree:'<path d="M11 21v-5H7l3-4H7l4-5H9l3-5 3 5h-2l4 5h-3l3 4h-4v5h-2z"/>',
-  "tree-pine":'<path d="M12 2 5 11h3l-4 5h5l-4 5h14l-4-5h5l-4-5h3L12 2m-2 19h4v-4h-4v4"/>',
-  trophy:'<path d="M7 3h10v5c0 4-2 7-5 8-3-1-5-4-5-8V3m-4 1h4v4H3V4m18 0h-4v4h4V4M9 18h6v3H9v-3m-3 3h12v2H6v-2"/>'
-};
+const EMBLEM_GLYPHS={"alarm-clock":0xea13,anchor:0xea49,"book-open":0xeab5,bookmark:0xeab7,briefcase:0xeaca,castle:0xeaf1,crown:0xeb4e,"diamond-gem":0xeb57,earth:0xeb61,factory:0xeb6a,flag:0xeb75,globe:0xeb95,hand:0xeba5,heart:0xebb1,leaf:0xebd5,moon:0xec0c,robot:0xec57,shield:0xec78,skull:0xec87,star:0xecb2,sword:0xecc2,tree:0xecf9,"tree-pine":0xecf8,trophy:0xecfb};
 const PALETTE=["#00966e","#2f6fd6","#d63a3a","#e0a71e","#8e44ad","#17a2b8","#e67e22","#2fa84f","#c2185b","#607d8b"];
 
 /* ---- T4: pixel portrait system (24×24 grids, layered) ---- */
@@ -907,8 +879,14 @@ function portraitHTML(){
 
 function emblemSVG(id,color,size){
   size=size||48;
-  const shape=EMBLEM_SVGS[id]||EMBLEM_SVGS.star;
-  return '<svg class="party-emblem" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" shape-rendering="crispEdges" style="color:'+color+';font-size:'+size+'px"><g fill="currentColor">'+shape+'</g></svg>';
+  const custom={
+    hammer:'<path d="M3 4h11v2h3v3h-3v2h-5v3h-2v2H5v2H3v-4h2v-2h2V9H3zM11 12h3v3h2v2h2v2h-3v-2h-2v-2h-2z"/>',
+    rose:'<path d="M10 2h5v2h3v3h-2v3h-2v2h-2v3h2v2h2v2h-2v-2H9v-2h2v-3H9v-2H7V7H5V4h3V2zm-3 3v2h3v2h2V5H9V3H8v2zm8 0h3v2h-3zm-8 3h2v2H7zm8 9h2v2h-2zM3 20h8v2H3z"/>' ,
+    snake:'<path d="M4 3h6v2H6v3h4v2H6v3h5v2H4v-2H2v-5h2V6H2V3zm7 11h7v2h4v5h-2v1h-6v-2h6v-2h-9zm5-8h4v2h2v4h-2v-2h-4z"/>'
+  };
+  if(custom[id])return '<svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" aria-hidden="true" shape-rendering="crispEdges"><g fill="'+color+'">'+custom[id]+'</g></svg>';
+  const glyph=String.fromCodePoint(EMBLEM_GLYPHS[id]||EMBLEM_GLYPHS.star);
+  return '<span class="party-emblem" aria-hidden="true" style="color:'+color+';font-size:'+size+'px">'+glyph+'</span>';
 }
 
 function bannerInner(){
