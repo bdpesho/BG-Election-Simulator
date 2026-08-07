@@ -112,7 +112,7 @@ const PHASE_NAMES=["Planning","Execution","Release"];
 const STAFF_ROLES=["Strategist","Spokesperson","Organizer","Fundraiser","Digital Lead","Pollster"];
 const STAFF_NAMES=["Ivan Petrov","Maya Georgieva","Nikola Dimitrov","Elena Hristova","Georgi Marinov","Radka Ivanova","Stoyan Kolev","Petia Yordanova","Krasimir Todorov","Desislava Angelova","Vladimir Atanasov","Silvia Petkova"];
 const CAMPAIGN_NAMES=["For a Strong Border","Clean Sweep","Europe Forward","Pensions First","Our Villages, Our Future","Zero Tolerance","A Fair State","Healthy Nation","Sofia's Promise","Step Forward","The New Deal","Open Doors"];
-const SAVE_KEY="121towin-save-v5";
+const SAVE_KEY="121towin-save-v6";
 
 const EMBLEM_IDS=["alarm-clock","anchor","book-open","bookmark","briefcase","castle","crown","diamond-gem","earth","factory","flag","globe","hammer","hand","heart","leaf","moon","robot","rose","shield","skull","snake","star","sword","tree","tree-pine","trophy"];
 const EMBLEM_GLYPHS={"alarm-clock":0xea13,anchor:0xea49,"book-open":0xeab5,bookmark:0xeab7,briefcase:0xeaca,castle:0xeaf1,crown:0xeb4e,"diamond-gem":0xeb57,earth:0xeb61,factory:0xeb6a,flag:0xeb75,globe:0xeb95,hand:0xeba5,heart:0xebb1,leaf:0xebd5,moon:0xec0c,robot:0xec57,shield:0xec78,skull:0xec87,star:0xecb2,sword:0xecc2,tree:0xecf9,"tree-pine":0xecf8,trophy:0xecfb};
@@ -123,196 +123,336 @@ const SKIN_TONES=["#f7d5b3","#e8b98c","#d9a066","#c98a52","#8d5a3b","#5e3a24"];
 const HAIR_COLORS=["#1c1c1c","#3b2a20","#5a3d2b","#8c5a2b","#c9a26b","#d8d8d8","#8a3324","#4a6a8a"];
 const SUIT_COLORS=["#1b2a44","#2b2d42","#22304a","#14213d","#1b4332","#3a2e22","#4a2450","#8a1f1f","#22424a","#0f1f38"];
 const SHIRT_COLORS=["#ffffff","#e8edf4","#f2d8c8","#dde8e8","#e6e0d0","#f0f0f0"];
-const HAIR_STYLES=["short","side","long","bun","curly","buzz","bald"];
-const HAIR_STYLE_NAMES={short:"Short",side:"Side part",long:"Long",bun:"Bun",curly:"Curly",buzz:"Buzz",bald:"Bald"};
+const HAIR_STYLES=["short","side","long","bun","curly","buzz","bald","bob","ponytail","mohawk","waves","locs","undercut"];
+const HAIR_STYLE_NAMES={short:"Short crop",side:"Side part",long:"Long",bun:"Bun",curly:"Curly",buzz:"Buzz",bald:"Bald",bob:"Bob cut",ponytail:"Ponytail",mohawk:"Mohawk",waves:"Waves",locs:"Locs",undercut:"Undercut"};
 const SUIT_STYLES=["classic","open","vest","blouse"];
 const SUIT_STYLE_NAMES={classic:"Classic + tie",open:"Open collar",vest:"Vest",blouse:"Shirt only"};
 const ETHNICITY_NAMES={bulgarian:"Bulgarian",turkish:"Turkish minority",roma:"Roma"};
 const POVERTY_DISTRICTS=["vidin","montana","vratsa","silistra"];
 
+/* Basic 16x16 pixel-art portraits — hand-drawn ASCII sprite grids.
+   Chars: K skin, N nose shade, E eye, M/m lips, H hair, S suit, T shirt, t tie. */
 const FACE_GRID=[
-"........................",
-"........................",
-"........................",
-"........KKKKKKKK........",
-".......KKKKKKKKKK.......",
-"......KKKKKKKKKKKK......",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-".....KKKKKKKKKKKKKK.....",
-"......KKKKKKKKKKKK......",
-".......KKKKKKKKKK.......",
-"........KKKKKKKK........",
-".........KKKKKK.........",
-".........KKKKKK........."
+"................",
+"................",
+"................",
+"...KKKKKKKKKK...",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"..KKKKKKKKKKKK..",
+"...KKKKKKKKKK...",
+"................",
+"................"
 ];
 const FEATURES_GRIDS={
   male:[
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-".......EE......EE.......",
-".......EE......EE.......",
-"...........NN...........",
-"...........NN...........",
-"...........NN...........",
-".........MMMMMM.........",
-"........................",
-"........................",
-"........................",
-"........................",
-"........................"
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"...EE....EE.....",
+"...EE....EE.....",
+".......N........",
+"......MMM.......",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   female:[
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-"........................",
-".......EE......EE.......",
-".......EE......EE.......",
-"...........NN...........",
-"...........NN...........",
-"...........NN...........",
-"........MMMMMMMM........",
-"........mmmmmmmm........",
-"........................",
-"........................",
-"........................",
-"........................"
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"...EE....EE.....",
+"...EE....EE.....",
+".......N........",
+".....MMMM.......",
+"......mmm.......",
+"................",
+"................",
+"................",
+"................"
   ]
 };
 const HAIR_GRIDS={
   short:[
-"........................",
-"........................",
-"........HHHHHHHH........",
-"......HHHHHHHHHHHH......",
-".....HHHHHHHHHHHHHH.....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHH.........HHH.....",
-"....HHH.........HHH....."
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+".HHHHHHHHHHHHHH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   side:[
-"........................",
-"........................",
-".............HHHHHH.....",
-"..........HHHHHHHHHH....",
-"........HHHHHHHHHHHHHH..",
-"....HHHHHHHHHHHHHHHH....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHH.........HHH.....",
-"....HHH.........HHH....."
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHKKHHHHHHH.",
+".HHHHHHHHHHHHHH.",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   long:[
-"........................",
-"........................",
-"........HHHHHHHH........",
-"......HHHHHHHHHHHH......",
-".....HHHHHHHHHHHHHH.....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHHHHHHHHHHHHHHH....",
-"...HHHH.........HHHH....",
-"...HHHH.........HHHH....",
-"...HHHH.........HHHH....",
-"...HHHH.........HHHH....",
-"...HHHH.........HHHH....",
-"...HHHH.........HHHH....",
-"....HHH.........HHH.....",
-"....HHH.........HHH.....",
-".....HH.........HH......"
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH",
+"HHH..........HHH"
   ],
   bun:[
-"........................",
-".........HHHHHH.........",
-"........HHHHHHHH........",
-".......HHHHHHHHHH.......",
-"......HHHHHHHHHHHH......",
-"....HHHHHHHHHHHHHHHH....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHH.........HHH.....",
-"....HHH.........HHH....."
+"......HHHH......",
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+"..HHHHHHHHHHHH..",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   curly:[
-"........................",
-"........................",
-"........HHHHHHHH........",
-"......HHHHHHHHHHHH......",
-".....HHHHHHHHHHHHHH.....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHHHHHHHHHHHHHHH....",
-"....HHH.........HHH....."
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+"HHHH........HHHH",
+"HHHH........HHHH",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   buzz:[
-"........................",
-"........................",
-"........................",
-"........HHHHHHHH........",
-".......HHHHHHHHHH.......",
-".......HHHHHHHHHH.......",
-".......HHHHHHHHHH......."
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ],
   bald:[
-"........................",
-"........................",
-"........................",
-"........................",
-"............HH..........",
-".........HH....HH......."
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
+  ],
+  bob:[
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+".HHHHHHHHHHHHHH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................"
+  ],
+  ponytail:[
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+".HHHHHHHHHHHHHH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH..........HH.",
+".HH.........HHH.",
+".HH.........HHH.",
+"................",
+"................",
+"................",
+"................",
+"................"
+  ],
+  mohawk:[
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"......HHH.......",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
+  ],
+  waves:[
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+".HHHH....HHHHHH.",
+".HHH........HHH.",
+".HH..........HH.",
+".HH..........HH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
+  ],
+  locs:[
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH",
+"HH............HH",
+"HHH..........HHH"
+  ],
+  undercut:[
+"....HHHHHHHH....",
+"..HHHHHHHHHHHH..",
+".HHHHHHHHHHHHHH.",
+".HHHHHHHHHHHHHH.",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................",
+"................"
   ]
 };
 const SUIT_GRIDS={
   classic:[
-"........TTTttTTT........",
-".......TTTTttTTTT.......",
-"......TTTTTttTTTTT......",
-"......SSSSttSSSSSS......",
-".....SSSSSSSSSSSSSS.....",
-".....SSSSSSSSSSSSSS....."
+"..SSSSSSSSSSSS..",
+"..SSTTTTTTTTSS..",
+"..SSSSSSSSSSSS.."
   ],
   open:[
-"........TTTTTTTT........",
-".......TTTTTTTTTT.......",
-".......TTTTTTTTTT.......",
-".......TTSSSSSSSSTT.....",
-"......SSSSSSSSSSSS......",
-"......SSSSSSSSSSSS......"
+"..TTTTTTTTTTTT..",
+"..TTSSSSSSSSTT..",
+"..SSSSSSSSSSSS.."
   ],
   vest:[
-"........TTTTTTTT........",
-".......TTTTTTTTTT.......",
-".......TTTTTTTTTT.......",
-"......STTTTTTTTTTS......",
-"......SSSSSSSSSSSS......",
-"......SSSSSSSSSSSS......"
+"..TTTTTTTTTTTT..",
+"..STTTTTTTTTTS..",
+"..SSSSSSSSSSSS.."
   ],
   blouse:[
-"........TTTTTTTT........",
-".......TTTTTTTTTT.......",
-"......TTTTTTTTTTTT......",
-"......TTTTTTTTTTTT......",
-"......TTTTTTTTTTTT......",
-"......TTTTTTTTTTTT......"
+"..TTTTTTTTTTTT..",
+"..TTTTTTTTTTTT..",
+"..TTTTTTTTTTTT.."
   ]
 };
-const PIXEL_FACE={W:24,H:24,FACE:FACE_GRID,FEATURES:FEATURES_GRIDS,HAIR:HAIR_GRIDS,SUIT:SUIT_GRIDS};
+const PIXEL_FACE={W:16,H:16,FACE:FACE_GRID,FEATURES:FEATURES_GRIDS,HAIR:HAIR_GRIDS,SUIT:SUIT_GRIDS};
 
 const FACES=[
   {bg:"#26547c",skin:2,hairColor:"#3b2a20",hairStyle:"short",suitColor:"#1b2a44",shirtColor:"#ffffff",suitStyle:"classic",gender:"male",glasses:false},
   {bg:"#3d5a80",skin:2,hairColor:"#22201c",hairStyle:"side",suitColor:"#22304a",shirtColor:"#e8edf4",suitStyle:"classic",gender:"male",glasses:true},
   {bg:"#5e548e",skin:1,hairColor:"#5a3d2b",hairStyle:"long",suitColor:"#2b2d42",shirtColor:"#f2d8c8",suitStyle:"blouse",gender:"female",glasses:false},
-  {bg:"#26547c",skin:3,hairColor:"#4a3b2a",hairStyle:"bald",suitColor:"#14213d",shirtColor:"#ffffff",suitStyle:"classic",gender:"male",glasses:false},
+  {bg:"#26547c",skin:3,hairColor:"#4a3b2a",hairStyle:"buzz",suitColor:"#14213d",shirtColor:"#ffffff",suitStyle:"classic",gender:"male",glasses:false},
   {bg:"#2d6a4f",skin:1,hairColor:"#6b4f2a",hairStyle:"bun",suitColor:"#1b4332",shirtColor:"#e6e0d0",suitStyle:"blouse",gender:"female",glasses:false},
   {bg:"#7f4f24",skin:4,hairColor:"#2b1d12",hairStyle:"curly",suitColor:"#3a2e22",shirtColor:"#ffffff",suitStyle:"open",gender:"male",glasses:true},
   {bg:"#4a4e69",skin:2,hairColor:"#8c5a2b",hairStyle:"long",suitColor:"#22223b",shirtColor:"#dde8e8",suitStyle:"vest",gender:"female",glasses:false},
@@ -461,10 +601,13 @@ function freshState(){
     activeIssues:[],
     debateWeek:15,debateDone:false,debate:null,
     pigWeek:18,pigPending:false,pigDone:false,pigRaid:false,
+    virusDone:false,virusLoss:null,
     log:[],stats:{rallies:0,ads:0,hqs:0,travels:0,campaigns:0},
+    cashHist:[],
     eventBag:[],eventCursor:0,paused:false,eventQueue:[],
     results:null,coalition:null,ending:null,perfMod:{},
-    cheat:false,cheatFloor:false
+    term:1,termHistory:[],
+    cheat:false,cheatFloor:false,debugBoost:{},cheatEasyWin:false,diksy:false,kosyo:false
   };
 }
 
@@ -501,6 +644,8 @@ function pts(x){return (x*100).toFixed(1);}
 function showScreen(name){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   $("screen-"+name).classList.add("active");
+  const nb=typeof document!=="undefined"?document.getElementById("news-bar"):null;
+  if(nb)nb.style.display=(name==="game"&&S&&S.phase==="campaign"&&isMobileUI())?"flex":"none";
 }
 
 function partyOf(id){if(id==="player")return playerParty();return AI_PARTIES.find(p=>p.id===id);}
@@ -511,7 +656,7 @@ function allParties(){return[playerParty(),...AI_PARTIES];}
 
 function getAttr(a){let v=S.player.attrs[a];for(const m of S.modifiers){const e=m.effects["attr_"+a];if(e)v+=e;}return clamp(v,1,12);}
 function modSum(key){let v=0;for(const m of S.modifiers){if(m.effects[key])v+=m.effects[key];}return v;}
-function getMaxStamina(){return 8+getAttr("stamina")+Math.round(modSum("maxStamina"));}
+function getMaxStamina(){return 8+getAttr("stamina")+Math.round(modSum("maxStamina"))-(S.term>1?(S.term-1):0);}
 function addModifier(spec){
   S.modifiers.push({id:uid(),name:spec.name,desc:spec.desc,bad:!!spec.bad,expires:spec.turns?S.week+spec.turns:null,effects:spec.effects||{}});
 }
@@ -588,6 +733,24 @@ function districtShares(d,noisy,boostOv){
   const out={};
   for(const k in scores){let sh=scores[k]/sum;if(noisy)sh+=pollNoiseFor(d.id,k);out[k]=Math.max(0,sh);}
   if(noisy){let s2=0;for(const k in out)s2+=out[k];if(s2>0)for(const k in out)out[k]/=s2;}
+  if(S.virusLoss){
+    let gained=0;
+    for(const k in out){
+      if(k==="others")continue;
+      const dloss=S.virusLoss[k];
+      if(dloss>0&&out[k]>0){const cut=Math.min(out[k],dloss);out[k]-=cut;gained+=cut;}
+    }
+    if(gained>0)out.others=(out.others||0)+gained;
+  }
+  const debugB=S.debugBoost&&S.debugBoost[d.id]?S.debugBoost[d.id]:0;
+  if(debugB>0){
+    const p0=out.player||0,np=Math.min(0.98,p0+debugB);
+    if(np>p0){const keep=1-np,others=1-p0;if(others>0){for(const k in out)if(k!=="player")out[k]*=keep/others;}out.player=np;}
+  }
+  if(S.cheatEasyWin){
+    const p0=out.player||0,np=Math.min(0.98,p0+0.50);
+    if(np>p0){const keep=1-np,others=1-p0;if(others>0){for(const k in out)if(k!=="player")out[k]*=keep/others;}out.player=np;}
+  }
   return out;
 }
 function nationalShares(noisy){
@@ -622,33 +785,33 @@ function addBoost(dId,pId,v){
 
 function faceSVG(cfg){
   cfg=cfg||{};
-  const skin=SKIN_TONES[cfg.skin]||SKIN_TONES[2];
-  const colors={
-    K:skin,N:shade(skin,.72),E:"#1a1a1a",M:"#7a2d25",m:"#c97a6a",
-    H:cfg.hairColor||HAIR_COLORS[0],S:cfg.suitColor||SUIT_COLORS[0],T:cfg.shirtColor||SHIRT_COLORS[0],
-    t:shade(cfg.suitColor||SUIT_COLORS[0],.55)
-  };
-  const layers=[
-    {g:FACE_GRID,y0:0},
-    {g:FEATURES_GRIDS[cfg.gender==="female"?"female":"male"],y0:0},
-    {g:HAIR_GRIDS[cfg.hairStyle]||HAIR_GRIDS.short,y0:0},
-    {g:SUIT_GRIDS[cfg.suitStyle]||SUIT_GRIDS.classic,y0:18}
-  ];
-  let out='<rect width="24" height="24" fill="'+cfg.bg+'"/>';
-  for(const L of layers){
-    for(let i=0;i<L.g.length;i++){
-      const row=L.g[i];
-      const y=i+L.y0;
-      for(let x=0;x<24;x++){
-        const c=row[x];
-        if(c==="."||c===undefined)continue;
-        const fill=colors[c];
-        if(fill)out+='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+fill+'"/>';
+  const female=cfg.gender==="female",skin=SKIN_TONES[cfg.skin]||SKIN_TONES[2];
+  const hair=cfg.hairColor||HAIR_COLORS[0],suit=cfg.suitColor||SUIT_COLORS[0],shirt=cfg.shirtColor||SHIRT_COLORS[0];
+  const shadow=shade(skin,.72),suitShadow=shade(suit,.62);
+  const mouth=female?"#9e3d50":"#7a2d25",lip=female?"#d9828b":shade(mouth,.85);
+  let out='<rect width="16" height="16" fill="'+(cfg.bg||"#26547c")+'"/>';
+  const C={K:skin,H:hair,N:shadow,E:"#24252b",M:mouth,m:lip,S:suit,T:shirt,t:suitShadow};
+  const run=(grid,y0)=>{
+    y0=y0||0;
+    grid.forEach((row,y)=>{
+      let x=0;
+      while(x<row.length){
+        const ch=row[x];
+        const c=C[ch];
+        if(!c){x++;continue;}
+        let w=1;
+        while(x+w<row.length&&row[x+w]===ch)w++;
+        out+='<rect x="'+x+'" y="'+(y+y0)+'" width="'+w+'" height="1" fill="'+c+'"/>';
+        x+=w;
       }
-    }
-  }
-  if(cfg.glasses)out+='<rect x="6" y="6" width="4" height="4" fill="none" stroke="#20242c" stroke-width="1"/><rect x="14" y="6" width="4" height="4" fill="none" stroke="#20242c" stroke-width="1"/><line x1="10" y1="8" x2="14" y2="8" stroke="#20242c" stroke-width="1"/>';
-  return '<svg viewBox="0 0 24 24" shape-rendering="crispEdges">'+out+'</svg>';
+    });
+  };
+  run(PIXEL_FACE.FACE);
+  run(female?PIXEL_FACE.FEATURES.female:PIXEL_FACE.FEATURES.male);
+  run(PIXEL_FACE.HAIR[cfg.hairStyle]||PIXEL_FACE.HAIR.short);
+  run(PIXEL_FACE.SUIT[cfg.suitStyle]||PIXEL_FACE.SUIT.classic,13);
+  if(cfg.glasses)out+='<rect x="2" y="6" width="4" height="4" fill="none" stroke="#20242c"/><rect x="8" y="6" width="4" height="4" fill="none" stroke="#20242c"/><rect x="6" y="7" width="2" height="1" fill="#20242c"/>';
+  return '<svg viewBox="0 0 16 16" data-gender="'+(female?"female":"male")+'" data-body-width="'+(female?16:18)+'" shape-rendering="crispEdges">'+out+'</svg>';
 }
 
 function defaultAppearance(){
@@ -659,6 +822,7 @@ function candidateModifiers(d){
   const app=S&&S.player&&S.player.appearance;
   if(!app)return{appealMult:0,entBonus:0};
   const out={appealMult:0,entBonus:0};
+  if(S&&S.kosyo)out.appealMult+=0.30;
   const g=d.geo||{};
   if(app.ethnicity==="turkish"){
     if(g.turkishMinority>=0.28)out.appealMult+=0.06;
@@ -912,6 +1076,98 @@ function pigAnswer(ev,ai){
   $("modal-root").innerHTML="";
   S.paused=false;
   updateAll();
+}
+
+/* ---- T39: the virus from India — V. Tarnovo stops the campaign ---- */
+const VIRUS_RATE=0.05;
+const VIRUS_DISTRICT="velikotarnovo";
+const VIRUS_WEEKS_SKIPPED=3;
+const VIRUS_PLANE_SVG='<svg viewBox="0 0 64 32"><path d="M4 18 L60 6 L50 26 L36 22 L30 30 L24 24 L6 24 Z" fill="#f4f4f8" stroke="#8892a6" stroke-width="1.5"/><path d="M60 6 L50 26" stroke="#8892a6" stroke-width="1.5"/></svg>';
+function virusRoll(){return S&&S.phase==="campaign"&&!S.virusDone&&rng()<VIRUS_RATE;}
+function virusDisarm(){if(S)S.virusDone=true;}
+function startVirusEvent(){
+  if(!S||S.phase!=="campaign")return;
+  S.paused=true;
+  S.virusDone=true;
+  log("BREAKING — a new virus has arrived in <b>V. Tarnovo</b>. The campaign freezes.","bad");
+  if(typeof window==="undefined"||!document.getElementById("map-canvas")){virusSkipTurns();return;}
+  const c=$("map-canvas");
+  const plane=document.createElement("div");
+  plane.id="virus-plane";
+  plane.innerHTML=VIRUS_PLANE_SVG;
+  plane.style.left="-90px";plane.style.top="56%";
+  c.appendChild(plane);
+  requestAnimationFrame(()=>{
+    plane.style.left="52%";plane.style.top="34%";
+    plane.classList.add("fly");
+  });
+  setTimeout(()=>{plane.classList.add("arrived");},2600);
+  setTimeout(()=>{plane.remove();},3600);
+  setTimeout(virusArrive,2700);
+}
+function virusArrive(){
+  zoomToDistrict(VIRUS_DISTRICT,2.6);
+  const node=document.querySelector('#bg-map .node[data-id="'+VIRUS_DISTRICT+'"]');
+  if(node)node.classList.add("virus-flash");
+  setTimeout(()=>{
+    const root=$("modal-root");
+    root.innerHTML='<div class="modal-back"><div class="modal">'
+      +'<div class="ev-head bad"><span>A NEW VIRUS HAS ARRIVED FROM INDIA</span><span class="paused-badge">GAME PAUSED</span></div>'
+      +'<div class="ev-body"><h3>V. Tarnovo is cut off</h3>'
+      +'<p>An unknown virus lands with the travellers in V. Tarnovo. Every party freezes for three weeks — no rallies, no ads, no doors. And when polling restarts, the voters punish them all.</p>'
+      +'<div class="ev-opts"><button class="btn primary" id="virus-continue">The campaign waits ▸</button></div></div>'
+      +'</div></div>';
+    $("virus-continue").onclick=virusContinue;
+  },700);
+}
+function virusContinue(){
+  virusCleanup();
+  $("modal-root").innerHTML="";
+  virusSkipTurns();
+}
+function virusCleanup(){
+  const plane=document.getElementById("virus-plane");
+  if(plane)plane.remove();
+  const node=document.querySelector('#bg-map .node[data-id="'+VIRUS_DISTRICT+'"]');
+  if(node)node.classList.remove("virus-flash");
+  const z=mapZoom;
+  if(z&&z.reset)z.reset();
+}
+function zoomToDistrict(id,scale){
+  const c=$("map-canvas"),svg=$("bg-map"),d=DIST_BY_ID[id];
+  if(!c||!svg||!d||!mapZoom)return;
+  const z=mapZoom;
+  const r=c.getBoundingClientRect();
+  const sr=svg.getBoundingClientRect();
+  if(!r.width||!r.height||!sr.width||!sr.height){z.setView(0,0,scale);return;}
+  const k=Math.min(sr.width/1000,sr.height/620);
+  const ox=(sr.width-1000*k)/2,oy=(sr.height-620*k)/2;
+  z.setView(-(ox+d.x*k)*scale+r.width/2,-(oy+d.y*k)*scale+r.height/2,scale);
+}
+function virusSkipTurns(){
+  const nat=nationalShares(false);
+  const loss={};
+  for(const p of allParties()){
+    const sh=nat[p.id]||0;
+    const target=Math.max(0.03,sh*0.75-0.02);
+    loss[p.id]=Math.max(0,sh-target);
+  }
+  S.virusLoss=loss;
+  recomputePolls();
+  const parts=[];
+  for(const p of allParties()){
+    const before=nat[p.id]||0;
+    parts.push(partyOf(p.id).abbr+" "+pct(before)+" → "+pct(S.pollNat[p.id]||0));
+  }
+  log("The virus shakes every party — "+parts.join(", ")+".","bad");
+  for(let i=1;i<=VIRUS_WEEKS_SKIPPED;i++){
+    S.week++;
+    log("Week "+S.week+" — campaigning suspended. Rallies cancel, polling stops, doors stay shut.","bad");
+  }
+  saveGame();
+  S.paused=false;
+  updateAll();
+  if(S.week>20){runElection();return;}
 }
 
 function buildEventPool(){
@@ -1282,6 +1538,7 @@ function showNextEvent(){
   const nxt=S.eventQueue.shift();
   if(nxt==="__DEBATE__"){startDebate();return;}
   if(nxt==="__PIG__"){startPigEvent();return;}
+  if(nxt==="__VIRUS__"){startVirusEvent();return;}
   renderEventModal(EVENT_POOL[nxt]);
 }
 
@@ -1380,6 +1637,37 @@ function renderEventModal(ev){
 function openModal(html){$("modal-root").innerHTML='<div class="modal-back"><div class="modal"><div class="modal-pad">'+html+'</div></div></div>';}
 function closeModal(){$("modal-root").innerHTML="";}
 
+/* ---- T35: DIKSY display rewrite layer (display-only, never touches state) ---- */
+function diksyOverlay(){
+  if(!S||!S.diksy||typeof document==="undefined")return;
+  const root=document.getElementById("app");
+  if(!root)return;
+  const textSel=[
+    "input[type=text]","input[type=search]","textarea",
+    ".log-line",".ev-head span","#modal-root h3","#modal-root p",
+    ".title-bar-text","label","h2","h4",".rname",".dc-name","#tb-pm","#end-title","#end-text"
+  ];
+  const skipSel="button,svg,.seat-cell,.chip,.tb-cash,.tb-stamina,.tb-poll,.tb-clock,.tb-days,.map-title,.preview-tip,.demand-chip,.mini-label,#end-stats,.pm-form,#mods-list";
+  root.querySelectorAll(textSel.join(",")).forEach(el=>{
+    if(el.closest(skipSel))return;
+    if(el.querySelector&&el.querySelector("input,select,textarea"))return;
+    if(el.tagName==="INPUT"||el.tagName==="TEXTAREA"){if(el.value!=="DIKSY")el.value="DIKSY";return;}
+    if(el.textContent==="DIKSY")return;
+    el.textContent="DIKSY";
+  });
+}
+let diksyObserver=null;
+function ensureDiksyObserver(){
+  if(diksyObserver||!S||!S.diksy||typeof document==="undefined"||typeof MutationObserver==="undefined")return;
+  const root=document.getElementById("app");
+  if(!root)return;
+  diksyObserver=new MutationObserver(()=>{
+    if(!S||!S.diksy)return;
+    diksyOverlay();
+  });
+  diksyObserver.observe(root,{subtree:true,childList:true,characterData:true});
+}
+
 function helpModal(){
   openModal('<h3>How to play</h3>'
     +'<p>You have <b>20 weeks</b> until Election Day. Each week you receive stamina points (SP) based on your candidate\'s Stamina attribute. Spend them to travel between the 29 districts and hold targeted rallies — each campaign draws <b>5 issues from a pool of nine</b> (Eurozone Entry, Anticorruption Reform, Energy Subsidies, Judicial Independence, Pension Reform, Healthcare, Defense Spending, Rural Development, Migration).</p>'
@@ -1391,17 +1679,22 @@ function helpModal(){
 }
 
 function menuModal(){
+  const mb=isMobileUI();
   openModal('<h3>Menu</h3><div class="ev-opts">'
     +'<button class="btn" id="m-resume">Resume campaign</button>'
     +'<button class="btn" id="m-save">Save campaign</button>'
     +'<button class="btn" id="m-load">Load last save</button>'
     +'<button class="btn" id="m-help">How to play</button>'
+    +(mb&&S&&S.cheat?'<button class="btn" id="m-debug">Debug console</button>':'')
     +'<button class="btn danger" id="m-quit">Quit to title</button>'
-    +'</div>');
+    +'</div>'
+    +(mb&&S&&S.cheat?'<p class="dc-note" style="margin:0;margin-top:8px"><b>CHEAT MODE ACTIVE</b> — Debug is available above.</p>':''));
   $("m-resume").onclick=closeModal;
   $("m-save").onclick=()=>{saveGame();closeModal();log("Campaign saved.","info");renderLog();};
   $("m-load").onclick=()=>{closeModal();if(!loadGame())alert("No save found.");};
   $("m-help").onclick=helpModal;
+  const md=$("m-debug");
+  if(md)md.onclick=debugModal;
   $("m-quit").onclick=()=>location.reload();
 }
 
@@ -1415,11 +1708,13 @@ function debugModal(){
     +'<button class="btn" id="dbg-cash">+100 000 лв</button>'
     +'<button class="btn" id="dbg-sp">Refill stamina to max</button>'
     +'<button class="btn" id="dbg-end">+10 max SP this run</button>'
-    +'<button class="btn" id="dbg-boost">+5% boost in <b>'+esc((S.selDistrict?DIST_BY_ID[S.selDistrict]:DIST_BY_ID[S.location]).short)+'</b></button>'
+    +'<button class="btn" id="dbg-boost">+5 points in <b>'+esc((S.selDistrict?DIST_BY_ID[S.selDistrict]:DIST_BY_ID[S.location]).short)+'</b></button>'
+    +'<button class="btn" id="dbg-easy">EASY WIN — +50% everywhere this turn</button>'
     +'<div class="center-row" style="gap:6px">'+rivalBtns+'</div>'
     +attrIn("stamina")+attrIn("charisma")+attrIn("intelligence")
     +'<button class="btn" id="dbg-apply">Apply attributes</button>'
     +'<button class="btn" id="dbg-floor">Guarantee 4% threshold</button>'
+    +'<button class="btn" id="dbg-virus">Trigger the India virus</button>'
     +'<button class="btn danger" id="dbg-election">Trigger Election Day now</button>'
     +'<button class="btn ghost" id="dbg-close">Close</button>'
     +'</div>');
@@ -1428,12 +1723,15 @@ function debugModal(){
     if(st)st.innerHTML="Funds: <b>"+fmtMoney(S.cash)+"</b> · Stamina: <b>"+S.stamina+"/"+getMaxStamina()+"</b> · Selected district: <b>"+esc((S.selDistrict?DIST_BY_ID[S.selDistrict]:DIST_BY_ID[S.location]).short)+"</b>";
     const fl=$("dbg-floor");
     if(fl)fl.textContent=S.cheatFloor?"Threshold guarantee: ARMED":"Guarantee 4% threshold";
+    const ew=$("dbg-easy");
+    if(ew)ew.textContent=S.cheatEasyWin?"EASY WIN: ARMED (clears at the end of the week)":"EASY WIN — +50% everywhere this turn";
   }
   refreshStatus();
   $("dbg-cash").onclick=()=>{S.cash+=100000;log("CHEAT — +100 000 лв.","info");updateAll();refreshStatus();};
   $("dbg-sp").onclick=()=>{S.stamina=getMaxStamina();log("CHEAT — stamina refilled to "+S.stamina+".","info");updateAll();refreshStatus();};
   $("dbg-end").onclick=()=>{addModifier({name:"Cheat: iron lungs",desc:"+10 max stamina (permanent)",turns:null,effects:{maxStamina:10}});log("CHEAT — +10 max stamina for the run.","info");updateAll();refreshStatus();};
-  $("dbg-boost").onclick=()=>{const bid=S.selDistrict||S.location;addBoost(bid,"player",0.05);recomputePolls();log("CHEAT — +5% boost in <b>"+DIST_BY_ID[bid].short+"</b>.","info");updateAll();refreshStatus();};
+  $("dbg-boost").onclick=()=>{const bid=S.selDistrict||S.location;S.debugBoost[bid]=Math.min(0.45,(S.debugBoost[bid]||0)+0.05);recomputePolls();log("CHEAT — +5 points for <b>"+DIST_BY_ID[bid].short+"</b>.","info");updateAll();refreshStatus();};
+  $("dbg-easy").onclick=()=>{S.cheatEasyWin=!S.cheatEasyWin;recomputePolls();log("CHEAT — Easy Win "+(S.cheatEasyWin?"ARMED (+50% support everywhere this turn).":"disarmed."),"info");updateAll();refreshStatus();};
   document.querySelectorAll("[data-weaken]").forEach(b=>{
     b.onclick=()=>{
       const pid=b.dataset.weaken;
@@ -1452,6 +1750,7 @@ function debugModal(){
     updateAll();refreshStatus();
   };
   $("dbg-floor").onclick=()=>{S.cheatFloor=!S.cheatFloor;log("CHEAT — threshold guarantee "+(S.cheatFloor?"ARMED":"disarmed")+".","info");refreshStatus();};
+  $("dbg-virus").onclick=()=>{S.virusDone=false;closeModal();startVirusEvent();};
   $("dbg-election").onclick=()=>{closeModal();runElection();};
   $("dbg-close").onclick=closeModal;
 }
@@ -1463,13 +1762,21 @@ function loadGame(){
     const raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return false;
     S=JSON.parse(raw);
+    if(!S.term)S.term=1;
+    if(!S.termHistory||!Array.isArray(S.termHistory))S.termHistory=[];
     if(!S.player.appearance)S.player.appearance=Object.assign(defaultAppearance(),FACES[S.player.face||0]||{});
     if(!S.partyMachine)S.partyMachine=defaultPartyMachine();
+    if(!Array.isArray(S.cashHist))S.cashHist=[];
+    if(S.virusDone===undefined)S.virusDone=false;
+    if(!S.virusLoss)S.virusLoss=null;
+    if(!S.debugBoost||typeof S.debugBoost!=="object")S.debugBoost={};
+    if(S.cheatEasyWin===undefined)S.cheatEasyWin=false;
     if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
     if(!S.debateWeek)S.debateWeek=15;
     if(!S.eventBag||!S.eventBag.length){buildEventPool();S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
     else {buildEventPool();}
     S.paused=false;S.eventQueue=[];
+    if(S.diksy){ensureDiksyObserver();diksyOverlay();}
     resumeFromState();
     return true;
   }catch(e){return false;}
@@ -1487,6 +1794,10 @@ function resumeFromState(){
   }
   else if(S.phase==="election"){renderElectionScreen();showScreen("election");}
   else if(S.phase==="coalition"){renderCoalition();showScreen("coalition");}
+  else if(S.phase==="review"){
+    if(!S.termReport&&S.termHistory.length)S.termReport=S.termHistory[S.termHistory.length-1].lines;
+    renderReviewScreen();showScreen("review");
+  }
   else if(S.phase==="end"){renderEndScreen();showScreen("end");}
   else showScreen("title");
 }
@@ -1544,8 +1855,8 @@ function redrawMap(){
     for(const k in sh){if(k==="others")continue;if(sh[k]>lv){lv=sh[k];leader=k;}}
     const p=partyOf(leader);
     const body=node.querySelector(".body");
-    body.setAttribute("fill",p?p.color:"#44506b");
-    body.setAttribute("fill-opacity","0.85");
+    body.setAttribute("fill",S.kosyo?S.party.color:(p?p.color:"#44506b"));
+    body.setAttribute("fill-opacity",S.kosyo?"1":"0.85");
     node.classList.toggle("sel",S.selDistrict===d.id);
     const ov=svg.querySelector('.overlay[data-id="'+d.id+'"]');
     const dot=ov?ov.querySelector(".city-dot"):null;
@@ -1571,19 +1882,56 @@ function renderTopbar(){
   clock.textContent="WEEK "+Math.min(S.week,20)+"/20";
   clock.classList.toggle("urgent",S.week>=18&&S.week<=20);
   $("tb-days").textContent=S.week>20?"ELECTION DAY":Math.max(0,(21-S.week))*7+" days to "+ELECTION_DATE;
-  $("tb-cash").innerHTML="Funds <b>"+fmtMoney(S.cash)+"</b>";
-  $("tb-stamina").innerHTML="SP <b>"+S.stamina+"/"+getMaxStamina()+"</b>";
+  $("tb-cash").innerHTML='<span class="sc-ico">лв</span><span>Funds <b>'+fmtMoney(S.cash)+"</b></span>";
+  $("tb-stamina").innerHTML='<span class="sc-ico">SP</span><span>SP <b>'+S.stamina+"/"+getMaxStamina()+"</b></span>";
   const pol=S.pollNat.player||0;
-  $("tb-poll").innerHTML="Poll <b>"+pct(pol)+"</b>";
+  $("tb-poll").innerHTML='<span class="sc-ico">%</span><span>Poll <b>'+pct(pol)+"</b></span>";
+  const hud=(id,ico,val,cap)=>{
+    const el=$(id);
+    if(el)el.innerHTML='<span class="hud-ico">'+ico+'</span><span class="hud-txt"><span class="hud-val">'+val+'</span><span class="hud-cap">'+cap+'</span></span>';
+  };
+  hud("hud-cash","лв",fmtMoney(S.cash),"Campaign funds");
+  hud("hud-stamina","SP",S.stamina+"/"+getMaxStamina(),"Stamina");
+  hud("hud-poll","%",pct(pol),"National poll");
   const dbgBtn=$("btn-debug");
   if(dbgBtn)dbgBtn.style.display=S.cheat?"":"none";
   const cheatChip=$("tb-cheat");
   if(cheatChip)cheatChip.style.display=S.cheat?"":"none";
 }
 
+function weeklyIncomeBreakdown(){
+  const hqCount=Object.keys(S.hq).length;
+  const incMult=1+modSum("incomeMult");
+  const hqIncome=hqCount*COSTS.hqIncome*incMult;
+  const stipend=COSTS.stipend;
+  return{stipend:stipend,hqIncome:hqIncome,income:Math.round(stipend+hqIncome),hqCount:hqCount,incMult:incMult};
+}
+function openFundsModal(){
+  if(!S||S.phase!=="campaign")return;
+  const bd=weeklyIncomeBreakdown();
+  const next=bd.income;
+  const hist=[...(S.cashHist||[])].reverse();
+  const rows=hist.map(h=>'<div class="db-row"><b>W'+h.week+'</b><span>'+fmtMoney(h.cash)+'</span><span class="db-choice">'+(h.income>=0?"+"+fmtMoney(h.income)+" income":"—")+'</span></div>').join("");
+  openModal(
+    '<div class="ev-head good"><span>CAMPAIGN FINANCES</span></div>'
+    +'<div class="dbg-status">Current funds: <b>'+fmtMoney(S.cash)+'</b></div>'
+    +'<div class="dbg-status">Expected next week: <b>+'+fmtMoney(next)+'</b><span style="display:block;color:#555;font-size:.74rem;margin-top:2px">state subsidy '+fmtMoney(bd.stipend)+' · '
+    +(bd.hqCount>0?bd.hqCount+" HQ × "+fmtMoney(Math.round(COSTS.hqIncome*bd.incMult))+"/week":"no campaign HQs yet")+'</span></div>'
+    +'<h3>Weekly cash history</h3>'
+    +(rows.length?'<div class="db-list">'+rows+'</div>':'<p>No income recorded yet — end your first week to start the ledger.</p>')
+    +'<p class="dc-note">Income arrives every week: a fixed state subsidy plus <b>'+fmtMoney(COSTS.hqIncome)+' лв</b> per Campaign HQ. Money goes to ads, HQs, party staff and campaign launches — budget for the whole race, not just the week.</p>'
+    +'<div class="center-row"><button class="btn primary" id="btn-close-funds">Close</button></div>'
+  );
+  const cb=$("btn-close-funds");
+  if(cb)cb.onclick=closeModal;
+}
+
 let inspectorTab="district";
 
 function renderDistrictCard(){
+  const pmIds=["pm-issue","pm-stance","pm-target","pm-name"];
+  const prevPm={};
+  for(const id of pmIds){const el=document.getElementById(id);if(el)prevPm[id]=el.value;}
   const tabs='<div class="insp-tabs">'
     +'<button class="insp-tab'+(inspectorTab==="district"?" active":"")+'" data-tab="district">District</button>'
     +'<button class="insp-tab'+(inspectorTab==="national"?" active":"")+'" data-tab="national">National Polls</button>'
@@ -1592,6 +1940,7 @@ function renderDistrictCard(){
   $("district-card").innerHTML='<div class="side-block">'+tabs
     +(inspectorTab==="national"?renderNationalPolls():inspectorTab==="party"?renderPartyMachine():renderDistrictDetail())
     +'</div>';
+  for(const id in prevPm){const el=document.getElementById(id);if(el&&el.value!==prevPm[id])el.value=prevPm[id];}
   $("district-card").querySelectorAll("[data-act]").forEach(b=>{
     b.onclick=()=>{
       const act=b.dataset.act;
@@ -1625,6 +1974,144 @@ function setInspectorTab(t){
   inspectorTab=t;
   if(t!=="district"&&S.selDistrict){S.selDistrict=null;redrawMap();}
   renderDistrictCard();
+  renderMobileActions();
+}
+
+/* ---- T40: mobile-only UI — hoisted HUD strip + top action cluster ---- */
+function isMobileUI(){
+  return !!(typeof window!=="undefined"&&window.matchMedia&&window.matchMedia("(max-width:899px)").matches);
+}
+
+function renderMobileActions(){
+  if(typeof document==="undefined")return;
+  const c=document.getElementById("mobile-actions");
+  const nb=document.getElementById("news-bar");
+  if(nb)nb.style.display=(isMobileUI()&&S&&S.phase==="campaign")?"flex":"none";
+  if(!c||!isMobileUI())return;
+  if(!S||S.phase!=="campaign"){
+    c.style.display="none";
+    c.innerHTML="";
+    return;
+  }
+  seedMobileNews();
+  const d=S.selDistrict?DIST_BY_ID[S.selDistrict]:null;
+  if(!d){
+    c.style.display="block";
+    c.innerHTML='<div class="dc-note" style="margin:0">Tap a district on the map to take action.</div>';
+    return;
+  }
+  const here=S.location===d.id;
+  const ral=activeIssueList();
+  let html='<div class="mb-acts">';
+  if(here){
+    html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
+    html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
+    if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
+    else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
+    html+='<div id="mb-rally-pop">'+ral.map(i=>'<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">'+esc(i.name)+' <span class="cost">'+COSTS.rallySP+' SP</span></button>').join("")+'</div>';
+  }else{
+    const tc=travelCost(S.location,d.id);
+    html+='<button class="btn wide" data-act="travel" '+((S.stamina<tc||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+tc+' SP</span></button>';
+  }
+  html+='</div>';
+  c.style.display="flex";
+  c.innerHTML=html;
+  c.querySelectorAll("[data-act]").forEach(b=>{
+    b.onclick=()=>{
+      const act=b.dataset.act;
+      const dd=DIST_BY_ID[S.selDistrict];
+      if(act==="travel")travelTo(dd.id);
+      else if(act==="rally"){
+        doRally(b.dataset.issue);
+        const o=document.getElementById("mb-rally-pop");
+        if(o)o.classList.remove("show");
+        const rt=document.getElementById("btn-mb-rally");
+        if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾';
+      }
+      else if(act==="ad")buyAd();
+      else if(act==="hq")buildHQ();
+    };
+  });
+  c.querySelectorAll("[data-act]").forEach(b=>wirePreviewTarget(b,()=>previewForButton(b)));
+  const rt=document.getElementById("btn-mb-rally");
+  if(rt)rt.onclick=()=>{
+    if(S.paused)return;
+    const o=document.getElementById("mb-rally-pop");
+    if(!o)return;
+    const open=o.classList.toggle("show");
+    rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> '+(open?"▴":"▾");
+  };
+}
+
+/* ---- T41: mobile rally popup + news panel ---- */
+let newsSeeded=false;
+function pushNews(html){
+  if(typeof document==="undefined")return;
+  const list=document.getElementById("news-list");
+  if(!list)return;
+  const line=document.createElement("div");
+  line.className="news-line";
+  line.innerHTML=html;
+  list.appendChild(line);
+  while(list.children.length>12)list.removeChild(list.firstChild);
+  list.scrollTop=list.scrollHeight;
+}
+function seedMobileNews(){
+  if(typeof document==="undefined"||newsSeeded||!S)return;
+  newsSeeded=true;
+  const days=Math.max(0,(21-S.week))*7;
+  pushNews('<b>Election Commission</b> — election day '+(S.week>20?"is here":("in "+days+" days"))+'. '+esc(S.party.abbr)+' is polling at <b>'+pct(S.pollNat.player||0)+'</b> nationally.');
+  pushNews('<b>Campaign HQ</b> — '+esc(S.player.name)+' opens this week\'s push, funds at <b>'+fmtMoney(S.cash)+'</b>.');
+}
+function bindRallyPopOutsideClose(){
+  if(typeof document==="undefined")return;
+  document.addEventListener("pointerdown",e=>{
+    if(!isMobileUI())return;
+    const pop=document.getElementById("mb-rally-pop");
+    if(!pop||!pop.classList.contains("show"))return;
+    const box=document.getElementById("mobile-actions");
+    if(box&&box.contains(e.target))return;
+    pop.classList.remove("show");
+    const rt=document.getElementById("btn-mb-rally");
+    if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾';
+  });
+}
+
+function applyMobileLayout(){
+  try{
+    const mq=window.matchMedia("(max-width:899px)");
+    const sync=()=>{
+      const mobile=!!mq.matches;
+      const hud=document.getElementById("hud-stats");
+      const topbar=document.getElementById("topbar");
+      const center=topbar?topbar.querySelector(".tb-center"):null;
+      if(!hud||!topbar)return;
+      if(mobile){
+        const host=topbar.parentElement;
+        if(host&&hud.parentElement!==host){
+          const anchor=host.querySelector("#mobile-actions")||topbar.nextSibling;
+          host.insertBefore(hud,anchor);
+        }
+        if(host&&center&&center.parentElement!==host){
+          host.insertBefore(center,host.querySelector("#game-main")||null);
+        }
+      }else{
+        const mapBody=document.querySelector("#map-panel .map-body");
+        const toolbar=document.getElementById("map-toolbar");
+        if(mapBody&&toolbar&&hud.parentElement!==mapBody){
+          toolbar.after(hud);
+        }
+        const tbRight=topbar.querySelector(".tb-right");
+        if(tbRight&&center&&center.parentElement!==topbar){
+          topbar.insertBefore(center,tbRight);
+        }
+      }
+      renderMobileActions();
+    };
+    sync();
+    if(mq.addEventListener)mq.addEventListener("change",sync);
+    else if(mq.addListener)mq.addListener(sync);
+  }catch(e){}
 }
 
 function renderPartyMachine(){
@@ -1691,10 +2178,25 @@ function renderPartyMachine(){
   return out;
 }
 
+function actionButtonsHtml(d,here){
+  let actions="";
+  if(!here){
+    const c=travelCost(S.location,d.id);
+    actions+='<button class="btn wide" data-act="travel" '+((S.stamina<c||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+c+' SP</span></button>';
+  }else{
+    for(const i of activeIssueList()){
+      actions+='<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">Rally: '+i.name+' <span class="cost">'+COSTS.rallySP+' SP</span></button>';
+    }
+    actions+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
+    if(S.hq[d.id])actions+='<button class="btn wide" disabled>Campaign HQ operational</button>';
+    else actions+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
+  }
+  return actions;
+}
+
 function renderDistrictDetail(){
   const d=S.selDistrict?DIST_BY_ID[S.selDistrict]:null;
-  if(!d)return '<div class="dc-empty">Click a district on the map to inspect it.</div>';
-  const here=S.location===d.id;
+  if(!d)return '<div class="dc-empty">Click a district on the map to inspect it.</div>';  const here=S.location===d.id;
   const sh=S.districtPoll[d.id]||districtShares(d,true);
   const rows=Object.keys(sh).filter(k=>k!=="others").map(k=>({k:k,v:sh[k]})).sort((a,b)=>b.v-a.v);
   const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
@@ -1727,18 +2229,7 @@ function renderDistrictDetail(){
   const geoLine=geoTop.length
     ?'<div class="dc-geo">'+geoTop.map(gg=>'<div class="geo-chip" title="'+esc(gg.l)+'"><span>'+esc(gg.l)+'</span><div class="bar"><div class="fill" style="width:'+(gg.v*100)+'%"></div></div><em>'+Math.round(gg.v*100)+'%</em></div>').join("")+'</div>'
     :"";
-  let actions="";
-  if(!here){
-    const c=travelCost(S.location,d.id);
-    actions+='<button class="btn wide" data-act="travel" '+((S.stamina<c||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+c+' SP</span></button>';
-  }else{
-    for(const i of activeIssueList()){
-      actions+='<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">Rally: '+i.name+' <span class="cost">'+COSTS.rallySP+' SP</span></button>';
-    }
-    actions+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
-    if(S.hq[d.id])actions+='<button class="btn wide" disabled>Campaign HQ operational</button>';
-    else actions+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
-  }
+  let actions=actionButtonsHtml(d,here);
   return '<div class="dc-head"><div><b>'+esc(d.name)+'</b><div class="dc-bg">'+esc(d.bg)+'</div></div><span class="seat-chip">'+d.seats+' seats</span></div>'
     +'<div class="dc-enthusiasm"><div class="mini-label"><span>Voter enthusiasm</span><span>'+entDisp+'%</span></div>'
     +'<div class="bar"><div class="fill" style="width:'+entDisp+'%;background:var(--acc)"></div></div></div>'
@@ -1827,6 +2318,7 @@ function updateAll(){
   renderTopbar();
   redrawMap();
   renderDistrictCard();
+  renderMobileActions();
   renderMods();
   renderLog();
 }
@@ -1836,6 +2328,513 @@ function selectDistrict(id){
   inspectorTab="district";
   renderDistrictCard();
   redrawMap();
+  renderMobileActions();
+  closeDrawer();
+}
+
+/* ---- T17: mobile drawer + collapsible log + map pinch-zoom ---- */
+function toggleDrawer(){
+  const p=$("side-panel");
+  const open=!p.classList.contains("open");
+  p.classList.toggle("open",open);
+  const b=$("drawer-backdrop");
+  if(b)b.classList.toggle("show",open);
+  const t=$("btn-panel-toggle");
+  if(t)t.textContent=open?"Inspector ✕":"Inspector ▸";
+}
+function closeDrawer(){
+  const p=$("side-panel");
+  if(p)p.classList.remove("open");
+  const b=$("drawer-backdrop");
+  if(b)b.classList.remove("show");
+  const t=$("btn-panel-toggle");
+  if(t)t.textContent="Inspector ▸";
+}
+let mapZoom=null;
+function mapZoomInit(){
+  const c=$("map-canvas"),svg=$("bg-map");
+  if(!c||!svg||mapZoom)return;
+  const z=mapZoom={scale:1,tx:0,ty:0,ptrs:new Map(),mode:null,pinchD:0};
+  const apply=()=>{
+    svg.style.transform="translate("+z.tx+"px,"+z.ty+"px) scale("+z.scale+")";
+    c.classList.toggle("zoomed-out",z.scale<0.95);
+  };
+  const clampAll=()=>{
+    z.scale=clamp(z.scale,0.6,4);
+    const r=c.getBoundingClientRect();
+    const mw=r.width*z.scale,mh=r.height*z.scale;
+    z.tx=clamp(z.tx,Math.min(0,r.width-mw),Math.max(0,r.width-mw));
+    z.ty=clamp(z.ty,Math.min(0,r.height-mh),Math.max(0,r.height-mh));
+  };
+  z.setView=(tx,ty,scale)=>{z.tx=tx;z.ty=ty;z.scale=scale;clampAll();apply();};
+  z.reset=()=>{z.scale=1;z.tx=0;z.ty=0;apply();};
+  const pinchDist=()=>{
+    const pts=[...z.ptrs.values()];
+    return Math.hypot(pts[0].x-pts[1].x,pts[0].y-pts[1].y);
+  };
+  const zoomAt=(cx,cy,factor)=>{
+    const ns=clamp(z.scale*factor,0.6,4);
+    z.tx=cx-(cx-z.tx)*(ns/z.scale);
+    z.ty=cy-(cy-z.ty)*(ns/z.scale);
+    z.scale=ns;
+    clampAll();apply();
+  };
+  const startPan=(pid,cx,cy)=>{
+    z.mode="pan";z.moved=true;
+    z.startX=cx;z.startY=cy;
+    z.panStart={tx:z.tx,ty:z.ty};
+    c.setPointerCapture&&c.setPointerCapture(pid);
+  };
+  if(typeof window!=="undefined"&&typeof window.PointerEvent!=="undefined"){
+    c.addEventListener("pointerdown",e=>{
+      z.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(z.ptrs.size===1){
+        z.mode="maybe";z.moved=false;
+        z.startX=e.clientX;z.startY=e.clientY;
+        z.panStart={tx:z.tx,ty:z.ty};
+      }else if(z.ptrs.size===2){
+        z.mode="pinch";z.moved=true;z.pinchD=pinchDist();
+        c.setPointerCapture&&c.setPointerCapture(e.pointerId);
+      }
+    });
+    c.addEventListener("pointermove",e=>{
+      const p=z.ptrs.get(e.pointerId);
+      if(!p)return;
+      if(z.mode==="maybe"&&Math.hypot(e.clientX-z.startX,e.clientY-z.startY)>6)startPan(e.pointerId,p.x,p.y);
+      if(z.mode==="pan"&&z.ptrs.size===1){
+        z.tx=z.panStart.tx+(e.clientX-z.startX);
+        z.ty=z.panStart.ty+(e.clientY-z.startY);
+        clampAll();apply();
+      }else if(z.mode==="pinch"&&z.ptrs.size===2){
+        z.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+        const d=pinchDist();
+        if(z.pinchD>0){
+          const r=c.getBoundingClientRect();
+          const pts=[...z.ptrs.values()];
+          zoomAt((pts[0].x+pts[1].x)/2-r.left,(pts[0].y+pts[1].y)/2-r.top,d/z.pinchD);
+        }
+        z.pinchD=d;
+      }
+      p.x=e.clientX;p.y=e.clientY;
+    });
+    const up=e=>{
+      const had=z.ptrs.size;
+      z.ptrs.delete(e.pointerId);
+      if(z.ptrs.size===0){z.mode=null;}
+      else if(had===2&&z.ptrs.size===1){
+        const left=[...z.ptrs.values()][0];
+        z.mode="pan";z.moved=true;
+        z.startX=left.x;z.startY=left.y;
+        z.panStart={tx:z.tx,ty:z.ty};
+      }
+    };
+    c.addEventListener("pointerup",up);
+    c.addEventListener("pointercancel",up);
+  }
+  c.addEventListener("wheel",e=>{
+    e.preventDefault&&e.preventDefault();
+    const r=c.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-(e.deltaY||0)*0.0015));
+  },{passive:false});
+  c.addEventListener("dblclick",()=>{z.scale=1;z.tx=0;z.ty=0;apply();});
+}
+
+/* ---- T37: the alive map — floating voices from the provinces ---- */
+const VOICES_BULGARISM=[
+  // clean classics
+  "Sega li me tursish kato me niama?",
+  "Ako iskash mir, gotvi banica.",
+  "Chestito! Ot ponedelnik si shef.",
+  "Nai-bogat chovek e tozi, deto ima rakiya i vreme.",
+  "Az kato glasuvam, i komshiata znae, che shte ima turbulencii.",
+  "V Bulgaria vremeto e dva sezona: zima i remont.",
+  "Shtom baba kazva, che shte e taka, shte e taka.",
+  "Ivan ot selo, ama dumite mu sa ot grad.",
+  "Pansionat, geran, ulica — tri oborota i pak sme tuk.",
+  "Edin chern peperud odi s... ne, tova e drug film.",
+  "Koito ne raboti, ne harchi. Koito harchi, ne si plati danatsite.",
+  "Rano stanah, ama rano ne e vse edno.",
+  "Vsiakoi gleda svoyata merja, ami nasheto selo e bez mreja.",
+  "Da e zhiv i zdrav! Ostanalite sa za sled izborite.",
+  "Shte gi vidim nai-nakraia, kato izlze novoto vladenie.",
+  "Stara rakiya, mlada cheshma — tova e demokraciyata.",
+  "Momcheto ot sasedno selo kazva, che shte ni izdruzhba.",
+  "Samo lishie, kato baia mi hodi v bankata — nikoi ne pita za ID.",
+  "Kazvaha, che shte ima i ovishto sireno. Ima, ami ot kutia.",
+  "Po-dobre e da badem zaedno, otkolkoto da badem vsyaka se ot nas.",
+  "Tez malki rabotni zaplatni listove ne se hranyat s chestitki.",
+  "Naroda izbira, ami govori gosudarstvenata maika.",
+  "Vseki zhelae da stane deputat, dori baba mi, a tya e za otpuskane.",
+  "E, izbori, izbori — kato shtia shte te tursia.",
+  "Ostavete nasheto oborche, ne e za politika.",
+  "Neka da glasuvame s nadezhda, che niama da izgorim pak.",
+  "V zemja na rakiya i med, niama nuzhda ot izvinenie.",
+  "Poleka, poleka — posledniat kray e na nai-otkachenia.",
+  "Malkata gradinka e otlivo ot nasheto selo.",
+  "Ako vsichki peiat, znam che niama da ima dostatachno horца.",
+  "Glasuvah, che da ne go boli glavata na gospozha.",
+  "Otvori si ochite, chovek, vsichki politici sa edni i sushti.",
+  "Rekoha mi, che glasut e tain. Sled tova go prodadoha tri puti.",
+  "Zemia ni hrani, ama izborite i gladi.",
+  "Vsiakoi iska da e ministar, ami i vodata she vi izchete.",
+  "S milichka ot starata pesen: 'Iskam te, Bulgaria!' — po-fino shte bade s plovdivski rakii.",
+  "I po-pazarnite dni sme gi izdruzhbali — izborite sa po-lesni.",
+  "Kato kazvat 'reformi', az chakam da vidia chernia kliszar.",
+  "Nai-vazhnoto e zdrave, ami i parite sa zdravni.",
+  "Starata pesen za bialata rakiya pak e na moda.",
+  "Ako te kani na obed, che te kani na izbori.",
+  "Nyakoi hora imat ot mnogo: nashite niamat nishto, a imat nadezhda.",
+  "S tezi razhodi i kalata, i pokrivite sa pod otkrito nebo.",
+  "Chovek s chestiti rезултати e kato petel: edno kukuryagane, ama pak peе.",
+  "Starite lyubovni pesni za selo i za izbori — po edno i sushto.",
+  "Samo da ne zapochne pak 'shto ne si rabotil...'",
+  "Vsichko e ot baba mi: 'Bez kusmet niama politika.'",
+  "Novite izbori sa kato starite obuvki: shte gi nosish do sledvashtite.",
+  "Ami dosta! Shte izpraznim shaшkata s horata i shte smenim vsichko.",
+  "V selo se znae vsichko, no nikoiko ne glasuva za sebia.",
+  "Po-lib si e dazhd v gradinata, otkolkoto obešchanie v parlamente.",
+  "Sred sezona i izbora: ludi hora v dve zali.",
+  "S truda si zabravih kartata za glasuvane — a taka i chakah izborite.",
+  "Chakam da izleze novata vlada, che pazara trima.",
+  "Samo edin vopros: koga shte ni obirish, pone tazi godina po-vkusi?",
+  "Malka Bulgaria e, ami ima mesta za mnogo izvinenia.",
+  "I v dobra i v losha zemia, nashata opravka e edna.",
+  "Na selo i na izbori se poznava chovekot.",
+  "Koiто sedi doma, ne misli. Koito misli, glasuva.",
+  "Razdelna ot nasheto — vsichki сме edni i sushti.",
+  "Vremeto leti, ami izborite пълзят.",
+  // diaspora
+  "Rodninite ot Germanija kazvat: 'Po-dobre tam, otkolkoto pak tuk.'",
+  "V Chicago mi pisat, che tuk niama kafe. A nie tuk niamame i izbori.",
+  "Emigrirah mentalno. Tяaloto e tuk.",
+  "London chaka: shtom izborite svыршат, pak na gurbet.",
+  // the classics
+  "Shte si kupya mercedes, da me vidyat horata kakav sam stanal.",
+  "S izbori ili bez, baba Penka pak ще пее.",
+  "Da ne si izdal gelati na praznik — shte go otkupiat depatutite.",
+  "Kazah na zhena si: 'Glasuvah za promяna.' Tя: 'Shte vidim sled godina.'",
+  "Soseto v seloto kazva: 'Pazete si parite, za izbori se davat.'",
+  "Nyakoga v Bulgaria izborite prodluzhavaha s nedelite — sega samo s debatite.",
+  "Ivan v selo kaza, che shte stane kandidat. Seloto si zamălcha.",
+  "Ako ne znaesh koi si, izborite shte ti kazhat: 'Na kogo si.'",
+  "Shto e izbira, izbira i se izbira. Sled tova vsichko se izmazva.",
+  "S glasovete, kato s dumite: poveche ot edin път ne se izkаzva.",
+  "Baba mi: 'Ne glasuvai za tozi, deto e kato otzad nяkolko godini.'",
+  "I smeh i salzi — izbori v Bulgaria.",
+  "Starite praznici, mladite izbori — vsichko e ot edna i sashta karita.",
+  "Vsichko shte бъде dobre, kazaha ot tribunata. Sled tova iztriха razglasiте.",
+  "Nashaта ulitsa glasuva za nadezhda. Ami i nashата ulitsa glasuva za vseki.",
+  "Uchitelkata ni kaza: 'Izborite sa vaжен ден.' Tя i sega si go спомня.",
+  "Izgoria, izgoria — ama pak ще се оправим.",
+  "Поне тия praznici shte ni e sram ot rakiяta... ne, sram ni e ot izborite.",
+  // spicy (the boss demanded some bite)
+  "Da im eba maikata na tiq komunisti, che pak si misliat, che sme v 1989!",
+  "Eba li gi tezi GERB-ski — 30 godini gi davat, ami pак ни търсят glasa.",
+  "Da im ebam izborite, deto ni aposa vsyaka se!",
+  "Ebah gi s ushi tezi s reklamite po tiah naliva!",
+  "Da se bierat po zala, ne po parite ni!",
+  "Samo da ne izleze pak тия s avtobusiте i cheshmata!",
+  "Ebem ti demokraciata, deto prodava ghiulia i chestitki!",
+  "Mайka им, deto ni razdeliha na chasti като banica!",
+  "S tezi izbori i s tezi na дядо ми — vsichko e edna голяма oргия!",
+  "Eba li gi тия, deto ni obishtat zlato, a дават lutichki!",
+  "Koito ni izбра и koito ни продаде — всички са от една глътка!",
+  "Da ne bia togava, che ni izbraha така, че i gledat po cherni obuвki!",
+  "Kato praznici - shtom izborite, che i chestitkite pak sa zameneni s obeshchaniya.",
+  "Nyakoi kazvat, che politikata e shah. U nas e dame, i vsichki syat po samoto.",
+  "Ako politikata e kato vremeto, nashata e samo prognoza za shturm.",
+  "Shto da ti kazha - izbrah si, che da si po-star. Glavno da ne e pak same.",
+  "Zheleznata logika na selo: koito obeshchava nai-mnogo, se nai-malko e smeel.",
+  "Pone da ni izberat, che da ne hodi vsjaka nedelia po avtobusa.",
+  "I sega - da vidim kakvo shte kazhe baba mi za novite obeshchaniya.",
+  "Dobre, che sme edini v sveta, deto se smeem na izbori ot rakiya."
+];
+
+const VOICES_POLL={
+  win:[
+    "We're at {N}% here in {D} and the {P} flag sellers can't keep up!",
+    "At {N}% in {D}, even the village cats vote {P} now.",
+    "My father voted GERB for twenty years. Yesterday he hung a {P} flag.",
+    "If {D} keeps this up, I'm naming my first born {P}.",
+    "{D} is {N}% {P} — the pensioners switched, and they don't switch back.",
+    "The canvassers in {D} are drinking all the mekitsi in the oblast.",
+    "Week {W} — {D} has already picked out the {P} ribbons for the lamp posts.",
+    "I told the neighbour: '{P} or nobody'. He said 'nobody then'. Neighbour's gone now.",
+    "Sofia's analysts say {N}% nationally — down here we're ahead of the rumour mill.",
+    "In {D} they call it the {P} spring. The municipality calls it a petition.",
+    "{P} at {N}% in {D} — the mayor's started greeting me first.",
+    "My wife said she'd vote {P} if the rallies keep giving out banitsa.",
+    "Baba across the street: 'Glasuvam za {P}, che drugite sa za chuzhdite.'",
+    "The kebab shop in {D} changed its name to 'Pepeto za {P}'."
+  ],
+  close:[
+    "Thirty-one to thirty in {D}! My heart's in my throat, kum.",
+    "It's 33–32 here. If you blink, {R} takes {D}.",
+    "Close one in {D} — the babi are betting rakia on it.",
+    "{N} to {V} in {D} and both campaigns are buying the same coffees.",
+    "The barber in {D} shaves with the polls: a centimetre to {P}, a centimetre back.",
+    "In {D} every vote counts twice — once in the booth, once in the recount.",
+    "Nationally {NAT}%, in {D} a knife's edge. Campaigns live or die here.",
+    "My neighbour says {P}, his brother says {R}. The gate's the border.",
+    "{D} has never been this divided since the village council banned the fountains.",
+    "Week {W}, {D} tied — the baba council has called an emergency sitting.",
+    "Two points, {D}. I'll tell you after the elections who my son voted for.",
+    "A close race in {D} and the TV pundits have already moved to Sofia."
+  ],
+  lose:[
+    "In {D} we're at {N}% and {R} at {V}% — did your canvassers even come?",
+    "Week {W} and {D} still leans {R}. I'm starting to doubt you, chicho.",
+    "My uncle promised to vote {P}. Then {R}'s bus came by. The bus had free cheese.",
+    "At {N}% in {D}, you couldn't fill a school bus with {P} supporters.",
+    "The babi in {D} like you, but they like their pensions more. {R} knows.",
+    "{D} is slipping — the coffee shops are all praising {R} now.",
+    "I wanted to vote {P}, but the whole village has a {R} calendar on the wall.",
+    "We're at {N}% in {D}. The rumour says even your own HQ staff shop in {R} colours.",
+    "If {D} goes {R} again, I'm moving my flag collection to the basement.",
+    "{D} last week, {D} this week — {R} is winning the photo finish by a nose.",
+    "The teacher in {D} asked who's voting {P}. Two hands. One was mine, nervously.",
+    "At this rate {D} will be {R} country by the time the snow falls.",
+    "I'd help you canvass in {D}, but my pension depends on not being seen.",
+    "Village rumour: {P} buys votes with promises. {R} buys them with rakia."
+  ],
+  rival:{
+    gerb:[
+      "GERB again in {D}? They treat parliament like a family business.",
+      "Po-dobre da glasuvam za fenera, otkolkoto za GERB pak!",
+      "The GERB machine in {D} buys coffees, souls, and the bakery's leftover bread.",
+      "GERB's flyers here say 'stability'. Everyone knows what that means — the same as always.",
+      "Ebah gi тия GERB-ski — 30 godini gi davat, ami pak ni tursyat!",
+      "The bus with GERB flags came through {D}. Nobody waved. The bus waved back."
+    ],
+    bsp:[
+      "Da im eba maikata na tiq komunisti, che pak se opravyat!",
+      "The reds are strong in {D} — the pensioners still remember 1990 like yesterday.",
+      "BSP's poster in {D}: 'We'll bring back the old days.' Which ones — the ration queues?",
+      "The communist-era factory in {D} is closed, but the BSP nostalgia is open 24/7.",
+      "My grandpa keeps the red flag 'for emergencies'. Election season is an emergency.",
+      "{D} votes BSP out of habit — and habit here is a heavyweight."
+    ],
+    dps:[
+      "DPS buy votes by the tray in {D} — my neighbour sold his for a sack of flour.",
+      "Peevski's people are already counting votes in {D}. The pencils are sharpened.",
+      "The DPS machine in {D} never sleeps. Neither does the counting.",
+      "In {D} they say DPS is the only party that delivers — the votes, by van.",
+      "DPS's candidate in {D} promised a mosque, a school and a discount on gypsy music. Voted.",
+      "The DPS office in {D} has more visitors than the clinic. And they all leave smiling."
+    ],
+    vaz:[
+      "Vazrazhdane in {D}? They promised to ban everything I love, including Mondays.",
+      "VRZ posters say 'Bulgaria above all' — mate, I'm Bulgarian and even I'm confused.",
+      "The nationalists in {D} sell their T-shirts with a strict 'return to the 1940s' policy.",
+      "Vazrazhdane's man in {D} told the pensioners the euro is a cucumber. Half believed him.",
+      "My nephew likes VRZ for the memes. The memes are better than the manifesto.",
+      "{D} and VRZ — the only flag they raise is the one that comes with a mirror."
+    ],
+    ppdb:[
+      "PP-DB talk about reforms in {D} and the coffee gets cold.",
+      "The blue-green intellectuals in {D} can't find the exit from their own debate.",
+      "PP-DB's canvasser in {D} explained the platform three times. Then explained it again.",
+      "Reformers in {D} promise to fix everything — after the next report, of course.",
+      "PP-DB's flyer in {D} has a QR code that leads to another flyer.",
+      "In {D} they love PP-DB on Instagram and forget them by election day."
+    ],
+    itn:[
+      "ITN's candidate in {D} is a singer. At least the rallies have bangers.",
+      "Slavi's party in {D} promises change and a TV show. The show is better.",
+      "ITN in {D} — the only party whose debate strategy is a drum solo.",
+      "The ITN van in {D} plays hits from 2004. The voters hum along, then vote elsewhere.",
+      "Ima takav narod? V {D} nyama — all our crazy people are already in the other parties.",
+      "ITN's slogan in {D}: 'Let's go back to the good years'. Which years, Slavi?"
+    ],
+    pb:[
+      "PB's man in {D} promised a moon base by Tuesday. We're still waiting on the ramp.",
+      "Progresivna's rally in {D} had more generals than voters.",
+      "Radev's people in {D} speak in slogans — long ones, with footnotes.",
+      "PB promises in {D} sound great until you ask how. Then it's a committee.",
+      "The PB candidate in {D} shook my hand with both hands. Politely suspicious.",
+      "In {D} PB's posters fade fast — the sun and the promises go equally quick."
+    ],
+    mech:[
+      "MECh's man in {D} keeps calling me 'brother' like we're in a heist movie.",
+      "The MECh candidate in {D} promised morality and a discount at the gym.",
+      "MECh in {D} — new party, old habits, fresh face, same smile.",
+      "The MECh van in {D} ran out of fuel. Morale, edinstvo... and diesel.",
+      "MECh's slogan in {D}: 'Honesty, unity, honour.' Their printer ran out of toner.",
+      "The MECh guy in {D} told me he left ITN because of 'creative differences'."
+    ],
+    aps:[
+      "APS splits DPS in {D} — two flags, same machine, twice the confusion.",
+      "The APS office in {D} opened next to the DPS office. Same building, two locks.",
+      "In {D} APS means 'the other DPS'. Nobody's sure which one is which anymore.",
+      "APS's candidate in {D} promises everything DPS promised — a week later.",
+      "The APS flyer in {D} lists 20 names. All of them worked for DPS last year.",
+      "Two minority parties, one {D}, zero exit strategy."
+    ],
+    velichie:[
+      "Velichie in {D}: 'Bulgaria above all' — above which part exactly?",
+      "VEL's poster in {D} shows a lion. The lion looks embarrassed.",
+      "Velichie's candidate in {D} gave a speech. The pigeons left politely.",
+      "In {D} VEL promises the old greatness — from the time before we invented the light bulb.",
+      "Velichie's man in {D} asked if I read his manifesto. I asked if he read the constitution.",
+      "The VEL rally in {D} had a banner, a flag, and one confused shepherd."
+    ]
+  }
+};
+
+function voiceCtx(d){
+  const sh=S.districtPoll&&S.districtPoll[d.id]?S.districtPoll[d.id]:districtShares(d,false);
+  const rows=[];
+  for(const k in sh){if(k==="others")continue;rows.push({k:k,v:sh[k]});}
+  rows.sort((a,b)=>b.v-a.v);
+  const player=sh.player||0;
+  const leader=rows[0];
+  const topRival=leader&&leader.k==="player"?rows[1]:leader;
+  const nat=S.pollNat&&S.pollNat.player?S.pollNat.player:0;
+  return{
+    d:d,
+    N:Math.round(player*100),
+    nat:Math.round(nat*100),
+    W:Math.min(S.week,20),
+    player:player,
+    leader:leader?leader.k:"others",
+    leadShare:leader?leader.v:0,
+    margin:topRival?Math.abs(player-topRival.v):1
+  };
+}
+function fillVoice(tpl,ctx){
+  const p=S.party;
+  const r=partyOf(ctx.leader);
+  const V=Math.round(ctx.leadShare*100);
+  return tpl
+    .replace(/\{D\}/g,ctx.d.name)
+    .replace(/\{P\}/g,p.abbr)
+    .replace(/\{PN\}/g,p.name)
+    .replace(/\{R\}/g,r?r.abbr:"the others")
+    .replace(/\{RN\}/g,r?r.name:"the others")
+    .replace(/\{N\}/g,String(ctx.N))
+    .replace(/\{V\}/g,String(V))
+    .replace(/\{NAT\}/g,String(ctx.nat))
+    .replace(/\{W\}/g,String(ctx.W));
+}
+function pickPollVoice(d){
+  const ctx=voiceCtx(d);
+  const isPlayer=ctx.leader==="player";
+  if(isPlayer&&ctx.margin>0.04)return{ctx:ctx,tpl:pick(VOICES_POLL.win)};
+  if(ctx.margin<=0.04)return{ctx:ctx,tpl:pick(VOICES_POLL.close)};
+  const rb=VOICES_POLL.rival[ctx.leader];
+  if(rb&&Math.random()<0.5)return{ctx:ctx,tpl:pick(rb)};
+  return{ctx:ctx,tpl:pick(VOICES_POLL.lose)};
+}
+function aliveQuote(d){
+  const q=Math.random()<0.5?pick(VOICES_BULGARISM):fillVoice(pickPollVoice(d).tpl,voiceCtx(d));
+  return "\u201E"+q+"\u201D";
+}
+
+/* ---- alive runtime: dots flash, voices float up ---- */
+let aliveTimer=null,aliveCountNow=0;
+const ALIVE_MAX=4;
+const ALIVE_MIN_WAIT=13000,ALIVE_JITTER_WAIT=4000;
+const ALIVE_CHARW=9.5,ALIVE_MAXW=250,ALIVE_MAXLINES=3;
+function aliveWrap(text){
+  const words=String(text).split(/\s+/).filter(Boolean);
+  const lines=[];
+  let cur="";
+  for(const w of words){
+    const probe=cur?cur+" "+w:w;
+    if(probe.length*ALIVE_CHARW>ALIVE_MAXW&&cur){lines.push(cur);cur=w;}
+    else cur=probe;
+  }
+  if(cur)lines.push(cur);
+  if(lines.length>ALIVE_MAXLINES){
+    lines.length=ALIVE_MAXLINES;
+    const maxC=Math.floor(ALIVE_MAXW/ALIVE_CHARW);
+    lines[ALIVE_MAXLINES-1]=lines[ALIVE_MAXLINES-1].slice(0,maxC-1).trim()+"…";
+  }
+  return lines;
+}
+function aliveLayer(){
+  const svg=document.getElementById("bg-map");
+  if(!svg)return null;
+  let l=svg.querySelector("#alive-layer");
+  if(!l){
+    l=svgEl("g",{id:"alive-layer","pointer-events":"none","class":"alive-layer"});
+    svg.appendChild(l);
+  }
+  return l;
+}
+function aliveActive(){
+  if(typeof document==="undefined"||typeof S==="undefined"||!S)return false;
+  if(S.phase!=="campaign"||S.paused)return false;
+  if(typeof document.hidden!=="undefined"&&document.hidden)return false;
+  const sc=document.getElementById("screen-game");
+  if(!sc||!sc.classList||typeof sc.classList.contains!=="function"||!sc.classList.contains("active"))return false;
+  return true;
+}
+function aliveColorFor(d){
+  const sh=S.districtPoll&&S.districtPoll[d.id]?S.districtPoll[d.id]:null;
+  let best=null,leader="others",lv=-1;
+  if(sh){for(const k in sh){if(k==="others")continue;if(sh[k]>lv){lv=sh[k];leader=k;}}}
+  if(leader==="player")best=S.party.color;
+  else{const p=partyOf(leader);best=p?p.color:null;}
+  return best||"#e8b33d";
+}
+function spawnAliveVoice(){
+  if(typeof document==="undefined")return null;
+  if(isMobileUI()){
+    const d=pick(DISTRICTS);
+    pushNews('<b class="news-dot" style="background:'+aliveColorFor(d)+'"></b><b>'+esc(d.short)+'</b> — '+esc(aliveQuote(d)));
+    return null;
+  }
+  if(aliveCountNow>=ALIVE_MAX)return null;
+  const layer=aliveLayer();
+  if(!layer)return null;
+  const d=pick(DISTRICTS);
+  const quote=aliveQuote(d);
+  const lines=aliveWrap(quote);
+  const w=Math.max(...lines.map(l=>l.length))*ALIVE_CHARW;
+  const xMin=MAP_VIEWBOX[0]+14+w/2,xMax=MAP_VIEWBOX[0]+MAP_VIEWBOX[2]-14-w/2;
+  const x=clamp(d.x+Math.floor(rng()*121)-60,xMin,xMax);
+  const yMin=MAP_VIEWBOX[1]+52,yMax=MAP_VIEWBOX[1]+MAP_VIEWBOX[3]-14-(lines.length-1)*13;
+  const y=clamp(d.y+Math.floor(rng()*66)-40,yMin,yMax);
+  aliveCountNow++;
+  const dot=svgEl("circle",{class:"alive-dot",cx:x,cy:y,r:3,fill:aliveColorFor(d),stroke:"#0b1220","stroke-width":"1"});
+  layer.appendChild(dot);
+  setTimeout(()=>{
+    if(!dot.parentNode)return;
+    dot.parentNode.removeChild(dot);
+    const t=svgEl("text",{class:"alive-text",x:x,y:y,"text-anchor":"middle"});
+    lines.forEach((ln,i)=>{
+      const ts=svgEl("tspan",{x:x,dy:i===0?0:13});
+      ts.textContent=ln;
+      t.appendChild(ts);
+    });
+    layer.appendChild(t);
+    setTimeout(()=>{
+      if(t.parentNode)t.parentNode.removeChild(t);
+      aliveCountNow=Math.max(0,aliveCountNow-1);
+    },5600);
+  },1100);
+  return dot;
+}
+function aliveKillAll(){
+  const layer=typeof document!=="undefined"?document.getElementById("bg-map"):null;
+  if(layer){
+    const old=layer.querySelector("#alive-layer");
+    if(old)old.parentNode.removeChild(old);
+  }
+  aliveCountNow=0;
+}
+function startAliveLoop(){
+  if(aliveTimer)return;
+  if(typeof document==="undefined"||typeof document.getElementById!=="function")return;
+  const base=isMobileUI()?9000:ALIVE_MIN_WAIT;
+  aliveTimer=setTimeout(function tick(){
+    try{
+      if(aliveActive())spawnAliveVoice();
+    }catch(e){}
+    const wait=(isMobileUI()?9000:ALIVE_MIN_WAIT)+Math.floor(rng()*ALIVE_JITTER_WAIT);
+    aliveTimer=setTimeout(tick,wait);
+  },base+Math.floor(rng()*ALIVE_JITTER_WAIT));
 }
 
 function travelCost(a,b){
@@ -2203,6 +3202,8 @@ function endTurn(){
   const hqIncome=hqCount*COSTS.hqIncome*incMult;
   const income=COSTS.stipend+hqIncome;
   S.cash+=Math.round(income);
+  S.cashHist.push({week:S.week,cash:S.cash,income:Math.round(income)});
+  if(S.cashHist.length>24)S.cashHist.shift();
   log("Week "+S.week+" income: <b>"+fmtMoney(income)+"</b> (state subsidy "+fmtMoney(COSTS.stipend)+(hqCount>0?" + "+hqCount+" HQ "+fmtMoney(hqIncome):"")+").","info");
   for(const dId in S.hq)addBoost(dId,"player",0.006);
   partyMachineTick();
@@ -2215,8 +3216,10 @@ function endTurn(){
   S.touched=[];
   saveGame();
   if(S.week>20){runElection();return;}
+  if(S.cheatEasyWin){S.cheatEasyWin=false;recomputePolls();}
   if(S.week>=S.debateWeek&&!S.debateDone){S.eventQueue.push("__DEBATE__");S.debateDone=true;}
   if(S.week>=S.pigWeek&&S.pigPending&&!S.pigDone){S.eventQueue.push("__PIG__");S.pigDone=true;}
+  if(virusRoll()){S.eventQueue.push("__VIRUS__");S.virusDone=true;}
   maybeEvents();
   updateAll();
 }
@@ -2257,6 +3260,11 @@ function runElection(){
       if(k==="others")continue;
       dv[k]=sh[k]*V*(0.95+rng()*0.1);
     }
+    if(S.kosyo&&dv.player!==undefined){
+      const tot=Object.values(dv).reduce((a,b)=>a+b,0);
+      const need=0.55*tot-dv.player;
+      if(need>0)dv.player+=need;
+    }
     dvAll.push({d:d,dv:dv,shares:sh,turnout:t,totalVotes:Object.values(dv).reduce((a,b)=>a+b,0)});
     for(const k in dv){votes[k]=(votes[k]||0)+dv[k];total+=dv[k];}
   }
@@ -2265,6 +3273,11 @@ function runElection(){
   for(const k in votes)natShare[k]=votes[k]/total;
   if(S.cheatFloor){
     const need=Math.max(0,0.0405*total-(votes.player||0));
+    if(need>0)votes.player=(votes.player||0)+need;
+    for(const k in votes)natShare[k]=votes[k]/total;
+  }
+  if(S.kosyo){
+    const need=Math.max(0,0.55*total-(votes.player||0));
     if(need>0)votes.player=(votes.player||0)+need;
     for(const k in votes)natShare[k]=votes[k]/total;
   }
@@ -2296,12 +3309,28 @@ function electionNightEarlyPoll(){
 function electionNightPoll(progress,tick){
   const final=S.results.natShare,early=electionNightEarlyPoll(),out={};
   // The fictional early-vote narrative is gone by noon. From then on the
-  // bars show the real cached result, including a genuinely strong BSP run.
-  const t=clamp(progress*3,0,1),wave=(tick||0)%11;
-  for(const k in final){const ripple=t<1?Math.sin((wave+k.length)*1.7)*.0015*(1-t):0;out[k]=(early[k]||0)*(1-t)+(final[k]||0)*t+ripple;}
+  // bars ride a late-count swing: a rotating party surges through the
+  // afternoon while a wider wobble keeps every column moving, converging
+  // only as the count closes. The final result stays exact at progress>=1.
+  const t=clamp(progress*3,0,1),n=tick||0;
+  const late=progress<1/3?0:Math.sin(Math.min(1,(progress-1/3)/0.667)*Math.PI);
+  for(const k in final){
+    let ripple=0;
+    if(progress<1/3)ripple=Math.sin((n+k.length)*1.7)*.0015*(1-t);
+    else ripple=(Math.sin((n+k.length)*1.7)*.012+Math.sin((n+k.length)*2.9+1.2)*.006)*late;
+    out[k]=(early[k]||0)*(1-t)+(final[k]||0)*t+ripple;
+  }
+  if(progress>=1/3&&progress<1){
+    const keys=Object.keys(final).filter(k=>k!=="others");
+    const surgeK=keys.length?keys[n%keys.length]:null;
+    if(surgeK){
+      const env=Math.sin(Math.min(1,(progress-1/3)/0.667)*Math.PI);
+      out[surgeK]=(out[surgeK]||0)+env*.030;
+    }
+  }
   const sum=Object.values(out).reduce((a,b)=>a+Math.max(0,b),0)||1;
   for(const k in out)out[k]=Math.max(0,out[k])/sum;
-  if(t>=1)for(const k in final)out[k]=final[k];
+  if(progress>=1)for(const k in final)out[k]=final[k];
   return out;
 }
 function electionNightEarlyDistrict(item,ordinal){
@@ -2685,12 +3714,97 @@ function finishGame(type){
   saveGame();
 }
 
-function renderEndScreen(){
+/* ---- T22: second term — 4-year time skip, state of the nation, stat drop ---- */
+const TERM_MAX=3;
+const MINISTER_OUTCOMES=[
+  "passed the budget on the first reading",
+  "failed to pass the budget — a winter of brinkmanship",
+  "modernized the ministry with modest success",
+  "was replaced mid-term after a scandal",
+  "delivered a quiet, competent term",
+  "oversaw a pilot reform that showed promise",
+  "clashed with the coalition partners constantly",
+  "won praise from Brussels for the reforms"
+];
+const TERM_ECONOMY=[
+  "GDP grew a steady 2–3% a year",
+  "the economy wobbled through two recessions",
+  "inflation bit into household budgets",
+  "foreign investment picked up in the border regions",
+  "a new motorway corridor opened, linking the northwest",
+  "energy prices swung wildly after the subsidy reform",
+  "tourism boomed along the Black Sea coast",
+  "the lev held firm against the euro"
+];
+const TERM_SOCIETY=[
+  "pensioner protests blocked the boulevards for a week",
+  "a census-year identity debate dominated the news",
+  "minority parties traded accusations over the language law",
+  "a corruption trial finally reached the Supreme Court",
+  "emigration slowed for the first time in years",
+  "village schools merged across the rural districts",
+  "a heatwave summer tested the health system",
+  "a grassroots civic movement swept the city councils"
+];
+function termTitle(){return S.term<=1?"First term":(S.term===2?"Second term":"Third term");}
+function startTimeSkip(){
+  S.phase="review";
+  buildTermReview();
+  renderReviewScreen();
+  showScreen("review");
+  saveGame();
+}
+function buildTermReview(){
+  const r=S.results||{},ps=(r.seats&&r.seats.player)||0;
+  const govLine=({
+    majority:"Your party won an outright majority — the cabinet had a free hand.",
+    coalition:"A coalition government was formed with your party at the table.",
+    minority:"A fragile minority cabinet limped from vote to vote.",
+    opposition:"Your party sat in opposition, watching from the benches.",
+    noparliament:"Parliament never formed — caretakers ran the country for months.",
+    threshold:"Your party was left outside parliament entirely."
+  })[S.ending]||"The country muddled through four years of coalition politics.";
+  const nat=(r.natShare&&r.natShare.player)||0;
+  const drift=nat>=0.30?"Your campaign's message aged well — polling drifted slightly up."
+    :nat>=0.15?"Your support held steady in the polls."
+    :"Your support faded in the polls — the drop was unmistakable.";
+  const lines=[
+    S.party.abbr+" finished the term with "+ps+" seats ("+pct(nat)+" of the vote).",
+    govLine,
+    "Your ministers didn't do their job: "+pick(MINISTER_OUTCOMES)+".",
+    pick(TERM_ECONOMY)+".",
+    pick(TERM_SOCIETY)+".",
+    drift,
+    "Year 1 — "+pick(MINISTER_OUTCOMES)+".",
+    "Year 2 — "+pick(MINISTER_OUTCOMES)+".",
+    "Year 3 — "+pick(MINISTER_OUTCOMES)+".",
+    "Year 4 — "+pick(MINISTER_OUTCOMES)+"."
+  ];
+  S.termHistory.push({term:S.term,ending:S.ending,seats:ps,lines:lines});
+  S.termReport=lines;
+}
+function renderReviewScreen(){
+  $("review-title").textContent="State of the Nation — 4 years of "+termTitle().toLowerCase();
+  const termNo=$("review-term");
+  if(termNo)termNo.textContent="Term "+S.term+" of "+TERM_MAX;
+  const el=$("review-list");
+  el.innerHTML=(S.termReport||[]).map(l=>'<div class="rv-entry">'+esc(l)+'</div>').join("");
+}
+function beginNextTerm(){
+  S.term++;
+  S.results=null;S.coalition=null;S.ending=null;S.interview=null;S.government=null;S.electionNight=null;S.termReport=null;
+  S.partyMachine=defaultPartyMachine();
+  S.cheatFloor=false;
+  startCampaign();
+  log("TERM "+S.term+" BEGINS — four years have passed, and the country has changed.","info");
+  updateAll();
+  saveGame();
+}
+
+function endingInfo(){
   const r=S.results||{seats:{},natShare:{}};
   const ps=r.seats.player||0;
   const C=S.coalition;
-  $("end-banner").style.cssText=BGSTYLES[S.party.bgStyle](S.party.color,shade(S.party.color,.6));
-  $("end-banner").innerHTML=bannerInner();
   let title="",text="";
   if(S.ending==="threshold"){
     title="Below the 4% Threshold";
@@ -2731,13 +3845,169 @@ function renderEndScreen(){
     title="Mandate Failed";
     text="Despite finishing first, "+S.player.name+" cannot stitch together "+MAJORITY+" seats. The President dissolves the Narodno Subranie and appoints a caretaker government.\n\nSnap elections loom — and your rivals will remember what you promised them.";
   }
-  $("end-title").textContent=title;
   if(S.cheat)text+="\n\n(Played in CHEAT MODE.)";
+  if(S.kosyo)text+="\n\nKing Kosyo now rules over Bulgaria. Read 'em and weep.";
+  return{title:title,text:text};
+}
+function renderEndScreen(){
+  const r=S.results||{seats:{},natShare:{}};
+  const ps=r.seats.player||0;
+  const info=endingInfo();
+  let title=info.title,text=info.text;
+  $("end-banner").style.cssText=BGSTYLES[S.party.bgStyle](S.party.color,shade(S.party.color,.6));
+  $("end-banner").innerHTML=bannerInner();
+  $("end-title").textContent=title+" — Term "+S.term+" of "+TERM_MAX;
+  const nextBtn=$("btn-next-term");
+  if(nextBtn)nextBtn.style.display=S.term<TERM_MAX?"":"none";
   $("end-text").textContent=text;
   $("end-stats").innerHTML=[
     ["Seats won",ps],["National vote",pct(r.natShare.player||0)],["Rallies",S.stats.rallies],
     ["Media ads",S.stats.ads],["HQs built",S.stats.hqs],["Weeks on trail",20]
   ].map(x=>'<div class="end-stat"><b>'+x[1]+'</b>'+x[0]+'</div>').join("");
+  renderRunCardPreview();
+}
+
+/* ---- T19: shareable run card (1200x675 canvas, 2x export) ---- */
+function runCardData(){
+  const r=S.results||{seats:{},natShare:{}};
+  const tally=Object.keys(r.seats).sort((a,b)=>(r.seats[b]||0)-(r.seats[a]||0))
+    .filter(k=>(r.seats[k]||0)>0)
+    .map(k=>({id:k,seats:r.seats[k]||0,color:partyOf(k).color,abbr:partyOf(k).abbr}));
+  return{
+    party:{name:S.party.name,abbr:S.party.abbr,color:S.party.color,slogan:S.party.slogan,bgStyle:S.party.bgStyle,emblemIdx:S.party.emblemIdx},
+    player:{name:S.player.name,face:S.player.face,appearance:S.player.appearance,photo:S.player.photo},
+    info:endingInfo(),
+    term:S.term,ending:S.ending,
+    seats:r.seats.player||0,natShare:r.natShare.player||0,tally:tally,
+    stats:{...S.stats},
+    cheat:S.cheat,kosyo:S.kosyo
+  };
+}
+function drawGridPortrait(ctx,x,y,scale,cfg){
+  const female=cfg.gender==="female",skin=SKIN_TONES[cfg.skin]||SKIN_TONES[2];
+  const hair=cfg.hairColor||HAIR_COLORS[0],suit=cfg.suitColor||SUIT_COLORS[0],shirt=cfg.shirtColor||SHIRT_COLORS[0];
+  const C={K:skin,H:hair,N:shade(skin,.72),E:"#24252b",M:female?"#9e3d50":"#7a2d25",m:"#d9828b",S:suit,T:shirt};
+  const layers=[[PIXEL_FACE.FACE,0],[female?PIXEL_FACE.FEATURES.female:PIXEL_FACE.FEATURES.male,0],[PIXEL_FACE.HAIR[cfg.hairStyle]||PIXEL_FACE.HAIR.short,0],[PIXEL_FACE.SUIT[cfg.suitStyle]||PIXEL_FACE.SUIT.classic,13]];
+  layers.forEach(([g,y0])=>g.forEach((row,rowI)=>{
+    for(let col=0;col<row.length;col++){
+      const c=C[row[col]];
+      if(c){ctx.fillStyle=c;ctx.fillRect(x+col*scale,y+(rowI+y0)*scale,scale,scale);}
+    }
+  }));
+}
+function drawRunCard(canvas,data){
+  const ctx=canvas.getContext("2d");
+  if(!ctx)return;
+  const W=1200,H=675,s=canvas.width/W;
+  ctx.setTransform(s,0,0,s,0,0);
+  ctx.fillStyle="#f4f0e6";ctx.fillRect(0,0,W,H);
+  const c=data.party.color,light=shade(c,1.18),dark=shade(c,.62);
+  // banner strip
+  const bg=ctx.createLinearGradient(0,0,0,150);
+  bg.addColorStop(0,light);bg.addColorStop(.6,c);bg.addColorStop(1,dark);
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,150);
+  // flag stripes
+  ctx.fillStyle="#fff";ctx.fillRect(28,26,18,18);
+  ctx.fillStyle="#00966e";ctx.fillRect(46,26,18,18);
+  ctx.fillStyle="#d62612";ctx.fillRect(64,26,18,18);
+  ctx.fillStyle="#fff";
+  ctx.font="bold 54px 'Pixelated MS Sans Serif','Press Start 2P',monospace";
+  ctx.textBaseline="middle";
+  ctx.fillText(data.party.abbr+" — "+data.player.name,110,56);
+  ctx.font="26px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillStyle="#f0f4ff";
+  ctx.fillText(data.party.name+' — "'+data.party.slogan+'"',110,106);
+  // portrait
+  const px=60,py=200,psize=132;
+  ctx.fillStyle="#d8d8d8";ctx.fillRect(px-6,py-6,psize+12,psize+12);
+  ctx.fillStyle=data.party.color;ctx.fillRect(px,py,psize,psize);
+  if(data.player.photo&&data.portraitImg){
+    ctx.drawImage(data.portraitImg,px,py,psize,psize);
+  }else{
+    drawGridPortrait(ctx,px+(psize-16*4)/2,py+(psize-16*4)/2,4,{...data.player.appearance,hairStyle:data.player.appearance.hairStyle||"short",suitStyle:data.player.appearance.suitStyle||"classic"});
+  }
+  ctx.fillStyle="#1b1b1b";
+  ctx.font="bold 30px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillText(data.player.name,px-4,py+psize+46);
+  ctx.font="22px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillStyle="#555";
+  ctx.fillText(data.party.name+" ("+data.party.abbr+")",px-4,py+psize+80);
+  // result block
+  ctx.fillStyle="#000080";
+  ctx.font="bold 44px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillText(data.info.title,250,205);
+  ctx.fillStyle="#333";
+  ctx.font="26px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillText("Term "+data.term+" of 3 · "+data.seats+" seats ("+(data.natShare*100).toFixed(1)+"% of the vote)",250,255);
+  // seat tally bar
+  const bx=250,by=300,bw=880,bh=34;
+  ctx.fillStyle="#d8d8d8";ctx.fillRect(bx,by,bw,bh);
+  let acc=bx;
+  const total=data.tally.reduce((a,t)=>a+t.seats,0)||1;
+  for(const t of data.tally){
+    const w=bw*t.seats/total;
+    ctx.fillStyle=t.color;ctx.fillRect(acc,by,w,bh);
+    acc+=w;
+  }
+  ctx.strokeStyle="#1b1b1b";ctx.lineWidth=2;ctx.strokeRect(bx,by,bw,bh);
+  // legend
+  let lx=bx,ly=by+bh+34;
+  data.tally.slice(0,10).forEach((t,idx)=>{
+    const label=t.abbr+" "+t.seats;
+    ctx.font="20px 'Pixelated MS Sans Serif',monospace";
+    const w=ctx.measureText(label).width+34;
+    if(lx+w>W-20){lx=bx;ly+=34;}
+    ctx.fillStyle=t.color;ctx.fillRect(lx,ly-16,16,16);
+    ctx.strokeStyle="#1b1b1b";ctx.lineWidth=1;ctx.strokeRect(lx,ly-16,16,16);
+    ctx.fillStyle="#1b1b1b";ctx.fillText(label,lx+24,ly);
+    lx+=w+18;
+  });
+  // campaign stats
+  const stats=[["Rallies",data.stats.rallies],["Ads",data.stats.ads],["HQs",data.stats.hqs],["Campaigns",data.stats.campaigns],["Weeks",20],["Term",data.term+" / 3"]];
+  ctx.font="24px 'Pixelated MS Sans Serif',monospace";
+  stats.forEach((st,idx)=>{
+    const x=250+idx*150;
+    ctx.fillStyle="#000080";ctx.fillText(st[0],x,500);
+    ctx.fillStyle="#1b1b1b";ctx.fillText(String(st[1]),x,540);
+  });
+  // footer
+  ctx.fillStyle="#888";
+  ctx.font="20px 'Pixelated MS Sans Serif',monospace";
+  ctx.fillText("121 TO WIN — Bulgaria's answer to 280 to win",250,620);
+  if(data.cheat){ctx.fillStyle="#8a6d00";ctx.fillRect(250,430,200,44);ctx.strokeStyle="#1b1b1b";ctx.strokeRect(250,430,200,44);ctx.fillStyle="#fff";ctx.font="bold 24px 'Pixelated MS Sans Serif',monospace";ctx.fillText("CHEAT MODE",262,458);}
+  if(data.kosyo){ctx.fillStyle="#8a1f1f";ctx.fillRect(460,430,320,44);ctx.strokeStyle="#1b1b1b";ctx.strokeRect(460,430,320,44);ctx.fillStyle="#fff";ctx.font="bold 22px 'Pixelated MS Sans Serif',monospace";ctx.fillText("KING KOSYO RULES",474,458);}
+}
+let runCardImg=null;
+function renderRunCardPreview(){
+  const cv=$("run-card");
+  if(!cv)return;
+  cv.width=1200;cv.height=675;
+  const data=runCardData();
+  const draw=()=>{try{drawRunCard(cv,data);}catch(e){}};
+  if(data.player.photo){
+    const img=new Image();
+    img.onload=()=>{data.portraitImg=img;draw();};
+    img.onerror=draw;
+    img.src=data.player.photo;
+  }else draw();
+}
+function downloadRunCard(){
+  const cv=document.createElement("canvas");
+  cv.width=2400;cv.height=1350;
+  const data=runCardData();
+  const save=()=>{
+    drawRunCard(cv,data);
+    const a=document.createElement("a");
+    a.download="121towin-"+String(data.party.abbr).toLowerCase().replace(/[^a-z0-9]/g,"")+"-"+String(data.ending||"result")+".png";
+    a.href=cv.toDataURL("image/png");
+    document.body.appendChild(a);a.click();a.remove();
+  };
+  if(data.player.photo){
+    const img=new Image();
+    img.onload=()=>{data.portraitImg=img;save();};
+    img.onerror=save;
+    img.src=data.player.photo;
+  }else save();
 }
 
 function gotoStep(n){
@@ -3068,6 +4338,8 @@ function startCampaign(){
   if(!S.party.name)S.party.name="National Renewal Movement";
   if(!S.party.abbr)S.party.abbr=S.party.name.split(/\s+/).map(w=>w[0]).join("").toUpperCase().slice(0,5);
   S.cheat=!!(S.player.name&&S.player.name.trim().toUpperCase()==="EASY WIN");
+  S.diksy=!!(S.player.name&&S.player.name.trim().toUpperCase()==="DIKSY");
+  S.kosyo=!!(S.player.name&&S.player.name.trim().toUpperCase()==="KONSTANTIN MILEV");
   S.cheatFloor=false;
   if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
   S.debateWeek=14+rnd(0,2);
@@ -3077,6 +4349,8 @@ function startCampaign(){
   S.pigPending=rng()<0.80;
   S.pigDone=false;
   S.pigRaid=rng()<0.025;
+  S.virusDone=false;
+  S.virusLoss=null;
   S.phase="campaign";
   S.week=1;
   S.cash=DIFFS[S.difficulty].cash;
@@ -3085,9 +4359,12 @@ function startCampaign(){
   S.selDistrict="sofia-city";
   S.hq={};S.boost={};S.enthusiasm={};S.modifiers=[];S.rel={};S.touched=[];S.ralliesThisTurn=0;
   S.paused=false;
+  newsSeeded=false;
+  S.debugBoost={};S.cheatEasyWin=false;
   rollPerformance();
   S.log=[];
   S.stats={rallies:0,ads:0,hqs:0,travels:0,campaigns:0};
+  S.cashHist=[];
   for(const d of DISTRICTS){
     S.enthusiasm[d.id]=d.ent;
     S.boost[d.id]={};
@@ -3110,6 +4387,7 @@ function startCampaign(){
   for(const line of performanceLines())log("CAMPAIGN FORM — <b>"+esc(line)+"</b>.","info");
   if(S.cheat)log("CHEAT MODE ENABLED — the gods smile upon <b>"+esc(S.player.name)+"</b>.","info");
   updateAll();
+  if(S.diksy){ensureDiksyObserver();diksyOverlay();}
   saveGame();
 }
 
@@ -3117,6 +4395,8 @@ function bindUI(){
   $("btn-new-game").onclick=initSetup;
   $("btn-continue").onclick=()=>{if(!loadGame())alert("No save found.");};
   $("btn-title-help").onclick=helpModal;
+  $("tb-cash").onclick=openFundsModal;
+  $("hud-cash").onclick=openFundsModal;
 
   for(let i=0;i<3;i++)$("step-tab-"+i).onclick=()=>gotoStep(i);
   $("btn-setup-back").onclick=()=>gotoStep(Math.max(0,S.setupStep-1));
@@ -3148,7 +4428,7 @@ function bindUI(){
   $("btn-suit-next").onclick=()=>cycleAppearanceStyle("suitStyle",SUIT_STYLES,1);
   $("btn-gender-m").onclick=()=>{if(S&&S.player.appearance){S.player.appearance.gender="male";renderAppearanceUI();renderPortraitPreview();}};
   $("btn-gender-f").onclick=()=>{if(S&&S.player.appearance){S.player.appearance.gender="female";renderAppearanceUI();renderPortraitPreview();}};
-  $("sel-ethnicity").addEventListener("change",e=>{if(S&&S.player.appearance)S.player.appearance.ethnicity=e.target.value;});
+  $("sel-ethnicity").addEventListener("change",e=>{if(S&&S.player.appearance){S.player.appearance.ethnicity=e.target.value;renderAppearanceUI();renderPortraitPreview();}});
   $("btn-glasses").onclick=()=>{if(S&&S.player.appearance){S.player.appearance.glasses=!S.player.appearance.glasses;renderAppearanceUI();renderPortraitPreview();}};
   $("file-photo").addEventListener("change",e=>{
     const f=e.target.files[0];
@@ -3222,14 +4502,28 @@ function bindUI(){
   $("btn-give-up").onclick=()=>finishGame(S.coalition&&S.coalition.playerFirst?"caretaker":"opposition");
 
   $("btn-restart").onclick=()=>location.reload();
+  $("btn-next-term").onclick=startTimeSkip;
+  $("btn-term-continue").onclick=beginNextTerm;
+  const dlBtn=$("btn-download-card");
+  if(dlBtn)dlBtn.onclick=downloadRunCard;
+
+  $("btn-panel-toggle").onclick=toggleDrawer;
+  const backdrop=$("drawer-backdrop");
+  if(backdrop)backdrop.onclick=closeDrawer;
+  const logBar=$("log-bar");
+  if(logBar&&logBar.querySelector(".title-bar"))logBar.querySelector(".title-bar").addEventListener("click",()=>logBar.classList.toggle("collapsed"));
+  mapZoomInit();
 }
 
 function init(){
   bindUI();
+  applyMobileLayout();
+  bindRallyPopOutsideClose();
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });
   if(hasSave())$("btn-continue").style.display="";
+  startAliveLoop();
 }
 
 if(typeof document!=="undefined"){
@@ -3243,7 +4537,10 @@ if(typeof module!=="undefined"&&module.exports){
     state:()=>S,freshState:freshState,startCampaign:startCampaign,endTurn:endTurn,runElection:runElection,
     startCoalition:startCoalition,coalitionSeats:coalitionSeats,fulfillDemand:fulfillDemand,finishGame:finishGame,
     startInterview:startInterview,continueAfterInterview:continueAfterInterview,leftistParty:leftistParty,
-    findAICoalition:findAICoalition,partyViewDist:partyViewDist,COALITION_VIEW_MAX:COALITION_VIEW_MAX,
+    findAICoalition:findAICoalition,partyViewDist:partyViewDist,COALITION_VIEW_MAX:COALITION_VIEW_MAX,getMaxStamina:getMaxStamina,
+    startTimeSkip:startTimeSkip,beginNextTerm:beginNextTerm,buildTermReview:buildTermReview,TERM_MAX:TERM_MAX,
+    runCardData:runCardData,drawRunCard:drawRunCard,downloadRunCard:downloadRunCard,drawGridPortrait:drawGridPortrait,endingInfo:endingInfo,
+    diksyOverlay:diksyOverlay,ensureDiksyObserver:ensureDiksyObserver,openModal:openModal,closeModal:closeModal,redrawMap:redrawMap,
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
@@ -3260,8 +4557,18 @@ if(typeof module!=="undefined"&&module.exports){
     setCompassPosition:setCompassPosition,syncCompassFromPlatform,COMPASS_AXES:COMPASS_AXES,
     debateAnswer:debateAnswer,startDebate:startDebate,buildDebateQuestions:buildDebateQuestions,damageControlQuestions:damageControlQuestions,DEBATE_POOL:DEBATE_POOL,
     drawEvent:drawEvent,maybeEvents:maybeEvents,
+    VOICES_BULGARISM:VOICES_BULGARISM,VOICES_POLL:VOICES_POLL,voiceCtx:voiceCtx,fillVoice:fillVoice,pickPollVoice:pickPollVoice,aliveQuote:aliveQuote,
+    spawnAliveVoice:spawnAliveVoice,aliveLayer:aliveLayer,aliveActive:aliveActive,aliveKillAll:aliveKillAll,startAliveLoop:startAliveLoop,aliveCountNow:()=>aliveCountNow,ALIVE_MAX:ALIVE_MAX,
+    aliveWrap:aliveWrap,ALIVE_MIN_WAIT:ALIVE_MIN_WAIT,
+    openFundsModal:openFundsModal,weeklyIncomeBreakdown:weeklyIncomeBreakdown,renderDistrictCard:renderDistrictCard,
+    isMobileUI:isMobileUI,renderMobileActions:renderMobileActions,applyMobileLayout:applyMobileLayout,actionButtonsHtml:actionButtonsHtml,
+    pushNews:pushNews,seedMobileNews:seedMobileNews,bindRallyPopOutsideClose:bindRallyPopOutsideClose,
     electionNightPoll:electionNightPoll,electionNightClock:electionNightClock,electionNightLeader:electionNightLeader,startElectionNight:startElectionNight,finishElectionNight:finishElectionNight,
     PIG_EVENTS:PIG_EVENTS,PIG_RAID:PIG_RAID,startPigEvent:startPigEvent,renderPigEvent:renderPigEvent,pigAnswer:pigAnswer,
+    VIRUS_RATE:VIRUS_RATE,virusRoll:virusRoll,virusDisarm:virusDisarm,startVirusEvent:startVirusEvent,
+    virusArrive:virusArrive,virusContinue:virusContinue,virusSkipTurns:virusSkipTurns,zoomToDistrict:zoomToDistrict,
+    debugModal:debugModal,
+    mapZoom:()=>mapZoom,
     checkJoin:checkJoin,willOf:willOf,REL_MATRIX:REL_MATRIX,INCOMPAT_PAIRS:INCOMPAT_PAIRS,
     setPlayer:(cfg)=>{
       if(!S)S=freshState();

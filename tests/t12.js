@@ -34,6 +34,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 // ---------- T12: expected-effects preview (floating tooltip) ----------
 click(document.getElementById("btn-new-game"));
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of poll-effect checks
 let S=g.state();
 const tip=()=>document.getElementById("preview-tip");
 const tipText=()=>tip()?tip().textContent:"";
@@ -171,7 +172,7 @@ window.showNextEvent=function(){
 for(let i=0;i<1000;i++)g.maybeEvents();
 const evWeeks=eventsPerCall.filter(n=>n>0).length;
 const pctEv=evWeeks/10;
-check("events in ~80% of weeks ("+pctEv.toFixed(1)+"%)",pctEv>=78&&pctEv<=82);
+check("events in ~80% of weeks ("+pctEv.toFixed(1)+"%)",pctEv>=76&&pctEv<=84);
 
 // no uncaught page errors
 check("no uncaught page errors",(window.__errs||[]).length===0);

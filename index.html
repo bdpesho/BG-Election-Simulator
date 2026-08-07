@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="121 to Win — campaign for 121 of the 240 seats in Bulgaria's parliament. 20 weeks, 29 districts, real 2026 rivals, pixel-perfect retro. Bulgaria's answer to 280 to win.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="121 to Win — Bulgarian Election Strategy">
+<meta property="og:description" content="Campaign for a 121-seat majority in the Narodno Subranie. 20 weeks, 29 districts, ten real rivals, coalitions, cheats and a second term.">
+<meta property="og:image" content="assets/og.png">
+<meta property="og:url" content="https://121to.win/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <title>121 to Win — Bulgarian Parliamentary Campaign Strategy</title>
 <link rel="stylesheet" href="vendor/xp.css">
 <link rel="stylesheet" href="styles.css">
@@ -11,6 +19,7 @@
 <div id="app">
 
   <section id="screen-title" class="screen active">
+    <canvas id="title-bg" aria-hidden="true"></canvas>
     <div class="title-wrap bevel-out">
       <div class="flag-stripe"><span class="fs-w"></span><span class="fs-g"></span><span class="fs-r"></span></div>
       <h1 class="title-logo">121 <span>TO WIN</span></h1>
@@ -124,10 +133,12 @@
                 <input type="text" id="in-party-abbr" maxlength="6" value="NRM">
               </label>
               <div class="fld"><span>Party colour</span>
-                <div id="color-swatches" class="swatches"></div>
-                <div class="color-pickers">
-                  <input type="color" id="in-party-color" value="#00966e" title="Pick any colour">
-                  <input type="text" id="in-party-hex" maxlength="7" placeholder="#rrggbb" spellcheck="false">
+                <div class="swatch-row">
+                  <div id="color-swatches" class="swatches"></div>
+                  <div class="color-pickers">
+                    <input type="color" id="in-party-color" value="#00966e" title="Pick any colour">
+                    <input type="text" id="in-party-hex" maxlength="7" placeholder="#rrggbb" spellcheck="false">
+                  </div>
                 </div>
               </div>
             </div>
@@ -223,12 +234,15 @@
         <div class="stat-chip" id="tb-stamina" title="Stamina points — spent on travel, rallies and more"></div>
         <div class="stat-chip" id="tb-poll" title="Your national polling"></div>
         <button class="btn ghost sm" id="btn-help">Help</button>
+        <button class="btn ghost sm" id="btn-panel-toggle" style="display:none">Inspector ▸</button>
         <button class="btn ghost sm" id="btn-debug" style="display:none">Debug</button>
         <button class="btn ghost sm" id="btn-save">Save</button>
         <button class="btn ghost sm" id="btn-menu" style="display:none">Menu</button>
         <span class="chip gold" id="tb-cheat" style="display:none" title="God mode is active">CHEAT</span>
       </div>
     </header>
+
+    <div id="mobile-actions"></div>
 
     <div id="game-main">
       <div id="map-panel" class="window">
@@ -245,7 +259,12 @@
             <span class="map-title">Electoral map of Bulgaria · 240 seats · threshold 4%</span>
             <div id="map-legend"></div>
           </div>
-          <svg id="bg-map" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet"></svg>
+          <div id="hud-stats">
+            <div class="hud-box" id="hud-cash" title="Campaign funds — click for details"></div>
+            <div class="hud-box" id="hud-stamina" title="Stamina points — spent on travel, rallies and more"></div>
+            <div class="hud-box" id="hud-poll" title="Your national polling"></div>
+          </div>
+          <div id="map-canvas"><svg id="bg-map" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet"></svg></div>
         </div>
       </div>
       <aside id="side-panel" class="window">
@@ -265,6 +284,18 @@
           </div>
         </div>
       </aside>
+    </div>
+
+    <div id="news-bar" class="window">
+      <div class="title-bar">
+        <span class="title-bar-text">News — from the provinces</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="news-body window-body" id="news-list"><span class="hint">Waiting for reports…</span></div>
     </div>
 
     <footer id="log-bar" class="window">
@@ -359,6 +390,27 @@
     </div>
   </section>
 
+  <section id="screen-review" class="screen">
+    <div class="review-wrap window">
+      <div class="title-bar">
+        <span class="title-bar-text">State of the Nation</span>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize" tabindex="-1"></button>
+          <button aria-label="Maximize" tabindex="-1"></button>
+          <button aria-label="Close" tabindex="-1"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <h2 id="review-title"></h2>
+        <div class="review-sub" id="review-term"></div>
+        <div id="review-list" class="review-list"></div>
+        <div class="center-row">
+          <button id="btn-term-continue" class="btn primary big">Start the Next Campaign ▸</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-end" class="screen">
     <div class="end-wrap window">
       <div class="title-bar">
@@ -374,14 +426,23 @@
       <h2 id="end-title"></h2>
       <div id="end-text" class="end-text"></div>
       <div id="end-stats" class="end-stats"></div>
-      <button id="btn-restart" class="btn primary big">New Campaign</button>
+      <div class="run-card-box">
+        <canvas id="run-card" width="1200" height="675" aria-label="Run summary card"></canvas>
+      </div>
+      <div class="center-row">
+        <button id="btn-download-card" class="btn primary">Download run card PNG</button>
+        <button id="btn-next-term" class="btn primary big" style="display:none">Continue to Next Term ▸</button>
+        <button id="btn-restart" class="btn ghost big">New Campaign</button>
+      </div>
       </div>
     </div>
   </section>
 
+  <div id="drawer-backdrop"></div>
   <div id="modal-root"></div>
 </div>
 <script src="mapdata.js"></script>
 <script src="game.js"></script>
+<script src="title-bg.js"></script>
 </body>
 </html>

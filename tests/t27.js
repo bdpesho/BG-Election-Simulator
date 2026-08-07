@@ -31,6 +31,7 @@ function click(el){el.dispatchEvent(new window.MouseEvent("click",{bubbles:true}
 // ---------- 1. full campaign to the election ----------
 click(document.getElementById("btn-new-game"));
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of coalition timing
 let S=g.state();
 S.eventQueue=[];S.paused=false;
 let weeks=0;

@@ -40,6 +40,7 @@ check("raid variant ~2-3% of runs ("+(raidCount/2).toFixed(1)+"%)",raidCount>=2&
 
 // ---------- fires exactly once at week 17-18, resolves ----------
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of pig-week timing
 let S=g.state();
 S.pigPending=true;S.pigRaid=false;S.pigWeek=17;S.pigDone=false;
 let pigWeek=0,resolved=false;
@@ -76,6 +77,7 @@ check("pig resolved after answering",!S.paused&&S.pigDone&&S.pigPending);
 
 // ---------- raid: DPS collapses ~80% (relative, measured around the answer) ----------
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of raid-week timing
 S=g.state();
 S.pigPending=true;S.pigRaid=true;S.pigWeek=17;S.pigDone=false;
 let dpsBefore=null,dpsAfter=null;

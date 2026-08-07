@@ -59,6 +59,7 @@ check("renormalized weights sum to 1",Math.abs(wsum-1)<1e-9);
 
 // campaign: rally buttons = 5 active issues
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of debate-week timing
 S=g.state();
 click(document.getElementById("map-"+S.location)||document.querySelectorAll("#bg-map .node")[0]);
 const rallyIssues=[...document.querySelectorAll("[data-act=rally]")].map(b=>b.dataset.issue);
@@ -96,6 +97,7 @@ check("debate picks 8 valid questions for any draw",allEight);
 
 // debate fires exactly once, weeks 14–16, and resolves
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of debate-week timing
 S=g.state();
 S.debateWeek=14;S.debateDone=false;S.debate=null;
 let firstDebateWeek=0,resolved=false;

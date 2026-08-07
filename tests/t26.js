@@ -9,6 +9,7 @@ global.localStorage={_d:{},getItem(k){return this._d[k]||null},setItem(k,v){this
 global.alert=()=>{}; let timerCalls=0; const realSetTimeout=global.setTimeout;
 global.setTimeout=(fn,ms)=>{timerCalls++;return realSetTimeout(fn,ms);};
 Object.assign(global,require("../mapdata.js")); const g=require("../game.js");
+timerCalls=0; // boot-time background loops (T37 alive map) schedule their first tick — the check below verifies the campaign/election logic itself is timer-free
 let pass=0,fail=0; function check(name,cond){if(cond){pass++;console.log("PASS | "+name);}else{fail++;console.log("FAIL | "+name);}}
 g.startCampaign(); g.runElection(); const S=g.state();
 check("headless election reaches final reveal without timers",S.phase==="election"&&S.electionNight.step===5);

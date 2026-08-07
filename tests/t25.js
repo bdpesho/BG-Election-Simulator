@@ -70,6 +70,7 @@ check("Vazrazhdane lean in Sliven/Yambol",(by["sliven"].lean.vaz||0)>=0.1&&(by["
 
 // balance + T28 regression with the new turnout bases
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of district-stats polls
 let S=g.state();
 for(let wk=1;wk<=20;wk++){
   g.doRally(S.activeIssues[0]);

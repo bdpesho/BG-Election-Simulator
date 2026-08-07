@@ -13,6 +13,7 @@ const dom=new JSDOM(html,{runScripts:"dangerously",pretendToBeVisual:true,url:"h
 const {window}=dom;
 const {document}=window;
 window.alert=()=>{window.__alerts=(window.__alerts||0)+1;};
+window.module={exports:{}};
 window.addEventListener("error",e=>{window.__errs=(window.__errs||[]);window.__errs.push(String(e.message||e));});
 for(const src of[mapSrc,gameSrc]){
   const s=document.createElement("script");
@@ -31,6 +32,18 @@ function tabBy(t){return [...document.querySelectorAll(".insp-tab")].find(b=>b.d
 // 1. start setup
 click(document.getElementById("btn-new-game"));
 check("setup screen active",document.getElementById("screen-setup").classList.contains("active"));
+
+// 1b. ethnicity selector change re-renders immediately (regression: the handler
+// only set state, so the select/portrait went blank until any other interaction)
+const ethSel=document.getElementById("sel-ethnicity");
+ethSel.value="turkish";
+ethSel.dispatchEvent(new window.Event("change",{bubbles:true}));
+check("ethnicity change updates candidate state",window.module.exports.state().player.appearance.ethnicity==="turkish");
+check("ethnicity select shows the chosen option (no blank)",document.getElementById("sel-ethnicity").value==="turkish");
+check("portrait preview survives the ethnicity change",document.getElementById("portrait-preview").innerHTML.indexOf("<svg")>=0);
+ethSel.value="bulgarian";
+ethSel.dispatchEvent(new window.Event("change",{bubbles:true}));
+check("ethnicity change back to default re-renders too",document.getElementById("sel-ethnicity").value==="bulgarian"&&window.module.exports.state().player.appearance.ethnicity==="bulgarian");
 
 // 2. over budget -> UI error, no alert()
 setAttr("stamina",8);setAttr("charisma",8);setAttr("intelligence",8);

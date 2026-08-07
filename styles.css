@@ -117,7 +117,9 @@ em{font-style:normal; color:var(--dim); font-size:.78rem; text-transform:none; l
 .flag-stripe span{flex:1;}
 .fs-w{background:#f4f4f4;} .fs-g{background:#00966e;} .fs-r{background:#d62612;}
 
-.title-wrap{margin:auto; text-align:center; padding:34px 40px; max-width:760px; border-top:4px solid var(--xp-title1);}
+#screen-title{position:relative; overflow:hidden; background:#3a6ea5; isolation:isolate;}
+#title-bg{position:absolute; inset:0; width:100%; height:100%; display:block; image-rendering:pixelated; image-rendering:crisp-edges; z-index:0; pointer-events:none;}
+.title-wrap{position:relative; z-index:1; margin:auto; text-align:center; padding:34px 40px; max-width:760px; border-top:4px solid var(--xp-title1);}
 .title-logo{font-size:2.6rem; letter-spacing:.1em; line-height:1; color:#0a246a;}
 .title-logo span{color:#c00000;}
 .title-sub{margin-top:12px; color:var(--mut); font-size:.95rem;}
@@ -226,11 +228,16 @@ input[type=radio],input[type=checkbox]{
 .swatches{display:flex; gap:7px; flex-wrap:wrap; padding:4px 0;}
 .swatch{width:24px; height:24px; cursor:pointer; border:2px solid #fff; box-shadow:0 0 0 1px #808080;}
 .swatch.sel{outline:2px solid #000080;}
-.color-pickers{display:flex; gap:8px; align-items:center; margin-top:6px;}
+.swatch-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.color-pickers{display:flex; gap:8px; align-items:center; margin-top:0;}
 .color-pickers input[type=color]{
-  width:46px; height:30px; padding:2px; background:#fff; border:1px solid var(--xp-low); cursor:pointer;
-  box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
+  width:24px; height:24px; padding:0; background:#fff; border-radius:0;
+  border:2px solid #fff; cursor:pointer;
+  box-shadow:0 0 0 1px #808080;
 }
+.color-pickers input[type=color]::-webkit-color-swatch{border:none; border-radius:0;}
+.color-pickers input[type=color]::-webkit-color-swatch-wrapper{padding:0; border-radius:0;}
+.color-pickers input[type=color]::-moz-color-swatch{border:none; border-radius:0;}
 .color-pickers input[type=text]{
   font-family:inherit; font-size:.88rem; width:110px; padding:5px 8px;
   background:#fff; color:#000; border:1px solid var(--xp-low);
@@ -339,9 +346,20 @@ input[type=radio],input[type=checkbox]{
 .stat-chip{
   background:#fff; border:1px solid var(--xp-low);
   box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff;
-  padding:4px 10px; font-size:.8rem; font-weight:700; white-space:nowrap; color:#000;
+  padding:7px 13px; font-size:.92rem; font-weight:700; white-space:nowrap; color:#000;
+  display:flex; align-items:center; gap:7px;
 }
 .stat-chip b{color:#8a6d00;}
+.sc-ico{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; flex:none; font-size:.66rem; color:#fff; font-weight:700;
+  box-shadow:inset -1px -1px rgba(0,0,0,.35), inset 1px 1px rgba(255,255,255,.35);
+}
+#tb-cash .sc-ico{background:#1c7a3c;}
+#tb-stamina .sc-ico{background:#000080;}
+#tb-poll .sc-ico{background:#c00000;}
+#tb-cash{cursor:pointer;}
+#tb-cash:hover{outline:1px dotted #000; outline-offset:-3px;}
 
 /* ---- campaign windows ---- */
 #game-main{flex:1; display:flex; gap:8px; min-height:0; padding:8px;}
@@ -352,7 +370,47 @@ input[type=radio],input[type=checkbox]{
 #map-legend{display:flex; gap:10px; flex-wrap:wrap; font-size:.74rem; color:var(--mut);}
 #map-legend .lg{display:flex; align-items:center; gap:4px;}
 #map-legend .lg i{width:10px; height:10px; display:inline-block; border:1px solid rgba(0,0,0,.4);}
-#bg-map{flex:1; width:100%; min-width:0; min-height:0;}
+#map-canvas{position:relative; flex:1; min-height:0; overflow:hidden; touch-action:none; display:flex; flex-direction:column;}
+#bg-map{flex:1; width:100%; height:100%; min-width:0; min-height:0; display:block; transform-origin:0 0;}
+
+/* ---- T38: funds/SP/poll HUD inside the map window ---- */
+#hud-stats{flex:none; display:flex; gap:8px; margin:0 0 6px; min-width:0;}
+.hud-box{
+  flex:1; min-width:0; display:flex; align-items:center; gap:9px;
+  background:var(--xp-face); cursor:pointer; text-align:left; padding:5px 10px;
+  box-shadow:inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+.hud-box:hover{background:#f4f2ea;}
+.hud-ico{
+  display:flex; align-items:center; justify-content:center; width:30px; height:30px; flex:none;
+  font-size:.78rem; color:#fff; font-weight:700;
+  box-shadow:inset -2px -2px rgba(0,0,0,.32), inset 1px 1px rgba(255,255,255,.35);
+}
+#hud-cash .hud-ico{background:#1c7a3c;}
+#hud-stamina .hud-ico{background:#000080;}
+#hud-poll .hud-ico{background:#c00000;}
+.hud-txt{min-width:0; display:flex; flex-direction:column; gap:1px;}
+.hud-val{font-size:.95rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1.15; overflow-wrap:anywhere;}
+.hud-cap{font-size:.6rem; color:#555; text-transform:uppercase; letter-spacing:.08em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+/* ---- T40: mobile-only action cluster (moved out of the district inspector) ---- */
+#mobile-actions{display:none;}
+
+/* ---- T41: mobile-only news panel (replaces the alive-map voices on phones) ---- */
+#news-bar{display:none;}
+
+/* ---- T39: the virus from India — plane + V. Tarnovo flash ---- */
+#virus-plane{
+  position:absolute; z-index:60; width:110px; height:46px; pointer-events:none;
+  opacity:0; transition:left 2.6s linear, top 2.6s ease-in-out, opacity .3s;
+}
+#virus-plane.fly{opacity:1;}
+#virus-plane.arrived{opacity:0; transition:opacity .9s;}
+#virus-plane svg{width:100%; height:100%;}
+@keyframes virusFlash{
+  0%{fill:#ff2d2d;} 20%{fill:#2dff8a;} 40%{fill:#2dd6ff;} 60%{fill:#ff2df7;} 80%{fill:#ffe32d;} 100%{fill:#ff2d2d;}
+}
+#bg-map .node.virus-flash .body{animation:virusFlash .7s linear infinite;}
 
 /* ---- electoral map (font stays Press Start 2P) ---- */
 .map-sea{fill:transparent;}
@@ -368,7 +426,7 @@ input[type=radio],input[type=checkbox]{
 @keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
 
 /* ---- side panel ---- */
-#side-panel{width:385px; flex:none; display:flex; flex-direction:column; overflow:hidden; padding:0;}
+#side-panel{width:410px; flex:none; display:flex; flex-direction:column; overflow:hidden; padding:0;}
 #side-panel .window-body{flex:1; overflow-y:auto; min-height:0; margin:6px 8px;}
 .side-block{
   background:var(--xp-face); border:1px solid transparent;
@@ -426,18 +484,21 @@ input[type=radio],input[type=checkbox]{
 .pm-sec{border-top:1px solid var(--xp-low); margin-top:10px; padding-top:8px;}
 .pm-sec .mini-label{margin-bottom:6px;}
 .pm-staff{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:5px 0; border-bottom:1px dashed #c9c9c9; font-size:.8rem;}
-.pm-staff span{display:block; color:#555; font-size:.72rem;}
+.pm-staff div{flex:1; min-width:0;}
+.pm-staff span{display:block; color:#555; font-size:.72rem; line-height:1.35; overflow-wrap:break-word;}
+.pm-staff .btn.sm{flex:none;}
 .pm-form{display:flex; flex-direction:column; gap:5px;}
 .pm-form select,.pm-form input{font:inherit; padding:4px 6px; border:1px solid var(--xp-low); background:#fff;}
 .pm-form input{color:#333;}
 .pm-camp{border:1px solid var(--xp-low); background:#fff; box-shadow:inset 1px 1px 0 #808080, inset -1px -1px 0 #fff; padding:7px 9px; margin-bottom:7px;}
 .pm-camp-top{display:flex; justify-content:space-between; gap:8px; font-size:.82rem;}
-.pm-camp-top span{color:#555; font-size:.72rem; text-align:right;}
+.pm-camp-top b{min-width:0; overflow-wrap:break-word;}
+.pm-camp-top span{color:#555; font-size:.72rem; text-align:right; min-width:0; overflow-wrap:break-word;}
 .pm-phases{display:flex; gap:3px; margin:6px 0;}
-.pm-phase{flex:1; text-align:center; font-size:.68rem; padding:2px 0; border:1px solid var(--xp-low); color:#777; background:var(--xp-face2); white-space:nowrap; overflow:hidden;}
+.pm-phase{flex:1; text-align:center; font-size:.66rem; padding:2px 3px; border:1px solid var(--xp-low); color:#777; background:var(--xp-face2); line-height:1.3; overflow-wrap:break-word;}
 .pm-phase.done{background:#e6f4ea; border-color:#1c7a3c; color:#1c7a3c;}
 .pm-phase.cur{background:#fff2c0; border-color:#c8a000; color:#7a5d00; font-weight:700;}
-.pm-alloc{display:flex; align-items:center; gap:4px; font-size:.76rem; color:#555;}
+.pm-alloc{display:flex; align-items:center; gap:4px; font-size:.76rem; color:#555; flex-wrap:wrap;}
 .pm-alloc .btn.sm{min-width:0; padding:2px 9px;}
 .pm-alloc .btn.sm.sel{background:#000080; color:#fff;}
 .pm-hist{font-size:.78rem; padding:4px 0; border-bottom:1px dashed #c9c9c9;}
@@ -462,7 +523,7 @@ input[type=radio],input[type=checkbox]{
 .np-note{font-size:.72rem; color:#555; margin-top:10px; line-height:1.4; border-top:1px solid var(--xp-low); padding-top:6px;}
 
 /* ---- log window ---- */
-#log-bar{flex:none; height:156px; display:flex; flex-direction:column; padding:0;}
+#log-bar{flex:none; height:156px; display:flex; flex-direction:column; padding:0; margin:0 8px 8px;}
 #log-bar .log-body{flex:1; display:flex; gap:12px; padding:6px 8px; min-height:0;}
 #log-list{
   flex:1; overflow-y:auto; font-size:.8rem; line-height:1.5; color:var(--tx); background:#fff;
@@ -587,6 +648,22 @@ input[type=radio],input[type=checkbox]{
 }
 .end-stat b{display:block; font-size:1.05rem; color:#000080;}
 
+/* ---- T19: run card ---- */
+.run-card-box{max-width:760px; margin:0 auto 18px;}
+#run-card{width:100%; height:auto; display:block; background:#f4f0e6; box-shadow:inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;}
+
+/* ---- T22: state of the nation review ---- */
+.review-wrap{margin:auto; padding:0; max-width:720px;}
+.review-wrap h2{font-size:1.5rem; margin:10px 0 4px; color:#000080;}
+.review-sub{color:var(--mut); font-size:.9rem; margin-bottom:12px;}
+.review-list{max-height:52vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:2px; margin-bottom:14px;}
+.rv-entry{
+  background:var(--xp-face);
+  box-shadow:inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  padding:10px 14px; font-size:.92rem; line-height:1.55; color:#222;
+}
+.rv-entry:first-child{color:#000080; font-weight:bold;}
+
 /* ---- XP dialog modals ---- */
 .modal-back{
   position:fixed; inset:0; background:rgba(0,0,0,.45);
@@ -660,3 +737,78 @@ input[type=radio],input[type=checkbox]{
 ::-webkit-scrollbar-thumb:hover{background:#f4f2ea;}
 ::-webkit-scrollbar-button{width:0; height:0;}
 ::-webkit-scrollbar-corner{background:#d4d0c8;}
+
+/* ---- T17/T38: mobile friendliness (<=899px) ---- */
+@media (max-width:899px){
+  html,body{overflow-x:hidden;}
+  #app{min-height:100dvh;}
+  #topbar{flex-wrap:wrap; gap:6px 10px; padding:6px 8px;}
+  .tb-left{flex-wrap:wrap;}
+  .tb-right{flex-wrap:wrap; justify-content:flex-end; max-width:100%;}
+  .stat-chip{padding:5px 9px; font-size:.8rem;}
+  #game-main{flex-direction:column; overflow:visible; padding:6px;}
+  #map-panel{width:100%; flex:none;}
+  #map-panel .map-body{margin:4px 6px;}
+  #map-canvas{flex:none; width:100%; aspect-ratio:940/446;}
+  #bg-map{height:100%;}
+  #hud-stats{flex-wrap:wrap; gap:6px;}
+  .hud-box{flex:1 1 30%; min-width:0;}
+  #side-panel{
+    position:static; width:100%; height:auto; transform:none; box-shadow:none; margin-top:6px;
+  }
+  #side-panel .window-body{max-height:44vh; overflow-y:auto;}
+  #log-bar{width:auto; height:auto; margin:6px;}
+  .btn,.btn.sm{min-height:44px;}
+  .dc-actions{display:grid; grid-template-columns:repeat(2,1fr); gap:8px;}
+  .dc-actions .btn.wide{width:100%; margin:0;}
+  .modal-back{align-items:center; padding:12px;}
+  .modal{width:min(540px,94vw); max-height:88vh; border:0;}
+  .setup-wrap{max-height:100dvh; overflow-y:auto;}
+  .setup-panel .cols{flex-direction:column;}
+  #map-canvas.zoomed-out .overlay text,#map-canvas.zoomed-out .node text{display:none;}
+  #map-canvas.zoomed-out .alive-layer{display:none;}
+  /* ---- T40: mobile rework — candidate top row, HUD strip, action cluster, Start-menu services ---- */
+  .tb-left{flex-wrap:nowrap; width:100%; order:1;}
+  .tb-left #btn-start{order:0; flex:none;}
+  .tb-left .pm-chip{order:1; flex:1; min-width:0; justify-content:center; text-align:center;}
+  .tb-left .pm-chip .pm-face{width:30px; height:30px;}
+  .tb-left #tb-banner{order:2; flex:none;}
+  .tb-right{display:none;}
+  .clock{font-size:.92rem;}
+  .clock-sub{font-size:.6rem;}
+  #topbar{order:1; flex:none;}
+  #hud-stats{order:2; width:auto; margin:4px 8px 0;}
+  #hud-stats .hud-box{flex:1 1 0; justify-content:center;}
+  #mobile-actions{order:3; position:relative; display:flex; width:auto; flex:none; margin:6px 8px 0;}
+  #mobile-actions .mb-acts{flex:1; display:flex; flex-wrap:wrap; gap:6px;}
+  #mobile-actions .btn.wide{flex:1 1 30%; margin:0; justify-content:center; text-align:center;}
+  #mb-rally-pop{display:none; position:absolute; left:0; right:0; bottom:calc(100% + 6px); z-index:60; gap:6px;}
+  #mb-rally-pop.show{display:grid; grid-template-columns:repeat(2,1fr);}
+  #mb-rally-pop .btn.wide{width:100%; margin:0;}
+  .tb-center{order:4; width:100%; flex:none; justify-content:center; gap:2px;}
+  #game-main{order:5; flex:none;}
+  #news-bar{order:6; display:flex; flex-direction:column; width:auto; height:auto; margin:0 8px 6px;}
+  #news-bar .news-body{max-height:26vh; overflow-y:auto; padding:4px 10px;}
+  .news-line{display:flex; align-items:baseline; gap:6px; font-size:.8rem; line-height:1.35; padding:3px 0; border-bottom:1px dashed rgba(0,0,0,.12);}
+  .news-line:last-child{border-bottom:0;}
+  .news-line .news-dot{flex:none; width:8px; height:8px; border-radius:50%; align-self:center;}
+  #log-bar{order:7;}
+  #btn-help,#btn-save,#btn-debug,#tb-cheat{display:none!important;}
+  .dc-actions{display:none;}
+}
+
+/* ---- T37: alive map — flashing dots + floating voices ---- */
+.alive-layer{pointer-events:none;user-select:none;}
+.alive-dot{animation:alive-blink .5s ease-in-out 2;}
+@keyframes alive-blink{0%,100%{opacity:1;}50%{opacity:.1;}}
+.alive-text{
+  font-family:"Press Start 2P",monospace;font-size:9px;fill:#ffffff;
+  paint-order:stroke;stroke:#0b1220;stroke-width:3px;
+  animation:alive-float 5.4s ease-out forwards;
+}
+@keyframes alive-float{
+  0%{opacity:0;transform:translateY(8px);}
+  10%{opacity:1;transform:translateY(0);}
+  82%{opacity:1;}
+  100%{opacity:0;transform:translateY(-42px);}
+}

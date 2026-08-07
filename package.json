@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "node tests/smoke.js && node tests/map_geometry.js && node tests/map_dom.js && node tests/inspector.js && node tests/t4.js && node tests/t5.js && node tests/t6.js && node tests/t12.js && node tests/t31.js && node tests/t32.js && node tests/t33.js && node tests/t36.js && node tests/t29.js && node tests/t15.js && node tests/t34.js && node tests/t21.js && node tests/t25.js && node tests/t26.js && node tests/t27.js"
+    "test": "node tests/smoke.js && node tests/map_geometry.js && node tests/map_dom.js && node tests/inspector.js && node tests/t4.js && node tests/t5.js && node tests/t6.js && node tests/t12.js && node tests/t31.js && node tests/t32.js && node tests/t33.js && node tests/t36.js && node tests/t29.js && node tests/t15.js && node tests/t34.js && node tests/t21.js && node tests/t25.js && node tests/t26.js && node tests/t27.js && node tests/t35.js && node tests/t22.js && node tests/t17.js && node tests/t19.js && node tests/t37.js && node tests/t38.js && node tests/t39.js && node tests/t40.js && node tests/t41.js"
   },
   "keywords": [
     "game",

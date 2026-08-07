@@ -28,6 +28,7 @@ check("no other AI party has a focus list",g.AI_PARTIES.filter(p=>p.id!=="ppdb")
 
 // full sim: 20 weeks, no player action (events resolve headless)
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of AI-targeting checks
 let S=g.state();
 for(let wk=1;wk<=20;wk++){
   g.endTurn();

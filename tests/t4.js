@@ -25,26 +25,51 @@ function shareOf(id){return g.districtShares(district(id),false).player;}
 g.startCampaign();
 const S=g.state();
 
-// 1. pixel grids are all exactly 24 wide, chars from the allowed set
+// 1. pixel grids are all exactly 16 wide, chars from the allowed set
 const pf=g.PIXEL_FACE;
 const CHARS=new Set((".KNE MmHSTt").replace(/ /g,"").split(""));
 let gridRows=0,gridBad=0;
 (function walk(o){
-  if(typeof o==="string"){gridRows++;if(o.length!==24)gridBad++;for(const c of o){if(!CHARS.has(c))gridBad++;}return;}
+  if(typeof o==="string"){gridRows++;if(o.length!==16)gridBad++;for(const c of o){if(!CHARS.has(c))gridBad++;}return;}
   if(Array.isArray(o)){o.forEach(walk);return;}
   if(o&&typeof o==="object"){for(const k in o)walk(o[k]);}
 })(pf);
-check("pixel grids: all rows 24 chars, valid charset",gridRows>=36&&gridBad===0);
+check("pixel grids: all rows 16 chars, valid charset",gridRows>=36&&gridBad===0);
 
 // 2. pixel face renders as SVG with a healthy number of rects
 const svg=g.faceSVG(g.defaultAppearance());
-check("faceSVG renders pixel face",(svg.match(/<rect/g)||[]).length>30&&svg.indexOf("shape-rendering=\"crispEdges\"")>=0);
+check("faceSVG renders pixel face",(svg.match(/<rect/g)||[]).length>20&&svg.indexOf("shape-rendering=\"crispEdges\"")>=0);
 
 // 3. ≥24 visually distinct portrait combinations reachable
 const combos=g.SKIN_TONES.length*g.HAIR_STYLES.length*g.SUIT_STYLES.length*Object.keys(g.ETHNICITY_NAMES).length;
 check("≥24 distinct combinations reachable ("+combos+")",combos>=24);
 const distinct=[];for(const f of[{skin:0,hairStyle:"short",suitStyle:"classic"},{skin:5,hairStyle:"bald",suitStyle:"blouse"},{skin:2,hairStyle:"bun",suitStyle:"vest"}])distinct.push(g.faceSVG({...g.defaultAppearance(),...f}));
 check("portrait variants differ",new Set(distinct).size===3);
+const male=g.faceSVG({...g.defaultAppearance(),gender:"male"});
+const female=g.faceSVG({...g.defaultAppearance(),gender:"female"});
+check("male and female silhouettes are distinct",male.indexOf('data-gender="male"')>=0&&female.indexOf('data-gender="female"')>=0&&male!==female);
+check("female silhouette is 2px narrower",male.indexOf('data-body-width="18"')>=0&&female.indexOf('data-body-width="16"')>=0);
+check("hair library has 12+ human styles",g.HAIR_STYLES.length>=12&&g.HAIR_STYLES.every(k=>g.faceSVG({...g.defaultAppearance(),hairStyle:k}).indexOf("<svg")>=0));
+
+// 3b. every rect stays inside the 16x16 frame for every style/gender/skin/suit combo
+let rectBad=0;
+for(const hairStyle of g.HAIR_STYLES){
+  for(const gender of["male","female"]){
+    const svg=g.faceSVG({...g.defaultAppearance(),hairStyle:hairStyle,gender:gender,glasses:true});
+    const re=/<rect x="(-?\d+)" y="(-?\d+)" width="(-?\d+)" height="(-?\d+)"/g;
+    let m;
+    while((m=re.exec(svg))){
+      const x=+m[1],y=+m[2],w=+m[3],h=+m[4];
+      if(x<0||y<0||x+w>16||y+h>16)rectBad++;
+    }
+    const lens=/<rect x="(-?\d+)" y="(-?\d+)" width="(\d+)" height="(\d+)" fill="none"/g;
+    while((m=lens.exec(svg))){
+      const x=+m[1],y=+m[2],w=+m[3],h=+m[4];
+      if(x<0||y<0||x+w>16||y+h>16)rectBad++;
+    }
+  }
+}
+check("all portrait rects stay inside the 16x16 frame",rectBad===0);
 
 // 4. identity effects: Turkish minority boosts Kardzhali, hurts Yambol
 S.player.appearance=g.defaultAppearance();

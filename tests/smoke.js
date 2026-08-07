@@ -65,3 +65,4 @@ for(const ev of pool){
 for(const ev of pool)for(const o of ev.opts)g.applyFx(o.fx);
 console.log("all "+pool.length+" pool entries force-applied without crashing");
 console.log("EXTENDED CHECKS OK");
+process.exit(0);

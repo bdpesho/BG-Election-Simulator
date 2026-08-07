@@ -40,6 +40,7 @@ function check(name,cond,detail){
 }
 g.setPlayer({name:"map test"});
 g.startCampaign();
+g.virusDisarm(); // T39: keep the random virus event out of DOM invariants
 const svg=registry["bg-map"];
 check("viewBox attribute set",svg.attrs.viewBox==="30 87 940 446",svg.attrs.viewBox);
 const sea=svg.children.find(c=>c.attrs.class==="map-sea");
