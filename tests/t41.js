@@ -1,4 +1,5 @@
-// T41 regression: election-night drama (bigger post-noon swings, exact final),
+// T41 regression: election-night drama (one coherent late-count arc — 2nd/3rd
+// place swap, 4% barrier oscillation, no per-tick jitter, exact final),
 // exact +5-point debug boost, Easy Win +50% everywhere for the turn, and the
 // debug modal buttons behind them. Run: node tests/t41.js (uses jsdom).
 const fs=require("fs");
@@ -41,8 +42,11 @@ const final=S.results.natShare;
 const pA=g.electionNightPoll(.5,2),pB=g.electionNightPoll(.5,3),pC=g.electionNightPoll(.8,4);
 check("noon stays exactly the final result",Object.keys(final).every(k=>Math.abs(g.electionNightPoll(1/3)[k]-(final[k]||0))<1e-9));
 check("evening swing polls stay normalized",Math.abs(Object.values(pB).reduce((a,b)=>a+b,0)-1)<1e-9);
-const mov=Math.max(...Object.keys(final).filter(k=>k!=="others").map(k=>Math.abs((pB[k]||0)-(pA[k]||0))));
-check("late-count swings move the bars by more than a point",mov>0.01);
+check("no per-tick jitter: same progress gives identical bars",Object.keys(final).every(k=>Math.abs((pA[k]||0)-(pB[k]||0))<1e-12));
+const sorted=Object.keys(final).filter(k=>k!=="others").sort((a,b)=>final[b]-final[a]);
+const mid=g.electionNightPoll(2/3);
+check("2nd place visibly swings up through the afternoon",(mid[sorted[1]]||0)-(final[sorted[1]]||0)>0.01);
+check("3rd place visibly swings down through the afternoon",(final[sorted[2]]||0)-(mid[sorted[2]]||0)>0.01);
 const far=Math.max(...Object.keys(final).map(k=>Math.abs((pC[k]||0)-(final[k]||0))));
 check("bars still move well after 12:00, before the final",far>0.005);
 check("final reveal stays byte-exact",Object.keys(final).every(k=>g.electionNightPoll(2)[k]===final[k]));

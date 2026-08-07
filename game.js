@@ -1674,7 +1674,7 @@ function helpModal(){
     +'<ul><li>Rallies are strongest on high-weight issues where your platform matches the district stance.</li><li>Campaign HQs cost 40 000 лв but pay 9 000 лв per week and slowly grow local support.</li><li>Local media ads scale with Intelligence and suffer diminishing returns.</li></ul>'
     +'<p>Polling: a district\'s vote share comes from <b>issue alignment × voter enthusiasm × campaign boosts</b>. Ten rivals campaign too — GERB, Progresivna Balgariya, PP-DB, DPS, Vazrazhdane, BSP, ITN, MECh, APS and Velichie — and the strict 4% national threshold will drop the weakest of them out of the Narodno Subranie.</p>'
     +'<p>Election Day uses proportional representation: a strict <b>4% national threshold</b>, then the <b>D\'Hondt method</b> allocates each district\'s seats. 240 seats total; 121 for a majority.</p>'
-    +'<p>After the vote, negotiate a coalition: spend political capital on cabinet posts, policy concessions and cash to push parties\' willingness to 100. Random events — <b>'+EVENT_POOL.length+' in the database</b> — pause the game and apply permanent, timed or one-time modifiers.</p>'
+    +'<p>After the vote, negotiate a coalition: spend political capital on cabinet posts, policy concessions and cash to push parties\' willingness to 100. Random events — <b>1K+ in the database</b> — pause the game and apply permanent, timed or one-time modifiers.</p>'
     +'<div class="center-row"><button class="btn primary" onclick="closeModal()">Got it</button></div>');
 }
 
@@ -3306,27 +3306,47 @@ function electionNightEarlyPoll(){
   out.bsp=targetBsp;out.pb=targetPb;
   return out;
 }
+function electionNightSwingPlan(){
+  // The stable "story" for the late-count arc, derived only from the real
+  // results so every render agrees without any state: 2nd and 3rd place
+  // trade places through the afternoon, the leader's margin tightens, and
+  // the party closest to the 4% barrier oscillates across the line.
+  const final=S.results.natShare;
+  const keys=Object.keys(final).filter(k=>k!=="others");
+  const sorted=keys.slice().sort((a,b)=>(final[b]||0)-(final[a]||0));
+  const swing={};
+  if(sorted.length>=3){
+    const s2=final[sorted[1]]||0,s3=final[sorted[2]]||0;
+    const a23=clamp((s2-s3)*0.6,0.012,0.024);
+    swing[sorted[0]]=-0.008;
+    swing[sorted[1]]=a23;
+    swing[sorted[2]]=-a23;
+  }
+  if(sorted.length>=4)swing[sorted[3]]=0.006;
+  let thresh=null,td=1;
+  for(const k of keys){const d=Math.abs((final[k]||0)-0.04);if(d<td){td=d;thresh=k;}}
+  return {swing:swing,thresh:thresh};
+}
 function electionNightPoll(progress,tick){
   const final=S.results.natShare,early=electionNightEarlyPoll(),out={};
   // The fictional early-vote narrative is gone by noon. From then on the
-  // bars ride a late-count swing: a rotating party surges through the
-  // afternoon while a wider wobble keeps every column moving, converging
-  // only as the count closes. The final result stays exact at progress>=1.
-  const t=clamp(progress*3,0,1),n=tick||0;
+  // bars ride one coherent late-count arc (see electionNightSwingPlan)
+  // that is a smooth function of progress only — no per-tick wobble, no
+  // rotating surge party — so the columns glide instead of jittering
+  // frame-to-frame, and the final result stays exact at progress>=1.
+  const t=clamp(progress*3,0,1);
   const late=progress<1/3?0:Math.sin(Math.min(1,(progress-1/3)/0.667)*Math.PI);
+  const x=clamp((progress-1/3)/0.667,0,1);
+  const plan=electionNightSwingPlan();
   for(const k in final){
-    let ripple=0;
-    if(progress<1/3)ripple=Math.sin((n+k.length)*1.7)*.0015*(1-t);
-    else ripple=(Math.sin((n+k.length)*1.7)*.012+Math.sin((n+k.length)*2.9+1.2)*.006)*late;
-    out[k]=(early[k]||0)*(1-t)+(final[k]||0)*t+ripple;
-  }
-  if(progress>=1/3&&progress<1){
-    const keys=Object.keys(final).filter(k=>k!=="others");
-    const surgeK=keys.length?keys[n%keys.length]:null;
-    if(surgeK){
-      const env=Math.sin(Math.min(1,(progress-1/3)/0.667)*Math.PI);
-      out[surgeK]=(out[surgeK]||0)+env*.030;
+    let drift=0;
+    if(progress<1/3)drift=Math.sin(progress*60+k.length*1.7)*.0015*(1-t);
+    else{
+      drift=(plan.swing[k]||0)*late;
+      if(plan.thresh===k)drift+=Math.sin(x*Math.PI*2)*.008;
+      drift+=Math.sin(progress*40+k.length*1.7)*.0008*late;
     }
+    out[k]=(early[k]||0)*(1-t)+(final[k]||0)*t+drift;
   }
   const sum=Object.values(out).reduce((a,b)=>a+Math.max(0,b),0)||1;
   for(const k in out)out[k]=Math.max(0,out[k])/sum;

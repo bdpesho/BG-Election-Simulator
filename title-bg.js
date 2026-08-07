@@ -92,6 +92,7 @@
     podiumWood:"#8b5a2b", podiumWoodDk:"#5e3d1e", mic:"#2b2b2b", micHi:"#7a7a7a",
     posterPaper:"#fffdf0", posterFrame:"#8d8d8d",
     roseRed:"#e53935", rosePink:"#ff8a80", roseGreen:"#3a9a3a", roseStem:"#4a6e2a",
+    cigWhite:"#f5f5f5", cigFilter:"#d4a574", cigGlow:"#ff3b30", smoke:"#d0d0d0",
     lionGold:"#c9981a", lionDark:"#8a6a0a",
     cloud:"#ffffff", cloudSh:"#dbe6f0", bird:"#1a1a1a",
     paper:"#ffffff", paperSh:"#e8e8e8"
@@ -124,50 +125,58 @@
     pRect(ox - sc*2, oy - sc*3, sc, sc, PAL.gold);
   }
 
-  // Small but recognizable Bulgaria map as procedural polygon filled with pixels
+  // Bulgaria map as pixel flag — accurate silhouette like https://thumbs.dreamstime.com/b/bulgaria-pixel-flag-map-icon-flat-vector-illustration-isolated-white-bit-art-bulgarian-covered-background-353124527.jpg
+  // 8-bit flag map: white top / green middle / red bottom inside the country's shape
+  const BULGARIA_POLY = [
+    [3,1],[6,1],[6,0],[8,0],[8,2],[12,2],[12,1],[18,1],[18,2],[22,2],[22,1],[28,1],[28,2],[32,2],[32,1],[36,1],[36,4],[40,4],[40,7],[38,7],[38,10],[40,10],[40,11],[38,11],[38,13],[36,13],[36,15],[34,15],[34,17],[32,17],[32,18],[30,18],[30,19],[28,19],[28,20],[26,20],[26,19],[24,19],[24,20],[22,20],[22,19],[20,19],[20,18],[18,18],[18,17],[16,17],[16,16],[14,16],[14,17],[12,17],[12,16],[10,16],[10,17],[8,17],[8,16],[6,16],[6,14],[4,14],[4,11],[2,11],[2,8],[4,8],[4,4],[2,4],[2,2],[4,2]
+  ];
+  function pointInPoly(px, py, poly){
+    let inside=false;
+    for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+      const xi=poly[i][0], yi=poly[i][1], xj=poly[j][0], yj=poly[j][1];
+      const intersect = ((yi>py)!==(yj>py)) && (px < (xj-xi)*(py-yi)/(yj-yi)+xi);
+      if(intersect) inside=!inside;
+    }
+    return inside;
+  }
   function drawBulgariaMap(ox, oy, sc, t){
-    // base green block with stepped edges approximating Bulgaria silhouette
-    // grid 36x16
-    const MAP_GRID=[
-      "....................................",
-      "..GGGG...............................",
-      ".GGGGGGG......GGGGGGGGGGG...........",
-      "GGGGGGGGGGG.GGGGGGGGGGGGGGGGG.......",
-      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG......",
-      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG....",
-      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG....",
-      "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG.....",
-      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG.....",
-      ".GGGGGGGGGGGGGGGGGGGGGGGGGGGGG......",
-      "..GGGGGGGGGGGGGGGGGGGGGGGGGGGG......",
-      "...GGGGGGGGGGGGGGGGGGGGGGGGGG.......",
-      ".....GGGGGGGGGGGGGGGGGGGGGG.........",
-      ".......GGGGGGGGGGGGGGGG.............",
-      ".........GGGGGGGG...................",
-      "...................................."
-    ];
-    const pal={G:PAL.mapG};
-    drawGrid(MAP_GRID, pal, ox, oy, sc, false, 0);
-    // shadow edge (one pixel down-right for depth)
-    for(let r=0;r<MAP_GRID.length;r++){
-      const row=MAP_GRID[r];
-      for(let c=0;c<row.length;c++) if(row[c]==="G"){
-        // if neighbor down/right is empty, draw shadow
-        const isEdge = (c===row.length-1 || row[c+1]===".") || (r===MAP_GRID.length-1 || MAP_GRID[r+1][c]===".");
-        if(isEdge){
-          ctx.fillStyle=PAL.mapGd+"55";
-          ctx.fillRect(Math.round(ox + (c+0.6)*sc), Math.round(oy + (r+0.6)*sc), sc, sc);
-        }
+    const W=40, H=20;
+    // bob slightly for liveness
+    const bob = Math.round(Math.sin(t*0.0012)*sc*0.3);
+    const baseY = oy + bob;
+    // draw pixel by pixel with flag bands — crisp, no anti-alias
+    for(let y=0;y<H;y++){
+      for(let x=0;x<W;x++){
+        const cx = x + 0.5, cy = y + 0.5;
+        if(!pointInPoly(cx, cy, BULGARIA_POLY)) continue;
+        let col;
+        if(y < H*0.34) col = PAL.flagW; // white top ~34%
+        else if(y < H*0.66) col = PAL.flagG; // green middle
+        else col = PAL.flagR; // red bottom
+        // slight bevel: if edge, darken a bit for depth
+        const isEdge = !pointInPoly(cx+1, cy, BULGARIA_POLY) || !pointInPoly(cx, cy+1, BULGARIA_POLY);
+        if(isEdge) col = y < H*0.34 ? "#e8e8e8" : y < H*0.66 ? "#0a7a4a" : "#b81e0e";
+        pRect(ox + x*sc, baseY + y*sc, sc, sc, col);
       }
     }
-    // Sofia red dot (approx center-west)
-    const sx = ox + 9*sc;
-    const sy = oy + 7*sc;
-    pRect(sx, sy, sc, sc, PAL.sofiaDot);
-    pRect(sx, sy, sc, sc, "rgba(0,0,0,0.18)");
-    // subtle float bob
-    // outline pixel border for crispness
-    // done
+    // outline — 1px dark border around shape for crispness
+    ctx.strokeStyle="rgba(0,0,0,0.22)";
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let i=0;i<BULGARIA_POLY.length;i++){
+      const px = ox + BULGARIA_POLY[i][0]*sc;
+      const py = baseY + BULGARIA_POLY[i][1]*sc;
+      if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    // drop shadow
+    ctx.fillStyle="rgba(0,0,0,0.14)";
+    for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+      if(!pointInPoly(x+0.5,y+0.5,BULGARIA_POLY)) continue;
+      const isEdge = !pointInPoly(x+1.5,y+0.5,BULGARIA_POLY) || !pointInPoly(x+0.5,y+1.5,BULGARIA_POLY);
+      if(isEdge) pRect(ox + x*sc + sc*0.6, baseY + y*sc + sc*0.6, sc*0.7, sc*0.7, "rgba(0,0,0,0.12)");
+    }
   }
 
   function drawNevsky(ox, oy, sc){
@@ -370,6 +379,184 @@
     pRect(ox+2*sc, oy+3*sc, 3*sc, 1*sc, PAL.rosePink);
     pRect(ox+2*sc, oy+4*sc, 1*sc, 1*sc, PAL.rosePink);
     pRect(ox+2*sc, oy, 3*sc, 1*sc, PAL.rosePink);
+  }
+
+  function drawRoseValley(ox, oy, sc, t){
+    // valley of red roses — MEGA DENSE — even more roses as requested
+    const cols = isMobile?20:32;
+    const rows = isMobile?4:5;
+    const stepX = isMobile?16:20;
+    const stepY = 8;
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const jitterX = ((c*7 + r*13)%5 -2);
+        const jitterY = ((c*11 + r*7)%4 -1);
+        const sway = Math.round(Math.sin(t*0.002 + c*0.9 + r)*sc*0.5);
+        const x = ox + c*stepX*sc + jitterX*sc + sway;
+        const y = oy + r*stepY*sc + jitterY*sc;
+        // draw rose at x,y — reuse drawRose but inline for speed, with slight scale variation
+        const s = sc * (0.85 + (c%3)*0.1);
+        // stem
+        pRect(x+3*s, y+6*s, 1*s, 4*s, PAL.roseStem);
+        pRect(x+1*s, y+7*s, 2*s, 1*s, PAL.roseGreen);
+        pRect(x+4*s, y+8*s, 2*s, 1*s, PAL.roseGreen);
+        // flower
+        pRect(x+1*s, y+2*s, 5*s, 3*s, PAL.roseRed);
+        pRect(x+2*s, y+1*s, 3*s, 1*s, PAL.roseRed);
+        pRect(x+2*s, y+3*s, 3*s, 1*s, PAL.rosePink);
+        pRect(x+2*s, y, 3*s, 1*s, PAL.rosePink);
+        // highlight dot
+        if((c+r)%2===0) pRect(x+2*s, y+2*s, 1*s, 1*s, "#ffab91");
+      }
+    }
+    // add larger hero roses in front — EVEN MORE
+    for(let i=0;i<(isMobile?4:8);i++){
+      const hx = ox + (3+i*5)*stepX*sc + Math.sin(t*0.001+i)*sc;
+      const hy = oy + (rows*stepY+2)*sc + (i%2?2:0)*sc;
+      const hs = sc*1.35;
+      pRect(hx+3*hs, hy+6*hs, 1*hs, 4*hs, PAL.roseStem);
+      pRect(hx+1*hs, hy+7*hs, 2*hs, 1*hs, PAL.roseGreen);
+      pRect(hx+4*hs, hy+8*hs, 2*hs, 1*hs, PAL.roseGreen);
+      pRect(hx+1*hs, hy+2*hs, 5*hs, 3*hs, PAL.roseRed);
+      pRect(hx+2*hs, hy+1*hs, 3*hs, 1*hs, PAL.roseRed);
+      pRect(hx+2*hs, hy+3*hs, 3*hs, 1*hs, PAL.rosePink);
+      pRect(hx+2*hs, hy, 3*hs, 1*hs, PAL.rosePink);
+    }
+  }
+
+  function drawBusStop(ox, oy, sc, t){
+    const W=18, H=16;
+    // shelter frame brown
+    pRect(ox, oy, W*sc, H*sc, "rgba(0,0,0,0.12)");
+    // roof
+    pRect(ox-1*sc, oy, (W+2)*sc, 3*sc, PAL.podiumWoodDk);
+    pRect(ox-1*sc, oy, (W+2)*sc, 1*sc, PAL.podiumWood);
+    // side glass panels
+    pRect(ox, oy+3*sc, 2*sc, 9*sc, "#a8c0d8");
+    pRect(ox+W*sc-2*sc, oy+3*sc, 2*sc, 9*sc, "#a8c0d8");
+    pRect(ox, oy+3*sc, W*sc, 1*sc, "#dbe6f0");
+    // bench
+    pRect(ox+3*sc, oy+11*sc, 12*sc, 1*sc, PAL.podiumWood);
+    pRect(ox+4*sc, oy+12*sc, 1*sc, 3*sc, PAL.podiumWoodDk);
+    pRect(ox+12*sc, oy+12*sc, 1*sc, 3*sc, PAL.podiumWoodDk);
+    // sign "BUS" pixel
+    pRect(ox+5*sc, oy+4*sc, 8*sc, 4*sc, PAL.flagW);
+    pRect(ox+6*sc, oy+5*sc, 1*sc, 1*sc, PAL.flagR);
+    pRect(ox+8*sc, oy+5*sc, 1*sc, 2*sc, PAL.flagG);
+    pRect(ox+10*sc, oy+5*sc, 1*sc, 1*sc, PAL.flagR);
+    // timetable paper
+    pRect(ox+14*sc, oy+6*sc, 3*sc, 3*sc, PAL.paper);
+  }
+
+  function drawSmoker(ox, oy, sc, t){
+    // 8-bit character sitting/standing at bus stop smoking — chibi, 10x16
+    // legs (jeans)
+    pRect(ox+2*sc, oy+12*sc, 2*sc, 4*sc, "#2a3a5e");
+    pRect(ox+6*sc, oy+12*sc, 2*sc, 4*sc, "#2a3a5e");
+    // shoes
+    pRect(ox+1*sc, oy+16*sc, 3*sc, 1*sc, "#1a1a1a");
+    pRect(ox+6*sc, oy+16*sc, 3*sc, 1*sc, "#1a1a1a");
+    // torso (jacket)
+    pRect(ox+2*sc, oy+7*sc, 6*sc, 5*sc, "#3a3a3a");
+    pRect(ox+2*sc, oy+7*sc, 6*sc, 1*sc, "#4a4a4a");
+    // arm extended with cigarette
+    pRect(ox+8*sc, oy+8*sc, 4*sc, 2*sc, PAL.skin);
+    pRect(ox+8*sc, oy+8*sc, 4*sc, 1*sc, "#d9a066");
+    // cigarette
+    const flick = Math.floor(t*0.015)%4;
+    const glow = flick===0 ? PAL.cigGlow : (flick===2 ? "#ff6b35" : "#ff9a5a");
+    pRect(ox+12*sc, oy+8*sc, 3*sc, 1*sc, PAL.cigWhite);
+    pRect(ox+14*sc, oy+8*sc, 1*sc, 1*sc, PAL.cigFilter);
+    pRect(ox+15*sc, oy+8*sc, 1*sc, 1*sc, glow);
+    // occasional glow halo
+    if(flick<2) pRect(ox+15*sc, oy+8*sc, 1*sc, 1*sc, "rgba(255,80,30,0.35)");
+    // smoke puffs rising — 3 particles with drift
+    for(let i=0;i<3;i++){
+      const age = (t*0.002 + i*1.8)%3;
+      const sy = oy+6*sc - age*6*sc;
+      const sx = ox+13*sc + Math.sin(t*0.003 + i)*2*sc + i*1*sc;
+      const a = Math.max(0, 1 - age/3);
+      const s = 1 + age*0.6;
+      ctx.fillStyle = "rgba(210,210,210,"+(a*0.45)+")";
+      ctx.fillRect(Math.round(sx), Math.round(sy), Math.round(s*sc), Math.round(s*sc));
+      ctx.fillStyle = "rgba(255,255,255,"+(a*0.25)+")";
+      ctx.fillRect(Math.round(sx+1), Math.round(sy), 1, 1);
+    }
+    // head
+    pRect(ox+3*sc, oy+2*sc, 4*sc, 4*sc, PAL.skin);
+    pRect(ox+3*sc, oy+2*sc, 4*sc, 1*sc, "#5a3d2b"); // hair fringe
+    // cap
+    pRect(ox+2*sc, oy+1*sc, 6*sc, 2*sc, "#1e2a4a");
+    pRect(ox+2*sc, oy+1*sc, 6*sc, 1*sc, "#2f4a7a");
+    // face details
+    pRect(ox+4*sc, oy+4*sc, 1*sc, 1*sc, "#1a1a1a"); // eye
+    pRect(ox+6*sc, oy+5*sc, 1*sc, 1*sc, "#7a3a2a"); // mouth drag
+    // cheek blush
+    pRect(ox+3*sc, oy+5*sc, 1*sc, 1*sc, "rgba(255,120,120,0.5)");
+  }
+
+  function drawSpeechBubble(ox, oy, sc, t, text){
+    // pixel speech bubble with tail to smoker's mouth — 8-bit style, white with black border
+    const pad = Math.round(6*sc*0.4);
+    const lineH = Math.round(9*sc*0.45);
+    // split text into lines that fit bubble width ~ 180px desktop
+    const maxW = isMobile? Math.round(120*sc*0.5) : Math.round(180*sc*0.6);
+    // simple word wrap using canvas measure
+    ctx.font = Math.round(sc*3.2)+"px 'Pixelated MS Sans Serif','Tahoma',sans-serif";
+    ctx.textBaseline="top";
+    const words = text.split(" ");
+    const lines=[];
+    let cur="";
+    for(const w of words){
+      const test = cur ? cur+" "+w : w;
+      const tw = ctx.measureText(test).width;
+      if(tw > maxW - pad*2 && cur){ lines.push(cur); cur=w; } else cur=test;
+    }
+    if(cur) lines.push(cur);
+    const bw = maxW;
+    const bh = lines.length*lineH + pad*2 + 6;
+    // bubble shadow
+    pRect(ox+2, oy+2, bw, bh, "rgba(0,0,0,0.18)");
+    // bubble fill
+    pRect(ox, oy, bw, bh, "#ffffff");
+    // border — 1.5px black pixel border with bevel
+    ctx.strokeStyle="#0a0a0a";
+    ctx.lineWidth= Math.max(1, Math.round(sc*0.6));
+    ctx.strokeRect(Math.round(ox), Math.round(oy), Math.round(bw), Math.round(bh));
+    // inner highlight
+    pRect(ox, oy, bw, 2, "#f0f0f0");
+    // text
+    ctx.fillStyle="#0a0a0a";
+    ctx.font = Math.round(sc*3.0)+"px 'Pixelated MS Sans Serif','Tahoma',sans-serif";
+    for(let i=0;i<lines.length;i++){
+      ctx.fillText(lines[i], Math.round(ox+pad), Math.round(oy+pad+ i*lineH));
+    }
+    // tail — jagged pixel line from bubble to mouth (mouth at ox+bubbleW/2? we compute tail start at bottom center of bubble)
+    const tailStartX = Math.round(ox + bw*0.28);
+    const tailStartY = Math.round(oy + bh);
+    const tailEndX = Math.round(ox + bw*0.18 - 8*sc); // towards smoker mouth, offset left/up
+    const tailEndY = Math.round(oy + bh + 14*sc);
+    // draw zigzag tail
+    ctx.strokeStyle="#0a0a0a";
+    ctx.lineWidth= Math.max(1, Math.round(sc*0.5));
+    ctx.beginPath();
+    ctx.moveTo(tailStartX, tailStartY);
+    ctx.lineTo(tailStartX - 3*sc*0.5, tailStartY + 5*sc*0.5);
+    ctx.lineTo(tailEndX + 6*sc*0.5, tailEndY - 3*sc*0.5);
+    ctx.lineTo(tailEndX, tailEndY);
+    ctx.stroke();
+    // tail fill white
+    ctx.strokeStyle="#ffffff";
+    ctx.lineWidth= Math.max(1, Math.round(sc*0.35));
+    ctx.beginPath();
+    ctx.moveTo(tailStartX, tailStartY);
+    ctx.lineTo(tailStartX - 3*sc*0.5, tailStartY + 5*sc*0.5);
+    ctx.lineTo(tailEndX + 6*sc*0.5, tailEndY - 3*sc*0.5);
+    ctx.lineTo(tailEndX, tailEndY);
+    ctx.stroke();
+    // small bob
+    const bob = Math.round(Math.sin(t*0.002)*1);
+    // we already applied bob via oy, but keep subtle
   }
 
   function drawLion(ox, oy, sc){
@@ -665,46 +852,46 @@
   function initEntities(isResize){
     // keep existing velocities but reposition if resize and out of bounds
     if(clouds.length===0){
-      const n = isMobile?2:4;
+      const n = isMobile?3:6;
       clouds=[];
       for(let i=0;i<n;i++){
         clouds.push({
           x: Math.random()*W*1.2 - 0.1*W,
-          y: H*0.12 + Math.random()*H*0.22,
-          speed: 8 + Math.random()*14 + (i%2?6:0),
+          y: H*0.08 + Math.random()*H*0.20,
+          speed: 10 + Math.random()*16 + (i%2?7:0),
           variant: i%3,
-          sc: isMobile?2:2
+          sc: isMobile?2.2:3.2
         });
       }
     } else if(isResize){
       // clamp y to new H
-      for(const c of clouds) c.y = Math.min(c.y, H*0.38);
+      for(const c of clouds) c.y = Math.min(c.y, H*0.34);
     }
     if(birds.length===0){
-      const n = isMobile?3:5;
+      const n = isMobile?4:7;
       birds=[];
       for(let i=0;i<n;i++){
         birds.push({
           x: Math.random()*W - 20,
-          y: H*0.14 + Math.random()*H*0.18,
-          speed: 32 + Math.random()*28,
+          y: H*0.10 + Math.random()*H*0.16,
+          speed: 36 + Math.random()*32,
           offset: Math.random()*1000
         });
       }
     } else if(isResize){
-      for(const b of birds) b.y = Math.min(b.y, H*0.32);
+      for(const b of birds) b.y = Math.min(b.y, H*0.30);
     }
     if(papers.length===0){
-      const n = isMobile?4:8;
+      const n = isMobile?5:10;
       papers=[];
       for(let i=0;i<n;i++){
         papers.push({
           x: Math.random()*W,
           y: Math.random()*H*0.9 - H*0.1,
-          vy: 18 + Math.random()*22,
-          vx: (Math.random()-0.5)*18,
+          vy: 22 + Math.random()*24,
+          vx: (Math.random()-0.5)*20,
           sway: Math.random()*Math.PI*2,
-          swaySpeed: 0.8+Math.random()*1.4,
+          swaySpeed: 0.9+Math.random()*1.5,
           rot:0
         });
       }
@@ -750,47 +937,99 @@
     // far mountains
     drawFarMountains(t);
 
-    // faint large Bulgaria map watermark behind title? place faintly top-left far
-    // we will draw it again as static landmark later with higher opacity; this watermark is very faint
-    ctx.globalAlpha=0.06;
-    const mapSc = isMobile?1.6:2.2;
-    drawBulgariaMap(W*0.06, H*0.06, mapSc, t);
-    ctx.globalAlpha=1;
-
-    // grid of static landmarks — positions chosen to avoid central title card
-    // Top row — always above the centered XP window
-    drawBulgariaMap(W*0.04, H*0.06, isMobile?1.3:1.9, t);
-    drawNevsky(W*(isMobile?0.60:0.70), H*0.07, isMobile?1.4:1.9);
-    drawFlag(W*0.06, H*(isMobile?0.14:0.22), isMobile?1.3:1.7, t);
-    drawSmallChurch(W*(isMobile?0.34:0.42), H*0.11, isMobile?1.2:1.6);
-    drawPriest(W*(isMobile?0.80:0.86), H*0.13, isMobile?1.4:1.9);
-    // Bottom row — below the XP window (mobile window is taller, so push lower)
-    const bottomY = H*(isMobile?0.68:0.50);
-    drawRedChurch(W*0.03, bottomY - (isMobile?2:0), isMobile?1.3:1.7);
-    drawFortress(W*(isMobile?0.28:0.34), bottomY + (isMobile?6:6), isMobile?1.3:1.8);
-    drawMonument(W*(isMobile?0.72:0.78), bottomY + (isMobile?8:4), isMobile?1.3:1.7);
-    // Additional election + cultural near bottom, just above grass/road
-    const lowY = H*(isMobile?0.78:0.62);
-    drawRose(W*0.02, lowY - (isMobile?6:0), isMobile?1.5:2.0);
-    drawLion(W*0.90, lowY - (isMobile?4:2), isMobile?1.5:1.9);
-    drawBallotBox(W*0.10, H*(isMobile?0.76:0.68), isMobile?1.5:2.0);
-    drawPodium(W*(isMobile?0.62:0.72), H*(isMobile?0.74:0.66), isMobile?1.4:1.9);
-    drawPosterWall(W*(isMobile?0.32:0.46), H*(isMobile?0.74:0.66), isMobile?1.2:1.6);
-    drawMegaphone(W*0.78, H*(isMobile?0.80:0.74), isMobile?1.5:2.0);
+    // grid — MAP REMOVED, FLAG ULTRA HUGE 4x+, SMOKER 15%+ FOCAL, VALLEY DENSER
+    drawNevsky(W*(isMobile?0.48:0.58), H*0.02, isMobile?3.8:7.5, t);
+    // FLAG — EVEN BIGGER 4x (desktop 18→22, mobile 8.5→10) + top-visible on mobile
+    const flagScM = 12.0, flagScD = 26.0;
+    const flagX = isMobile ? 4 : W*0.02;
+    const flagY = isMobile ? 2 : H*0.02;
+    drawFlag(flagX, flagY, isMobile?flagScM:flagScD, t);
+    drawSmallChurch(W*(isMobile?0.26:0.36), H*0.04, isMobile?3.4:6.5, t);
+    drawPriest(W*(isMobile?0.70:0.80), H*0.05, isMobile?3.6:7.0, t);
+    // Bottom row — ULTRA HUGE, ground-hugging
+    const bottomY = H*(isMobile?0.58:0.44);
+    drawRedChurch(W*0.005, bottomY, isMobile?3.6:6.5, t);
+    drawFortress(W*(isMobile?0.18:0.24), bottomY+2, isMobile?3.6:7.2, t);
+    drawMonument(W*(isMobile?0.62:0.74), bottomY+2, isMobile?3.6:6.5, t);
+    // Valley of red roses — MEGA DENSE — 160+ roses, even more
+    const valleyY = H - Math.round(H*0.18) - (isMobile?30:52);
+    drawRoseValley(W*0.005, valleyY, isMobile?2.8:4.4, t);
+    // Election hero elements — ULTRA HUGE
+    drawLion(W*0.80, H*(isMobile?0.56:0.50), isMobile?3.6:7.0, t);
+    drawBallotBox(W*(isMobile?0.04:0.08), H*(isMobile?0.62:0.50), isMobile?5.5:13.0, t);
+    drawPodium(W*(isMobile?0.52:0.62), H*(isMobile?0.62:0.48), isMobile?3.6:7.0, t);
+    drawPosterWall(W*(isMobile?0.24:0.40), H*(isMobile?0.62:0.48), isMobile?3.0:6.2, t);
+    drawMegaphone(W*0.68, H*(isMobile?0.70:0.58), isMobile?3.6:5.8, t);
+    // Bus stop + SMOKER FOCAL — 15%+ (even bigger)
+    const busSc = isMobile?3.6:5.6;
+    const busX = W*(isMobile?0.28:0.38);
+    const busY = H - Math.round(H*0.18) - 16*busSc - (isMobile?16:22);
+    drawBusStop(busX, busY, busSc, t);
+    const smokerSc = isMobile?6.8:8.5;
+    const smokerH = 17*smokerSc;
+    const grassY2 = H - Math.round(H*0.18);
+    const smokerY = grassY2 - smokerH + (isMobile?6:8);
+    const smokerX = busX + 7*busSc;
+    drawSmoker(smokerX, smokerY, smokerSc, t);
+    // DOM speech bubble — focal, above smoker, tail to mouth, always on top of XP window
+    const bubbleEl = document.getElementById("smoker-bubble");
+    if(bubbleEl){
+      const mouthX = smokerX + 14*smokerSc;
+      const mouthY = smokerY + 8*smokerSc;
+      // position bubble centered above smoker's head, offset to avoid title
+      const bubbleW2 = bubbleEl.offsetWidth || (isMobile? 220: 280);
+      const bubbleH2 = bubbleEl.offsetHeight || 46;
+      let bx = mouthX - bubbleW2*0.38;
+      let by = smokerY - bubbleH2 - 18;
+      // keep inside screen with padding
+      bx = Math.max(6, Math.min(W - bubbleW2 - 6, bx));
+      by = Math.max(6, Math.min(H - bubbleH2 - 6, by));
+      // if bubble would be behind title (title is centered), push it slightly up/left to stay visible
+      // title is at ~5vh from top, height ~380, so title top ~40, bottom ~420 on 800px
+      // if bubble is inside title rect, nudge it above title
+      const titleEl = document.querySelector(".title-wrap");
+      if(titleEl){
+        const tr = titleEl.getBoundingClientRect();
+        const sr = screen.getBoundingClientRect();
+        const bxAbs = sr.left + bx;
+        const byAbs = sr.top + by;
+        const br = {left: bxAbs, right: bxAbs+bubbleW2, top: byAbs, bottom: byAbs+bubbleH2};
+        const rr = {left: tr.left, right: tr.right, top: tr.top, bottom: tr.bottom};
+        const overlap = !(br.right < rr.left || br.left > rr.right || br.bottom < rr.top || br.top > rr.bottom);
+        if(overlap){
+          // push bubble above title
+          by = Math.max(6, tr.top - sr.top - bubbleH2 - 14);
+          bx = Math.max(6, Math.min(W - bubbleW2 - 6, mouthX - bubbleW2*0.35));
+        }
+      }
+      bubbleEl.style.left = Math.round(bx) + "px";
+      bubbleEl.style.top = Math.round(by) + "px";
+      bubbleEl.style.display = screen.classList.contains("active") ? "block" : "none";
+      // subtle bob
+      const bob2 = Math.round(Math.sin(t*0.002)*2);
+      bubbleEl.style.transform = "translateY("+bob2+"px)";
+    }
+    ctx.strokeStyle="#0a0a0a";
+    ctx.lineWidth= Math.max(1, Math.round(smokerSc*0.35));
+    ctx.beginPath();
+    ctx.moveTo(bubbleX + bubbleW*0.30, bubbleY + 38);
+    ctx.lineTo(mouthX - 2*smokerSc, mouthY);
+    ctx.stroke();
 
     // ground and road
     drawGroundAndRoad();
 
-    // decorative small flags on ground along road fence (tiny)
-    for(let x= W*0.06; x< W*0.94; x+= 46){
-      // skip where van is? just draw
+    // decorative flags on ground along road fence — bigger, denser to fill desktop
+    const flagStep = isMobile?42:32;
+    for(let x= W*0.04; x< W*0.96; x+= flagStep){
       const fx = x;
       const fy = H*0.82;
-      // tiny flag pole 6px
-      pRect(fx, fy-8, 1, 8, "#7a4a2a");
-      pRect(fx+1, fy-8, 4, 2, PAL.flagW);
-      pRect(fx+1, fy-6, 4, 2, PAL.flagG);
-      pRect(fx+1, fy-4, 4, 2, PAL.flagR);
+      const pole = isMobile?8:11;
+      const fw = isMobile?5:7;
+      pRect(fx, fy-pole, 1.5, pole, "#7a4a2a");
+      pRect(fx+1.5, fy-pole, fw, 3, PAL.flagW);
+      pRect(fx+1.5, fy-pole+3, fw, 3, PAL.flagG);
+      pRect(fx+1.5, fy-pole+6, fw, 3, PAL.flagR);
     }
   }
 
@@ -827,30 +1066,29 @@
   function draw(t){
     // draw static layer each frame (cheap, or could cache but simple)
     drawStaticLayer(t);
-    const sc = isMobile?2:2.5;
-    // clouds (parallax mid)
+    const sc = isMobile?2.8:4.2;
+    // clouds (parallax mid) — use per-cloud sc for variety, but boost overall
     for(const c of clouds){
-      drawCloud(c.x, c.y, sc, c.variant);
+      drawCloud(c.x, c.y, c.sc || sc, c.variant);
     }
-    // birds
+    // birds — bigger, more visible
     for(const b of birds){
       const frame = Math.floor(b.offset)%2;
-      drawBird(b.x, b.y, isMobile?1.8:2.2, frame);
+      drawBird(b.x, b.y, isMobile?2.6:4.0, frame);
     }
-    // ballot papers falling (foreground)
+    // ballot papers falling (foreground) — bigger, denser
     for(const p of papers){
-      drawPaper(p.x, p.y, isMobile?1.6:1.9, p.rot);
+      drawPaper(p.x, p.y, isMobile?2.2:3.6, p.rot);
     }
-    // vans on road (foreground, fastest)
+    // vans on road (foreground, fastest) — HUGE hero, election campaign bus
     const roadY = H - (H*0.055) - 4;
     for(const v of vans){
-      const vy = roadY - 10* (isMobile?1.7:2.0);
-      // flip for dir -1 ? draw mirrored? just draw normally but indicate
+      const vy = roadY - 10* (isMobile?2.0:3.4);
       if(v.dir===-1){
         // simple mirror by translating and scale -1? Easier: draw with same but indicate direction with flag mirrored
         // we will just draw normally; movement direction still indicates
       }
-      drawVan(v.x, vy, isMobile?1.6:1.9, t + v.x*1.2);
+      drawVan(v.x, vy, isMobile?2.2:4.0, t + v.x*1.2);
       // dust puff behind van occasionally
       if(Math.floor(t*0.008 + v.x*0.03)%20===0){
         pRect(v.x - 6, vy+8, 3, 2, "rgba(120,120,120,0.25)");
