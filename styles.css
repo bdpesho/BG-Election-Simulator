@@ -28,7 +28,6 @@
 
 @font-face{font-family:'Pixelated MS Sans Serif';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/ms_sans_serif.woff2) format('woff2');}
 @font-face{font-family:'Pixelated MS Sans Serif';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/ms_sans_serif_bold.woff2) format('woff2');}
-@font-face{font-family:'pixelart-icons-font';font-style:normal;font-weight:400;font-display:swap;src:url(node_modules/pixelarticons/fonts/pixelart-icons-font.woff2) format('woff2');}
 
 @font-face{font-family:'Press Start 2P';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/ps2-cyrillic-ext.woff2) format('woff2');unicode-range:U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F;}
 @font-face{font-family:'Press Start 2P';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/ps2-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116;}
@@ -281,7 +280,7 @@ input[type=radio],input[type=checkbox]{
 }
 .banner-emblem{width:52px; height:52px; display:flex; align-items:center; justify-content:center;}
 .banner-emblem svg,.banner-emblem img{max-width:100%; max-height:100%; object-fit:contain; image-rendering:pixelated;}
-.party-emblem{display:block; width:1em; height:1em; font-family:'pixelart-icons-font'; font-style:normal; font-weight:400; line-height:1; text-align:center; image-rendering:pixelated;}
+.party-emblem{display:block; width:1em; height:1em; line-height:1; text-align:center; image-rendering:pixelated;}
 .banner-name{font-weight:700; letter-spacing:.04em; font-size:1rem; text-align:center; padding:0 10px; text-transform:uppercase;}
 .banner-abbr{font-size:.75rem; letter-spacing:.3em; opacity:.92; font-weight:700;}
 .banner-slogan{font-size:.8rem; font-weight:700; opacity:.95; text-align:center; padding:0 14px;}

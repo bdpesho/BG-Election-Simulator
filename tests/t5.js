@@ -104,13 +104,12 @@ check("contrast: white→dark text",g.contrast("#ffffff")==="#101826");
 check("color input not wrapped in a label",document.getElementById("in-party-color").closest("label")===null);
 check("banner text now carries a readability glow",preview.innerHTML.indexOf("text-shadow:0 0 4px")>=0);
 
-// 7c. emblem library expanded and every emblem renders
+// 7c. emblem library expanded and every emblem renders as a self-contained SVG
 check("EMBLEM_IDS expanded (≥20)",g.EMBLEM_IDS.length>=20);
 let allEmblemsOk=true;
 for(const id of g.EMBLEM_IDS){
   const svg=g.emblemSVG(id,"#ffffff",52);
-  const custom=["hammer","rose","snake"].includes(id);
-  if(custom?(svg.indexOf("<svg")!==0||svg.indexOf("shape-rendering=\"crispEdges\"")<0):(svg.indexOf("<span")!==0||svg.indexOf("party-emblem")<0||svg.indexOf("font-size:52px")<0)||svg.indexOf("stroke")>=0||svg.indexOf("<rect")>=0)allEmblemsOk=false;
+  if(svg.indexOf("<svg")!==0||svg.indexOf('class="party-emblem"')<0||svg.indexOf("shape-rendering=\"crispEdges\"")<0||svg.indexOf("font-size:52px")<0)allEmblemsOk=false;
 }
 check("every emblem id renders directly over the banner",allEmblemsOk);
 check("campaign emblem size stays compact",g.emblemSVG(g.EMBLEM_IDS[0],"#ffffff",26).indexOf("font-size:26px")>=0);
