@@ -98,7 +98,7 @@ const css=fs.readFileSync(path.join(ROOT,"styles.css"),"utf8");
 check("mobile: topbar right side wraps (no side-scroll)",css.indexOf(".tb-right{flex-wrap:wrap")>=0);
 check("mobile: modals are centred, not bottom sheets",css.indexOf(".modal-back{align-items:center")>=0);
 check("mobile: inspector is static and full-width under the map",css.indexOf("#side-panel{")>=0&&css.indexOf("position:static; width:100%")>=0);
-check("mobile: inspector body capped so the log stays reachable",css.indexOf("max-height:44vh")>=0);
+check("mobile: inspector body stays inside the fixed campaign viewport",css.indexOf("#side-panel .window-body{max-height:none; overflow-y:auto; min-height:0;}")>=0&&css.indexOf("#screen-game{height:100dvh; min-height:0; overflow:hidden;")>=0);
 
 check("no uncaught page errors",!(window.__errs&&window.__errs.length));
 console.log(pass+" passed, "+fail+" failed");

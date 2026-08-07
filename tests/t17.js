@@ -30,7 +30,7 @@ check("map canvas wrapper exists",!!document.getElementById("map-canvas")&&!!doc
 check("drawer backdrop exists",!!document.getElementById("drawer-backdrop"));
 check("inspector drawer toggle button exists",!!document.getElementById("btn-panel-toggle"));
 check("tap targets enforced at 44px on mobile",css.indexOf("min-height:44px")>=0);
-check("rally buttons become a 2x2 grid on mobile",css.indexOf("grid-template-columns:repeat(2,1fr)")>=0);
+check("rally options use a 2-column grid in the mobile popup",css.indexOf("#mb-rally-pop .mb-rally-panel")>=0&&css.indexOf("grid-template-columns:repeat(2,minmax(0,1fr))")>=0);
 check("modals stay centred on mobile (T38)",css.indexOf(".modal-back{align-items:center")>=0);
 check("labels declutter when zoomed out",css.indexOf("zoomed-out")>=0);
 check("map canvas disables touch scrolling",css.indexOf("touch-action:none")>=0);

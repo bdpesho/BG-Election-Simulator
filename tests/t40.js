@@ -130,10 +130,13 @@ check("mobile CSS: help/save/debug/cheat leave the topbar",css.indexOf("#btn-hel
 check("mobile CSS: Start left, candidate centred, banner right",css.indexOf(".tb-left #btn-start{order:0; flex:none;}")>=0&&css.indexOf(".tb-left .pm-chip{order:1; flex:1; min-width:0; justify-content:center; text-align:center;}")>=0&&css.indexOf(".tb-left #tb-banner{order:2; flex:none;}")>=0);
 check("mobile CSS: topbar stat chips hidden (HUD strip takes over)",css.indexOf(".tb-right{display:none;}")>=0);
 check("mobile CSS: inspector action buttons hidden",css.indexOf(".dc-actions{display:none;}")>=0);
-check("mobile CSS: rally options float in a popup above the cluster",css.indexOf("#mb-rally-pop{display:none; position:absolute; left:0; right:0; bottom:calc(100% + 6px); z-index:60; gap:6px;}")>=0&&css.indexOf("#mb-rally-pop.show{display:grid; grid-template-columns:repeat(2,1fr);}")>=0);
+check("mobile CSS: rally options use a centred fixed popup",css.indexOf("#mb-rally-pop{display:none; position:fixed; inset:0; z-index:80; align-items:center; justify-content:center;")>=0&&css.indexOf("#mb-rally-pop.show{display:flex;}")>=0&&css.indexOf(".mb-rally-panel")>=0);
 check("mobile CSS: clock row sits between the action cluster and the map",css.indexOf(".tb-center{order:4; width:100%; flex:none; justify-content:center; gap:2px;}")>=0);
-check("mobile CSS: the main row cannot shrink under the log",css.indexOf("#game-main{order:5; flex:none;}")>=0);
-check("mobile CSS: news panel sits between the inspector and the log",css.indexOf("#news-bar{order:6; display:flex; flex-direction:column; width:auto; height:auto; margin:0 8px 6px;}")>=0&&css.indexOf("#log-bar{order:7;}")>=0);
+check("mobile CSS: campaign screen locks to the viewport",css.indexOf("#screen-game{height:100dvh; min-height:0; overflow:hidden;")>=0&&css.indexOf("#game-main{order:5; flex:1 1 auto; min-height:0; overflow:hidden;}")>=0);
+check("mobile CSS: inspector body scrolls internally",css.indexOf("#side-panel .window-body{max-height:none; overflow-y:auto; min-height:0;}")>=0);
+check("mobile CSS: news and log have bounded inner panels",css.indexOf("#news-bar{order:6; display:flex; flex:0 0 clamp(64px,12dvh,100px);")>=0&&css.indexOf("#log-bar{order:7; flex:0 0 clamp(78px,14dvh,112px);")>=0);
+check("mobile CSS: end screen owns its vertical scroll",css.indexOf("#screen-end{height:100dvh; min-height:0; overflow-x:hidden; overflow-y:auto;")>=0&&css.indexOf("#screen-end .end-wrap{width:calc(100% - 16px); margin:0 auto 20px; flex:0 0 auto;}")>=0);
+check("mobile tooltip safety handles cancelled and scrolling gestures",gameSrc.indexOf("function bindMobilePreviewSafety()")>=0&&gameSrc.indexOf("[\"pointerup\",\"pointercancel\",\"touchend\",\"touchcancel\",\"touchmove\",\"scroll\"]")>=0);
 
 console.log(pass+" passed, "+fail+" failed");
 process.exit(fail?1:0);

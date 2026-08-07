@@ -1984,6 +1984,7 @@ function isMobileUI(){
 
 function renderMobileActions(){
   if(typeof document==="undefined")return;
+  if(isMobileUI())tipHide();
   const c=document.getElementById("mobile-actions");
   const nb=document.getElementById("news-bar");
   if(nb)nb.style.display=(isMobileUI()&&S&&S.phase==="campaign")?"flex":"none";
@@ -2008,7 +2009,7 @@ function renderMobileActions(){
     html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
     if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
     else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
-    html+='<div id="mb-rally-pop">'+ral.map(i=>'<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">'+esc(i.name)+' <span class="cost">'+COSTS.rallySP+' SP</span></button>').join("")+'</div>';
+    html+='<div id="mb-rally-pop" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Choose a rally issue"><div class="mb-rally-panel"><div class="mb-rally-title">Choose a rally issue</div>'+ral.map(i=>'<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">'+esc(i.name)+' <span class="cost">'+COSTS.rallySP+' SP</span></button>').join("")+'</div></div>';
   }else{
     const tc=travelCost(S.location,d.id);
     html+='<button class="btn wide" data-act="travel" '+((S.stamina<tc||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+tc+' SP</span></button>';
@@ -2023,10 +2024,7 @@ function renderMobileActions(){
       if(act==="travel")travelTo(dd.id);
       else if(act==="rally"){
         doRally(b.dataset.issue);
-        const o=document.getElementById("mb-rally-pop");
-        if(o)o.classList.remove("show");
-        const rt=document.getElementById("btn-mb-rally");
-        if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾';
+        setMobileRallyOpen(false);
       }
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
@@ -2038,9 +2036,17 @@ function renderMobileActions(){
     if(S.paused)return;
     const o=document.getElementById("mb-rally-pop");
     if(!o)return;
-    const open=o.classList.toggle("show");
-    rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> '+(open?"▴":"▾");
+    setMobileRallyOpen(!o.classList.contains("show"));
   };
+}
+
+function setMobileRallyOpen(open){
+  const o=document.getElementById("mb-rally-pop");
+  if(!o)return;
+  o.classList.toggle("show",!!open);
+  o.setAttribute("aria-hidden",open?"false":"true");
+  const rt=document.getElementById("btn-mb-rally");
+  if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> '+(open?"▴":"▾");
 }
 
 /* ---- T41: mobile rally popup + news panel ---- */
@@ -2069,11 +2075,11 @@ function bindRallyPopOutsideClose(){
     if(!isMobileUI())return;
     const pop=document.getElementById("mb-rally-pop");
     if(!pop||!pop.classList.contains("show"))return;
-    const box=document.getElementById("mobile-actions");
-    if(box&&box.contains(e.target))return;
-    pop.classList.remove("show");
     const rt=document.getElementById("btn-mb-rally");
-    if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾';
+    if(rt&&rt.contains(e.target))return;
+    const panel=pop.querySelector(".mb-rally-panel");
+    if(panel&&panel.contains(e.target))return;
+    setMobileRallyOpen(false);
   });
 }
 
@@ -2965,7 +2971,7 @@ function tipHide(){
 }
 function wirePreviewTarget(b,htmlFn){
   let holdTimer=null;
-  const enter=e=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipTimer=setTimeout(()=>tipShowAt(e,htmlFn()),200);};
+  const enter=e=>{if(isMobileUI())return;if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipTimer=setTimeout(()=>tipShowAt(e,htmlFn()),200);};
   const move=e=>{if(tipVisible)positionTip(e);};
   const leave=()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipHide();};
   b.addEventListener("mouseenter",enter);
@@ -2974,11 +2980,21 @@ function wirePreviewTarget(b,htmlFn){
   b.addEventListener("focus",enter);
   b.addEventListener("blur",leave);
   b.addEventListener("pointerdown",e=>{
+    if(isMobileUI())tipHide();
     if(tipTimer){clearTimeout(tipTimer);tipTimer=null;}
     holdTimer=setTimeout(()=>tipShowAt(e,htmlFn()),500);
   });
   b.addEventListener("pointerup",()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}tipHide();});
-  b.addEventListener("pointerleave",()=>{if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}});
+  b.addEventListener("pointercancel",leave);
+  b.addEventListener("pointerleave",leave);
+}
+
+let mobilePreviewSafetyBound=false;
+function bindMobilePreviewSafety(){
+  if(typeof document==="undefined"||mobilePreviewSafetyBound)return;
+  const hide=()=>{if(isMobileUI())tipHide();};
+  ["pointerup","pointercancel","touchend","touchcancel","touchmove","scroll"].forEach(type=>document.addEventListener(type,hide,true));
+  mobilePreviewSafetyBound=true;
 }
 
 function doRally(issueId){
@@ -4539,6 +4555,7 @@ function init(){
   bindUI();
   applyMobileLayout();
   bindRallyPopOutsideClose();
+  bindMobilePreviewSafety();
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });
