@@ -3,7 +3,7 @@ const fs=require("fs");
 const path=require("path");
 const vm=require("vm");
 const sandbox={};
-vm.runInNewContext(fs.readFileSync(path.join(__dirname,"..","mapdata.js"),"utf8")+"\n;globalThis.__E={REGION_PATHS,REGION_LABELS,CITY_DOTS,MAP_VIEWBOX,LABEL_POS,MAP_NAMES};",sandbox);
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,"..","mapdata.js"),"utf8")+"\n;globalThis.__E=globalThis.__121_MAPDATA__;",sandbox);
 const {REGION_PATHS,REGION_LABELS,CITY_DOTS,MAP_VIEWBOX,LABEL_POS,MAP_NAMES}=sandbox.__E;
 let failures=0;
 function check(name,cond,detail){

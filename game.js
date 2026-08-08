@@ -1,5 +1,7 @@
 "use strict";
 
+const {REGION_PATHS,REGION_LABELS,CITY_DOTS,MAP_VIEWBOX,LABEL_POS,MAP_NAMES}=globalThis.__121_MAPDATA__||globalThis;
+
 const ISSUES=[
   {id:"euro",name:"Eurozone Entry",lo:"Eurosceptic",hi:"Eurozone Now"},
   {id:"corruption",name:"Anticorruption Reform",lo:"Status Quo",hi:"Zero Tolerance"},
@@ -575,6 +577,8 @@ function labelPos(d){
 
 let S=null;
 let EVENT_POOL=[];
+const EVENT_EDITOR_OVERRIDES=/*EVENT_EDITOR_OVERRIDES_START*/[]/*EVENT_EDITOR_OVERRIDES_END*/;
+const EVENT_EDITOR_DELETIONS=/*EVENT_EDITOR_DELETIONS_START*/[]/*EVENT_EDITOR_DELETIONS_END*/;
 
 function defaultPartyMachine(){
   return{hqLevel:1,energy:6,staff:[],campaigns:[],history:[]};
@@ -607,7 +611,8 @@ function freshState(){
     eventBag:[],eventCursor:0,paused:false,eventQueue:[],
     results:null,coalition:null,ending:null,perfMod:{},
     term:1,termHistory:[],
-    cheat:false,cheatFloor:false,debugBoost:{},cheatEasyWin:false,diksy:false,kosyo:false
+    cheat:false,cheatFloor:false,debugBoost:{},cheatEasyWin:false,diksy:false,kosyo:false,
+    misho:false,martin:false,brat:false,mishoFired:false,sofiaFired:false
   };
 }
 
@@ -646,6 +651,7 @@ function showScreen(name){
   $("screen-"+name).classList.add("active");
   const nb=typeof document!=="undefined"?document.getElementById("news-bar"):null;
   if(nb)nb.style.display=(name==="game"&&S&&S.phase==="campaign"&&isMobileUI())?"flex":"none";
+  if(name!=="game"&&mobileSheetOpen)closeMobileSheet();
 }
 
 function partyOf(id){if(id==="player")return playerParty();return AI_PARTIES.find(p=>p.id===id);}
@@ -741,6 +747,11 @@ function districtShares(d,noisy,boostOv){
       if(dloss>0&&out[k]>0){const cut=Math.min(out[k],dloss);out[k]-=cut;gained+=cut;}
     }
     if(gained>0)out.others=(out.others||0)+gained;
+  }
+  const namedWin=(S.misho&&d.id==="yambol")||((S.martin||S.brat)&&d.id==="sofia-city");
+  if(namedWin){
+    const p0=out.player||0,np=Math.max(.60,p0);
+    if(np>p0){const keep=1-np,others=1-p0;if(others>0){for(const k in out)if(k!=="player")out[k]*=keep/others;}out.player=np;}
   }
   const debugB=S.debugBoost&&S.debugBoost[d.id]?S.debugBoost[d.id]:0;
   if(debugB>0){
@@ -1049,6 +1060,17 @@ const PIG_EVENTS=[
     {label:"Punchline: 'The Pig would know about mud-slinging'",sub:"The clip goes viral, DPS furious",fx:{nationBoost:.008,rel:{dps:-12}}}
   ]}
 ];
+
+const MISHO_EVENT={
+  kind:"good",flavor:true,title:"The Misho effect reaches Yambol",
+  text:"Famous Misho has been spotted in Zimnitsa, and his great leadership has spread across the region. Voters are swapping stories about Zimnishka rakia and how he used it to great effect to win them over.",
+  opts:[{label:"Raise the banner",sub:"Yambol remembers the story.",fx:{}}]
+};
+const SOFIA_NAME_EVENT={
+  kind:"choice",flavor:true,title:"A Sofia story gets around",
+  text:"People in Sofia are still talking about the copious amounts of Madjun and alcohol consumed by the old campaign legends. Their names carry farther than any loudspeaker.",
+  opts:[{label:"Let the story travel",sub:"Sofia knows the names.",fx:{}}]
+};
 
 function startPigEvent(){
   const ev=S.pigRaid?PIG_RAID:pick(PIG_EVENTS);
@@ -1435,6 +1457,12 @@ function buildEventPool(){
     {label:"Cameras everywhere",sub:"Total transparency, +1.5%",fx:{nationBoost:.015,enthusiasmAll:.03}},
     {label:"Keep it private",sub:"",fx:{}}
   ]});
+  for(const o of EVENT_EDITOR_OVERRIDES){
+    if(!o||!o.event||!Number.isInteger(o.index)||o.index<0)continue;
+    if(o.index<P.length)P[o.index]=o.event;
+    else if(o.index===P.length)P.push(o.event);
+  }
+  for(const index of EVENT_EDITOR_DELETIONS.slice().sort((a,b)=>b-a))if(Number.isInteger(index)&&index>=0&&index<P.length)P.splice(index,1);
 }
 
 function closestAlly(){
@@ -1539,6 +1567,8 @@ function showNextEvent(){
   if(nxt==="__DEBATE__"){startDebate();return;}
   if(nxt==="__PIG__"){startPigEvent();return;}
   if(nxt==="__VIRUS__"){startVirusEvent();return;}
+  if(nxt==="__MISHO__"){renderEventModal(MISHO_EVENT);return;}
+  if(nxt==="__SOFIA_NAME__"){renderEventModal(SOFIA_NAME_EVENT);return;}
   renderEventModal(EVENT_POOL[nxt]);
 }
 
@@ -1771,6 +1801,12 @@ function loadGame(){
     if(!S.virusLoss)S.virusLoss=null;
     if(!S.debugBoost||typeof S.debugBoost!=="object")S.debugBoost={};
     if(S.cheatEasyWin===undefined)S.cheatEasyWin=false;
+    const name=(S.player&&S.player.name||"").trim().toLowerCase();
+    if(S.misho===undefined)S.misho=name==="mihail stamboliev";
+    if(S.martin===undefined)S.martin=name==="georgi martinov";
+    if(S.brat===undefined)S.brat=name==="nikola bratanov";
+    if(S.mishoFired===undefined)S.mishoFired=false;
+    if(S.sofiaFired===undefined)S.sofiaFired=false;
     if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
     if(!S.debateWeek)S.debateWeek=15;
     if(!S.eventBag||!S.eventBag.length){buildEventPool();S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
@@ -1975,11 +2011,19 @@ function setInspectorTab(t){
   if(t!=="district"&&S.selDistrict){S.selDistrict=null;redrawMap();}
   renderDistrictCard();
   renderMobileActions();
+  if(isPhoneUI()){
+    const title=$("mobile-inspector-title");
+    if(title)title.textContent=t==="national"?"National Polls":t==="party"?"Party Machine":"District";
+    setMobileTabActive(mobileTabForInspector());
+  }
 }
 
 /* ---- T40: mobile-only UI — hoisted HUD strip + top action cluster ---- */
 function isMobileUI(){
   return !!(typeof window!=="undefined"&&window.matchMedia&&window.matchMedia("(max-width:899px)").matches);
+}
+function isPhoneUI(){
+  return !!(typeof window!=="undefined"&&window.matchMedia&&window.matchMedia("(max-width:600px)").matches);
 }
 
 function renderMobileActions(){
@@ -1996,24 +2040,23 @@ function renderMobileActions(){
   }
   seedMobileNews();
   const d=S.selDistrict?DIST_BY_ID[S.selDistrict]:null;
-  if(!d){
-    c.style.display="block";
-    c.innerHTML='<div class="dc-note" style="margin:0">Tap a district on the map to take action.</div>';
-    return;
-  }
-  const here=S.location===d.id;
-  const ral=activeIssueList();
   let html='<div class="mb-acts">';
-  if(here){
-    html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
-    html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
-    if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
-    else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
-    html+='<div id="mb-rally-pop" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Choose a rally issue"><div class="mb-rally-panel"><div class="mb-rally-title">Choose a rally issue</div>'+ral.map(i=>'<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">'+esc(i.name)+' <span class="cost">'+COSTS.rallySP+' SP</span></button>').join("")+'</div></div>';
+  if(!d){
+    html+='<div class="dc-note" style="margin:0">Tap a district on the map to take action.</div>';
   }else{
-    const tc=travelCost(S.location,d.id);
-    html+='<button class="btn wide" data-act="travel" '+((S.stamina<tc||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+tc+' SP</span></button>';
+    const here=S.location===d.id,ral=activeIssueList();
+    if(here){
+      html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
+      html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
+      if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
+      else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
+      html+='<div id="mb-rally-pop" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Choose a rally issue"><div class="mb-rally-panel"><div class="mb-rally-title">Choose a rally issue</div>'+ral.map(i=>'<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">'+esc(i.name)+' <span class="cost">'+COSTS.rallySP+' SP</span></button>').join("")+'</div></div>';
+    }else{
+      const tc=travelCost(S.location,d.id);
+      html+='<button class="btn wide" data-act="travel" '+((S.stamina<tc||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+tc+' SP</span></button>';
+    }
   }
+  if(isPhoneUI())html+='<button class="btn primary wide" id="btn-mb-endturn" '+(S.paused?"disabled":"")+'>End Week ▸</button>';
   html+='</div>';
   c.style.display="flex";
   c.innerHTML=html;
@@ -2031,6 +2074,8 @@ function renderMobileActions(){
     };
   });
   c.querySelectorAll("[data-act]").forEach(b=>wirePreviewTarget(b,()=>previewForButton(b)));
+  const endBtn=document.getElementById("btn-mb-endturn");
+  if(endBtn)endBtn.onclick=endTurn;
   const rt=document.getElementById("btn-mb-rally");
   if(rt)rt.onclick=()=>{
     if(S.paused)return;
@@ -2047,6 +2092,74 @@ function setMobileRallyOpen(open){
   o.setAttribute("aria-hidden",open?"false":"true");
   const rt=document.getElementById("btn-mb-rally");
   if(rt)rt.innerHTML='Rally <span class="cost">'+COSTS.rallySP+' SP</span> '+(open?"▴":"▾");
+}
+
+let mobileSheetOpen=null,mobileUnread=0;
+function mobileTabForInspector(){return inspectorTab==="national"?"polls":inspectorTab;}
+function setMobileTabActive(tab){
+  if(typeof document==="undefined")return;
+  document.querySelectorAll("#mobile-tabbar [data-mobile-tab]").forEach(b=>b.classList.toggle("active",b.dataset.mobileTab===tab));
+}
+function renderMobileTabbar(){
+  if(typeof document==="undefined")return;
+  const badge=document.getElementById("mobile-log-badge");
+  if(badge){badge.textContent=String(Math.min(99,mobileUnread));badge.hidden=mobileUnread<=0;}
+}
+function closeMobileSheet(){
+  if(typeof document==="undefined")return;
+  document.querySelectorAll(".mobile-sheet.open").forEach(s=>s.classList.remove("open"));
+  mobileSheetOpen=null;
+  setMobileTabActive("map");
+}
+function openMobileSheet(name){
+  if(!isPhoneUI()||typeof document==="undefined")return;
+  document.querySelectorAll(".mobile-sheet").forEach(s=>s.classList.remove("open"));
+  const sheet=document.getElementById("sheet-"+name);
+  if(!sheet)return;
+  if(name==="inspector"){
+    const title=document.getElementById("mobile-inspector-title");
+    if(title)title.textContent=inspectorTab==="national"?"National Polls":inspectorTab==="party"?"Party Machine":"District";
+    setMobileTabActive(mobileTabForInspector());
+  }else{
+    setMobileTabActive(name);
+  }
+  sheet.classList.add("open");
+  mobileSheetOpen=name;
+  if(name==="log"){
+    mobileUnread=0;
+    renderMobileTabbar();
+    renderLog();
+  }
+}
+function bindMobileSheets(){
+  if(typeof document==="undefined")return;
+  document.querySelectorAll("#mobile-tabbar [data-mobile-tab]").forEach(b=>b.onclick=()=>{
+    const tab=b.dataset.mobileTab;
+    if(tab==="map")closeMobileSheet();
+    else if(tab==="district"){setInspectorTab("district");openMobileSheet("inspector");}
+    else if(tab==="polls"){setInspectorTab("national");openMobileSheet("inspector");}
+    else if(tab==="party"){setInspectorTab("party");openMobileSheet("inspector");}
+    else openMobileSheet(tab);
+  });
+  document.querySelectorAll(".mobile-sheet").forEach(sheet=>sheet.addEventListener("pointerdown",e=>{if(e.target===sheet)closeMobileSheet();}));
+  document.querySelectorAll("[data-close-sheet]").forEach(b=>b.onclick=closeMobileSheet);
+  renderMobileTabbar();
+}
+function syncPhonePanels(phone){
+  if(typeof document==="undefined")return;
+  const screen=document.getElementById("screen-game"),main=document.getElementById("game-main");
+  const side=document.getElementById("side-panel"),news=document.getElementById("news-bar"),logbar=document.getElementById("log-bar");
+  const sideSlot=document.getElementById("mobile-inspector-slot"),newsSlot=document.getElementById("mobile-news-slot"),logSlot=document.getElementById("mobile-log-slot");
+  if(phone){
+    if(side&&sideSlot&&side.parentElement!==sideSlot)sideSlot.appendChild(side);
+    if(news&&newsSlot&&news.parentElement!==newsSlot)newsSlot.appendChild(news);
+    if(logbar&&logSlot&&logbar.parentElement!==logSlot)logSlot.appendChild(logbar);
+  }else{
+    if(side&&main&&side.parentElement!==main)main.appendChild(side);
+    if(news&&screen&&news.parentElement!==screen)main.after(news);
+    if(logbar&&screen&&logbar.parentElement!==screen)news.after(logbar);
+    if(mobileSheetOpen)closeMobileSheet();
+  }
 }
 
 /* ---- T41: mobile rally popup + news panel ---- */
@@ -2086,13 +2199,21 @@ function bindRallyPopOutsideClose(){
 function applyMobileLayout(){
   try{
     const mq=window.matchMedia("(max-width:899px)");
+    const phoneMq=window.matchMedia("(max-width:600px)");
     const sync=()=>{
       const mobile=!!mq.matches;
+      const phone=!!phoneMq.matches;
       const hud=document.getElementById("hud-stats");
       const topbar=document.getElementById("topbar");
-      const center=topbar?topbar.querySelector(".tb-center"):null;
+      const mapPanel=document.getElementById("map-panel");
+      const center=document.querySelector("#screen-game > .tb-center")||(topbar?topbar.querySelector(".tb-center"):null);
       if(!hud||!topbar)return;
-      if(mobile){
+      if(phone){
+        const mapBody=mapPanel?mapPanel.querySelector(".map-body"):null,toolbar=document.getElementById("map-toolbar");
+        if(mapBody&&toolbar&&hud.parentElement!==mapBody)toolbar.after(hud);
+        const tbRight=topbar.querySelector(".tb-right");
+        if(center&&center.parentElement!==topbar)topbar.insertBefore(center,tbRight||null);
+      }else if(mobile){
         const host=topbar.parentElement;
         if(host&&hud.parentElement!==host){
           const anchor=host.querySelector("#mobile-actions")||topbar.nextSibling;
@@ -2102,7 +2223,7 @@ function applyMobileLayout(){
           host.insertBefore(center,host.querySelector("#game-main")||null);
         }
       }else{
-        const mapBody=document.querySelector("#map-panel .map-body");
+        const mapBody=mapPanel?mapPanel.querySelector(".map-body"):null;
         const toolbar=document.getElementById("map-toolbar");
         if(mapBody&&toolbar&&hud.parentElement!==mapBody){
           toolbar.after(hud);
@@ -2112,11 +2233,15 @@ function applyMobileLayout(){
           topbar.insertBefore(center,tbRight);
         }
       }
+      syncPhonePanels(phone);
       renderMobileActions();
+      renderMobileTabbar();
     };
     sync();
     if(mq.addEventListener)mq.addEventListener("change",sync);
     else if(mq.addListener)mq.addListener(sync);
+    if(phoneMq.addEventListener)phoneMq.addEventListener("change",sync);
+    else if(phoneMq.addListener)phoneMq.addListener(sync);
   }catch(e){}
 }
 
@@ -2317,6 +2442,8 @@ function renderLog(){
 function log(html,cls){
   S.log.push({week:Math.min(S.week,20),html:html,cls:cls||"info"});
   if(S.log.length>80)S.log.shift();
+  if(isPhoneUI()&&mobileSheetOpen!=="log")mobileUnread++;
+  renderMobileTabbar();
 }
 
 function updateAll(){
@@ -2336,6 +2463,7 @@ function selectDistrict(id){
   redrawMap();
   renderMobileActions();
   closeDrawer();
+  if(isPhoneUI()&&!mobileSheetOpen)setMobileTabActive("map");
 }
 
 /* ---- T17: mobile drawer + collapsible log + map pinch-zoom ---- */
@@ -3236,6 +3364,9 @@ function endTurn(){
   if(S.week>=S.debateWeek&&!S.debateDone){S.eventQueue.push("__DEBATE__");S.debateDone=true;}
   if(S.week>=S.pigWeek&&S.pigPending&&!S.pigDone){S.eventQueue.push("__PIG__");S.pigDone=true;}
   if(virusRoll()){S.eventQueue.push("__VIRUS__");S.virusDone=true;}
+  if(S.week<10&&!S.mishoFired&&S.misho){S.eventQueue.push("__MISHO__");S.mishoFired=true;}
+  if(S.week<10&&!S.sofiaFired&&(S.martin||S.brat)){S.eventQueue.push("__SOFIA_NAME__");S.sofiaFired=true;}
+  if(S.mishoFired||S.sofiaFired)saveGame();
   maybeEvents();
   updateAll();
 }
@@ -4373,9 +4504,15 @@ function startCampaign(){
   if(!S.player.name)S.player.name="Aleksandar Vasilev";
   if(!S.party.name)S.party.name="National Renewal Movement";
   if(!S.party.abbr)S.party.abbr=S.party.name.split(/\s+/).map(w=>w[0]).join("").toUpperCase().slice(0,5);
-  S.cheat=!!(S.player.name&&S.player.name.trim().toUpperCase()==="EASY WIN");
-  S.diksy=!!(S.player.name&&S.player.name.trim().toUpperCase()==="DIKSY");
-  S.kosyo=!!(S.player.name&&S.player.name.trim().toUpperCase()==="KONSTANTIN MILEV");
+  const name=(S.player.name||"").trim().toLowerCase();
+  S.cheat=name.toUpperCase()==="EASY WIN";
+  S.diksy=name.toUpperCase()==="DIKSY";
+  S.kosyo=name.toUpperCase()==="KONSTANTIN MILEV";
+  S.misho=name==="mihail stamboliev";
+  S.martin=name==="georgi martinov";
+  S.brat=name==="nikola bratanov";
+  S.mishoFired=false;
+  S.sofiaFired=false;
   S.cheatFloor=false;
   if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
   S.debateWeek=14+rnd(0,2);
@@ -4396,6 +4533,7 @@ function startCampaign(){
   S.hq={};S.boost={};S.enthusiasm={};S.modifiers=[];S.rel={};S.touched=[];S.ralliesThisTurn=0;
   S.paused=false;
   newsSeeded=false;
+  mobileSheetOpen=null;mobileUnread=0;
   S.debugBoost={};S.cheatEasyWin=false;
   rollPerformance();
   S.log=[];
@@ -4553,6 +4691,7 @@ function bindUI(){
 
 function init(){
   bindUI();
+  bindMobileSheets();
   applyMobileLayout();
   bindRallyPopOutsideClose();
   bindMobilePreviewSafety();
@@ -4617,3 +4756,4 @@ if(typeof module!=="undefined"&&module.exports){
     }
   };
 }
+if(typeof window!=="undefined")window.__121Game={buildEventPool:buildEventPool,EVENT_POOL:()=>EVENT_POOL,startCampaign:startCampaign,resetEventEditor:()=>{EVENT_EDITOR_OVERRIDES.length=0;EVENT_EDITOR_DELETIONS.length=0;buildEventPool();}};
