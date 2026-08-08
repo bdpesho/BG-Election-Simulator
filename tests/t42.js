@@ -55,6 +55,9 @@ check("Map tab closes the active sheet",!document.querySelector(".mobile-sheet.o
 check("phone CSS locks the campaign viewport",css.indexOf("#screen-game{\n    display:grid;")>=0&&css.indexOf("grid-template-rows:auto minmax(0,1fr) calc(44px + env(safe-area-inset-bottom));")>=0);
 check("phone CSS allows sheet-body scrolling",css.indexOf(".sheet-body{flex:1; min-height:0; overflow-y:auto;")>=0);
 check("phone CSS uses the 600px breakpoint",css.indexOf("@media (max-width:600px)")>=0);
+check("retro cursor assets are wired",css.indexOf("cursor-arrow.svg")>=0&&css.indexOf("cursor-hand.svg")>=0&&css.indexOf("cursor-crosshair.svg")>=0&&css.indexOf("cursor-busy.svg")>=0);
+check("click feedback is wired",css.indexOf(".click-spark")>=0&&gameSrc.indexOf("function bindInteractionFx()")>=0&&gameSrc.indexOf("function pulseMapSelection")>=0);
+check("distinct event and End Week sounds are wired",gameSrc.indexOf('playSound("endweek")')>=0&&gameSrc.indexOf('playSound("event")')>=0&&gameSrc.indexOf("endweek:{notes:")>=0&&gameSrc.indexOf("event:{notes:")>=0);
 check("no uncaught page errors",!(window.__errs&&window.__errs.length));
 console.log(pass+" passed, "+fail+" failed");
 process.exit(fail?1:0);

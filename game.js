@@ -601,7 +601,7 @@ function freshState(){
     week:1,cash:0,stamina:0,location:"sofia-city",selDistrict:"sofia-city",
     hq:{},boost:{},enthusiasm:{},modifiers:[],rel:{},touched:[],ralliesThisTurn:0,
     partyMachine:defaultPartyMachine(),
-    pollsPrev:null,pollNat:{},districtPoll:{},
+    pollsPrev:null,pollNat:{},pollHist:[],districtPoll:{},
     activeIssues:[],
     debateWeek:15,debateDone:false,debate:null,
     pigWeek:18,pigPending:false,pigDone:false,pigRaid:false,
@@ -1564,6 +1564,7 @@ function showNextEvent(){
   if(!S.eventQueue.length){S.paused=false;updateAll();return;}
   S.paused=true;
   const nxt=S.eventQueue.shift();
+  playSound("event");
   if(nxt==="__DEBATE__"){startDebate();return;}
   if(nxt==="__PIG__"){startPigEvent();return;}
   if(nxt==="__VIRUS__"){startVirusEvent();return;}
@@ -1715,6 +1716,7 @@ function menuModal(){
     +'<button class="btn" id="m-save">Save campaign</button>'
     +'<button class="btn" id="m-load">Load last save</button>'
     +'<button class="btn" id="m-help">How to play</button>'
+    +'<button class="btn" id="m-sound">Sound: '+(soundEnabled?"On":"Off")+'</button>'
     +(mb&&S&&S.cheat?'<button class="btn" id="m-debug">Debug console</button>':'')
     +'<button class="btn danger" id="m-quit">Quit to title</button>'
     +'</div>'
@@ -1723,6 +1725,8 @@ function menuModal(){
   $("m-save").onclick=()=>{saveGame();closeModal();log("Campaign saved.","info");renderLog();};
   $("m-load").onclick=()=>{closeModal();if(!loadGame())alert("No save found.");};
   $("m-help").onclick=helpModal;
+  const ms=$("m-sound");
+  if(ms)ms.onclick=()=>{toggleSound();ms.textContent="Sound: "+(soundEnabled?"On":"Off");};
   const md=$("m-debug");
   if(md)md.onclick=debugModal;
   $("m-quit").onclick=()=>location.reload();
@@ -1797,6 +1801,7 @@ function loadGame(){
     if(!S.player.appearance)S.player.appearance=Object.assign(defaultAppearance(),FACES[S.player.face||0]||{});
     if(!S.partyMachine)S.partyMachine=defaultPartyMachine();
     if(!Array.isArray(S.cashHist))S.cashHist=[];
+    if(!Array.isArray(S.pollHist))S.pollHist=[];
     if(S.virusDone===undefined)S.virusDone=false;
     if(!S.virusLoss)S.virusLoss=null;
     if(!S.debugBoost||typeof S.debugBoost!=="object")S.debugBoost={};
@@ -1908,6 +1913,19 @@ function redrawMap(){
   pin.appendChild(t);
 }
 
+function pollTrend(){
+  const prev=S.pollsPrev&&S.pollsPrev.player;
+  if(prev===undefined||prev===null)return"STEADY";
+  const d=(S.pollNat.player||0)-prev;
+  return Math.abs(d)<0.0005?"STEADY":(d>0?"▲ "+pts(d):"▼ "+pts(d));
+}
+function pollSparkline(){
+  const vals=(S.pollHist||[]).concat([S.pollNat.player||0]).slice(-8);
+  if(vals.length<2)return"";
+  const lo=Math.min.apply(null,vals),hi=Math.max.apply(null,vals),span=hi-lo||.01;
+  const points=vals.map((v,i)=>((i/(vals.length-1))*48).toFixed(1)+","+(12-(v-lo)/span*10).toFixed(1)).join(" ");
+  return '<svg class="hud-spark" viewBox="0 0 48 12" aria-hidden="true"><polyline points="'+points+'" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';
+}
 function renderTopbar(){
   $("tb-banner").style.background=S.party.color;
   $("tb-banner").innerHTML=S.party.logo
@@ -1918,17 +1936,19 @@ function renderTopbar(){
   clock.textContent="WEEK "+Math.min(S.week,20)+"/20";
   clock.classList.toggle("urgent",S.week>=18&&S.week<=20);
   $("tb-days").textContent=S.week>20?"ELECTION DAY":Math.max(0,(21-S.week))*7+" days to "+ELECTION_DATE;
-  $("tb-cash").innerHTML='<span class="sc-ico">лв</span><span>Funds <b>'+fmtMoney(S.cash)+"</b></span>";
-  $("tb-stamina").innerHTML='<span class="sc-ico">SP</span><span>SP <b>'+S.stamina+"/"+getMaxStamina()+"</b></span>";
+  const income=weeklyIncomeBreakdown();
+  const trend=pollTrend();
+  $("tb-cash").innerHTML='<span class="sc-ico">лв</span><span>Funds <b>'+fmtMoney(S.cash)+"</b><small>+"+fmtMoney(income.income)+" next</small></span>";
+  $("tb-stamina").innerHTML='<span class="sc-ico">SP</span><span>SP <b>'+S.stamina+"/"+getMaxStamina()+"</b><small>field energy</small></span>";
   const pol=S.pollNat.player||0;
-  $("tb-poll").innerHTML='<span class="sc-ico">%</span><span>Poll <b>'+pct(pol)+"</b></span>";
+  $("tb-poll").innerHTML='<span class="sc-ico">%</span><span>Poll <b>'+pct(pol)+"</b><small>"+trend+"</small></span>";
   const hud=(id,ico,val,cap)=>{
     const el=$(id);
     if(el)el.innerHTML='<span class="hud-ico">'+ico+'</span><span class="hud-txt"><span class="hud-val">'+val+'</span><span class="hud-cap">'+cap+'</span></span>';
   };
-  hud("hud-cash","лв",fmtMoney(S.cash),"Campaign funds");
-  hud("hud-stamina","SP",S.stamina+"/"+getMaxStamina(),"Stamina");
-  hud("hud-poll","%",pct(pol),"National poll");
+  hud("hud-cash","лв",fmtMoney(S.cash),"WAR CHEST · +"+fmtMoney(income.income)+" next week");
+  hud("hud-stamina","SP",S.stamina+"/"+getMaxStamina(),"FIELD ENERGY");
+  hud("hud-poll","%",pct(pol)+pollSparkline(),"NATIONAL MOOD · "+trend);
   const dbgBtn=$("btn-debug");
   if(dbgBtn)dbgBtn.style.display=S.cheat?"":"none";
   const cheatChip=$("tb-cheat");
@@ -1960,6 +1980,15 @@ function openFundsModal(){
   );
   const cb=$("btn-close-funds");
   if(cb)cb.onclick=closeModal;
+}
+function openStaminaModal(){
+  if(!S||S.phase!=="campaign")return;
+  openModal('<h3>FIELD ENERGY</h3><p>You have <b>'+S.stamina+'/'+getMaxStamina()+' SP</b> this week. Spend it on travel, rallies, and the ground game. End the week to refill your field team.</p><div class="center-row"><button class="btn primary" onclick="closeModal()">Got it</button></div>');
+}
+function openPollDetails(){
+  if(!S||S.phase!=="campaign")return;
+  setInspectorTab("national");
+  if(isPhoneUI())openMobileSheet("inspector");
 }
 
 let inspectorTab="district";
@@ -1998,6 +2027,15 @@ function renderDistrictCard(){
       updateAll();
     };
   });
+  const pmTarget=$("pm-target"),pmLaunch=$("district-card").querySelector("[data-pm-launch]");
+  const syncLaunch=()=>{
+    if(!pmTarget||!pmLaunch)return;
+    const cost=pmTarget.value==="national"?COSTS.campaignNational:COSTS.campaignDistrict;
+    pmLaunch.disabled=S.paused||S.partyMachine.campaigns.length>=CAMPAIGN_CAP||S.cash<cost;
+    pmLaunch.innerHTML="Launch campaign <span class=\"cost\">"+fmtMoney(cost)+"</span>";
+  };
+  if(pmTarget)pmTarget.onchange=syncLaunch;
+  syncLaunch();
   $("district-card").querySelectorAll(".insp-tab").forEach(b=>{
     b.onclick=()=>setInspectorTab(b.dataset.tab);
   });
@@ -2278,7 +2316,7 @@ function renderPartyMachine(){
     +'<select id="pm-stance"><option value="pro">PRO — toward the high stance</option><option value="anti">ANTI — toward the low stance</option></select>'
     +'<select id="pm-target">'+distOpts+'</select>'
     +'<input id="pm-name" type="text" maxlength="28" placeholder="Campaign name (optional)">'
-    +'<button class="btn wide" data-pm="launch" '+((S.cash<COSTS.campaignDistrict||S.paused||pm.campaigns.length>=CAMPAIGN_CAP)?"disabled":"")+'>Launch campaign</button>'
+    +'<button class="btn wide" data-pm="launch" data-pm-launch '+((S.cash<COSTS.campaignDistrict||S.paused||pm.campaigns.length>=CAMPAIGN_CAP)?"disabled":"")+'>Launch campaign</button>'
     +'</div></div>';
   if(pm.campaigns.length){
     out+='<div class="pm-sec"><div class="mini-label"><span>Active campaigns</span></div>';
@@ -2463,7 +2501,77 @@ function selectDistrict(id){
   redrawMap();
   renderMobileActions();
   closeDrawer();
+  pulseMapSelection(id);
+  playSound("select");
   if(isPhoneUI()&&!mobileSheetOpen)setMobileTabActive("map");
+}
+
+function pulseMapSelection(id){
+  if(typeof document==="undefined")return;
+  const node=document.querySelector('#bg-map .node[data-id="'+id+'"]');
+  if(!node)return;
+  node.classList.remove("map-select-pulse");
+  void node.offsetWidth;
+  node.classList.add("map-select-pulse");
+  setTimeout(()=>node.classList.remove("map-select-pulse"),560);
+}
+
+function bindInteractionFx(){
+  if(typeof document==="undefined")return;
+  document.addEventListener("pointerdown",e=>{
+    const target=e.target&&e.target.closest?e.target.closest("button,a,[role=button],.hud-box,.mobile-tab,.node"):null;
+    if(!target||target.disabled)return;
+    const rect=target.getBoundingClientRect();
+    const x=Number.isFinite(e.clientX)&&e.clientX?e.clientX:rect.left+rect.width/2;
+    const y=Number.isFinite(e.clientY)&&e.clientY?e.clientY:rect.top+rect.height/2;
+    const spark=document.createElement("span");
+    spark.className="click-spark";spark.style.left=x+"px";spark.style.top=y+"px";
+    document.body.appendChild(spark);
+    playSound("click");
+    target.classList.add("ui-press");
+    setTimeout(()=>{spark.remove();target.classList.remove("ui-press");},420);
+  });
+}
+
+let soundEnabled=false,audioCtx=null;
+try{soundEnabled=localStorage.getItem("121towin-sound")==="on";}catch(e){}
+function refreshSoundUI(){
+  if(typeof document==="undefined")return;
+  const buttons=[document.getElementById("btn-sound")];
+  buttons.forEach(b=>{if(b){b.textContent="Sound: "+(soundEnabled?"On":"Off");b.setAttribute("aria-pressed",soundEnabled?"true":"false");}});
+}
+function ensureAudio(){
+  if(typeof window==="undefined")return null;
+  const AudioCtor=window.AudioContext||window.webkitAudioContext;
+  if(!AudioCtor)return null;
+  try{
+    if(!audioCtx)audioCtx=new AudioCtor();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    return audioCtx;
+  }catch(e){return null;}
+}
+function playSound(name){
+  if(!soundEnabled)return;
+  const ctx=ensureAudio();if(!ctx)return;
+  const tones={
+    click:{notes:[620],gap:0,duration:.035,type:"square",volume:.018},
+    confirm:{notes:[880],gap:0,duration:.08,type:"square",volume:.025},
+    select:{notes:[440],gap:0,duration:.06,type:"triangle",volume:.02},
+    endweek:{notes:[330,494,660],gap:.055,duration:.06,type:"square",volume:.025},
+    event:{notes:[880,660,880],gap:.07,duration:.065,type:"square",volume:.028}
+  };
+  const tone=tones[name]||tones.click,now=ctx.currentTime;
+  tone.notes.forEach((freq,i)=>{
+    const start=now+i*tone.gap,osc=ctx.createOscillator(),gain=ctx.createGain();
+    osc.type=tone.type;osc.frequency.setValueAtTime(freq,start);gain.gain.setValueAtTime(tone.volume,start);gain.gain.exponentialRampToValueAtTime(.0001,start+tone.duration);
+    osc.connect(gain);gain.connect(ctx.destination);osc.start(start);osc.stop(start+tone.duration+.01);
+  });
+}
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  try{localStorage.setItem("121towin-sound",soundEnabled?"on":"off");}catch(e){}
+  refreshSoundUI();
+  if(soundEnabled)playSound("confirm");
 }
 
 /* ---- T17: mobile drawer + collapsible log + map pinch-zoom ---- */
@@ -3334,6 +3442,7 @@ function aiTurn(){
 
 function endTurn(){
   if(S.paused||S.phase!=="campaign")return;
+  playSound("endweek");
   S.week++;
   for(const d of DISTRICTS){
     const b=S.boost[d.id]||{};
@@ -3355,6 +3464,7 @@ function endTurn(){
   expireModifiers();
   S.pollsPrev=S.pollNat;
   recomputePolls();
+  S.pollHist=(S.pollHist||[]).concat([S.pollNat.player||0]).slice(-8);
   S.stamina=getMaxStamina();
   S.ralliesThisTurn=0;
   S.touched=[];
@@ -3508,12 +3618,18 @@ function electionNightEarlyDistrict(item,ordinal){
 function morningBspDistricts(){
   return (S.results.districts||[]).slice().sort((a,b)=>(b.shares.bsp||0)-(a.shares.bsp||0)).slice(0,6).map(item=>item.id);
 }
+function finalDistrictLeader(item){
+  let leader=null,score=-1;
+  for(const k in item.shares)if(k!=="others"&&item.shares[k]>score){leader=k;score=item.shares[k];}
+  return leader;
+}
 function electionNightLeader(item,progress,ordinal){
-  if(progress>=1){let final=null,score=-1;for(const k in item.shares)if(k!=="others"&&item.shares[k]>score){final=k;score=item.shares[k];}return final;}
-  if(item.id==="sofia-city"||item.id==="sofia-obl")return item.shares.ppdb!==undefined?"ppdb":electionNightLeader(item,1,ordinal);
-  const early=electionNightEarlyDistrict(item,ordinal),keys=new Set(Object.keys(item.shares).concat(Object.keys(early))),noon=1/3;
-  if(progress<noon&&morningBspDistricts().includes(item.id)&&item.shares.bsp!==undefined)return "bsp";
-  const finalBlend=Math.min(1,progress/noon);let leader=null,score=-1;
+  const firstTwoHours=1/6;
+  if(progress>=firstTwoHours)return finalDistrictLeader(item);
+  if(item.id==="sofia-city"||item.id==="sofia-obl")return item.shares.ppdb!==undefined?"ppdb":finalDistrictLeader(item);
+  const early=electionNightEarlyDistrict(item,ordinal),keys=new Set(Object.keys(item.shares).concat(Object.keys(early)));
+  if(morningBspDistricts().includes(item.id)&&item.shares.bsp!==undefined)return "bsp";
+  const finalBlend=Math.min(1,progress/firstTwoHours);let leader=null,score=-1;
   keys.forEach(k=>{const v=(early[k]||0)*(1-finalBlend)+(item.shares[k]||0)*finalBlend;if(k!=="others"&&v>score){leader=k;score=v;}});
   return leader;
 }
@@ -4247,6 +4363,19 @@ function cycleAppearanceStyle(key,list,dir){
   renderPortraitPreview();
 }
 
+function repaintEthnicitySelect(){
+  const el=$("sel-ethnicity");
+  if(!el||!S||!S.player.appearance)return;
+  const paint=()=>{
+    if(!el.isConnected)return;
+    el.value=S.player.appearance.ethnicity;
+    el.selectedIndex=[...el.options].findIndex(o=>o.value===S.player.appearance.ethnicity);
+  };
+  paint();
+  if(typeof requestAnimationFrame==="function")requestAnimationFrame(paint);
+  else setTimeout(paint,0);
+}
+
 function renderAppearanceUI(){
   const app=S.player.appearance;
   if(!app)return;
@@ -4258,7 +4387,7 @@ function renderAppearanceUI(){
   $("suit-label").textContent=SUIT_STYLE_NAMES[app.suitStyle]||app.suitStyle;
   $("btn-gender-m").classList.toggle("on",app.gender==="male");
   $("btn-gender-f").classList.toggle("on",app.gender==="female");
-  $("sel-ethnicity").value=app.ethnicity;
+  repaintEthnicitySelect();
   $("btn-glasses").textContent="Glasses: "+(app.glasses?"On":"Off");
 }
 
@@ -4554,6 +4683,7 @@ function startCampaign(){
   S.eventQueue=[];
   recomputePolls();
   S.pollsPrev=null;
+  S.pollHist=[S.pollNat.player||0];
   buildMap();
   showScreen("game");
   log("The campaign begins. "+ELECTION_DATE+" is 20 weeks away. First stop: <b>Sofia</b>.","info");
@@ -4570,7 +4700,11 @@ function bindUI(){
   $("btn-continue").onclick=()=>{if(!loadGame())alert("No save found.");};
   $("btn-title-help").onclick=helpModal;
   $("tb-cash").onclick=openFundsModal;
+  $("tb-stamina").onclick=openStaminaModal;
+  $("tb-poll").onclick=openPollDetails;
   $("hud-cash").onclick=openFundsModal;
+  $("hud-stamina").onclick=openStaminaModal;
+  $("hud-poll").onclick=openPollDetails;
 
   for(let i=0;i<3;i++)$("step-tab-"+i).onclick=()=>gotoStep(i);
   $("btn-setup-back").onclick=()=>gotoStep(Math.max(0,S.setupStep-1));
@@ -4661,6 +4795,8 @@ function bindUI(){
   $("btn-help").onclick=helpModal;
   $("btn-debug").onclick=debugModal;
   $("btn-save").onclick=()=>{saveGame();log("Campaign saved.","info");renderLog();};
+  $("btn-sound").onclick=toggleSound;
+  refreshSoundUI();
   $("btn-menu").onclick=menuModal;
   const startBtn=$("btn-start");
   if(startBtn)startBtn.onclick=menuModal;
@@ -4695,6 +4831,7 @@ function init(){
   applyMobileLayout();
   bindRallyPopOutsideClose();
   bindMobilePreviewSafety();
+  bindInteractionFx();
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });

@@ -84,6 +84,11 @@ if(partyTab){
     nameEl.value="Fresh start";
     g.renderDistrictCard();
     check("pm form selections persist across re-render",document.getElementById("pm-issue").value===pick1&&document.getElementById("pm-name").value==="Fresh start");
+    const targetEl=document.getElementById("pm-target"),launchEl=document.querySelector("[data-pm-launch]");
+    targetEl.value="national";targetEl.dispatchEvent(new window.Event("change",{bubbles:true}));
+    check("party machine launch button tracks national cost",!!launchEl&&launchEl.textContent.indexOf("20 000")>=0&&!launchEl.disabled);
+    targetEl.value="sofia-city";targetEl.dispatchEvent(new window.Event("change",{bubbles:true}));
+    check("party machine launch button tracks district cost",launchEl.textContent.indexOf("8 000")>=0&&!launchEl.disabled);
   }
 }
 
