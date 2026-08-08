@@ -1665,7 +1665,17 @@ function renderEventModal(ev){
   });
 }
 
-function openModal(html){$("modal-root").innerHTML='<div class="modal-back"><div class="modal"><div class="modal-pad">'+html+'</div></div></div>';}
+function openModal(html){
+  const root=$("modal-root");
+  root.innerHTML='<div class="modal-back"><div class="modal"><div class="modal-pad">'+html+'</div></div></div>';
+  if(!root.dataset.closeBound){
+    root.dataset.closeBound="1";
+    root.addEventListener("click",function(ev){
+      const t=ev.target.closest?ev.target.closest("[data-close]"):null;
+      if(t)closeModal();
+    });
+  }
+}
 function closeModal(){$("modal-root").innerHTML="";}
 
 /* ---- T35: DIKSY display rewrite layer (display-only, never touches state) ---- */
@@ -1706,7 +1716,7 @@ function helpModal(){
     +'<p>Polling: a district\'s vote share comes from <b>issue alignment × voter enthusiasm × campaign boosts</b>. Ten rivals campaign too — GERB, Progresivna Balgariya, PP-DB, DPS, Vazrazhdane, BSP, ITN, MECh, APS and Velichie — and the strict 4% national threshold will drop the weakest of them out of the Narodno Subranie.</p>'
     +'<p>Election Day uses proportional representation: a strict <b>4% national threshold</b>, then the <b>D\'Hondt method</b> allocates each district\'s seats. 240 seats total; 121 for a majority.</p>'
     +'<p>After the vote, negotiate a coalition: spend political capital on cabinet posts, policy concessions and cash to push parties\' willingness to 100. Random events — <b>1K+ in the database</b> — pause the game and apply permanent, timed or one-time modifiers.</p>'
-    +'<div class="center-row"><button class="btn primary" onclick="closeModal()">Got it</button></div>');
+    +'<div class="center-row"><button class="btn primary" data-close>Got it</button></div>');
 }
 
 function menuModal(){
@@ -1983,7 +1993,7 @@ function openFundsModal(){
 }
 function openStaminaModal(){
   if(!S||S.phase!=="campaign")return;
-  openModal('<h3>FIELD ENERGY</h3><p>You have <b>'+S.stamina+'/'+getMaxStamina()+' SP</b> this week. Spend it on travel, rallies, and the ground game. End the week to refill your field team.</p><div class="center-row"><button class="btn primary" onclick="closeModal()">Got it</button></div>');
+  openModal('<h3>FIELD ENERGY</h3><p>You have <b>'+S.stamina+'/'+getMaxStamina()+' SP</b> this week. Spend it on travel, rallies, and the ground game. End the week to refill your field team.</p><div class="center-row"><button class="btn primary" data-close>Got it</button></div>');
 }
 function openPollDetails(){
   if(!S||S.phase!=="campaign")return;

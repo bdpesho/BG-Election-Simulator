@@ -58,6 +58,11 @@ check("phone CSS uses the 600px breakpoint",css.indexOf("@media (max-width:600px
 check("retro cursor assets are wired",css.indexOf("cursor-arrow.svg")>=0&&css.indexOf("cursor-hand.svg")>=0&&css.indexOf("cursor-crosshair.svg")>=0&&css.indexOf("cursor-busy.svg")>=0);
 check("click feedback is wired",css.indexOf(".click-spark")>=0&&gameSrc.indexOf("function bindInteractionFx()")>=0&&gameSrc.indexOf("function pulseMapSelection")>=0);
 check("distinct event and End Week sounds are wired",gameSrc.indexOf('playSound("endweek")')>=0&&gameSrc.indexOf('playSound("event")')>=0&&gameSrc.indexOf("endweek:{notes:")>=0&&gameSrc.indexOf("event:{notes:")>=0);
+
+window.helpModal();
+check("Help Got it uses data-close, not an inline handler",!!document.querySelector("#modal-root [data-close]")&&gameSrc.indexOf('onclick="closeModal()"')<0);
+document.querySelector("#modal-root [data-close]").click();
+check("Got it closes the Help modal",!document.getElementById("modal-root").innerHTML.trim());
 check("no uncaught page errors",!(window.__errs&&window.__errs.length));
 console.log(pass+" passed, "+fail+" failed");
 process.exit(fail?1:0);
