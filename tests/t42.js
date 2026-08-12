@@ -63,6 +63,11 @@ window.helpModal();
 check("Help Got it uses data-close, not an inline handler",!!document.querySelector("#modal-root [data-close]")&&gameSrc.indexOf('onclick="closeModal()"')<0);
 document.querySelector("#modal-root [data-close]").click();
 check("Got it closes the Help modal",!document.getElementById("modal-root").innerHTML.trim());
+
+check("chiptune tracks defined (title/campaign/election/calm)",gameSrc.indexOf("MUSIC_TRACKS")>=0&&["title","campaign","election","calm"].every(t=>gameSrc.indexOf(t+":{bpm:")>=0));
+check("music maps screens and follows the sound toggle",gameSrc.indexOf("SCREEN_TRACKS")>=0&&gameSrc.indexOf("setMusicForScreen(name);")>=0&&gameSrc.indexOf("musicFromPhase();")>=0&&gameSrc.indexOf("else musicStop();")>=0);
+g.toggleSound();g.toggleSound();
+check("music engine guards headless audio (no crash)",!(window.__errs&&window.__errs.length));
 check("no uncaught page errors",!(window.__errs&&window.__errs.length));
 console.log(pass+" passed, "+fail+" failed");
 process.exit(fail?1:0);

@@ -652,6 +652,7 @@ function showScreen(name){
   const nb=typeof document!=="undefined"?document.getElementById("news-bar"):null;
   if(nb)nb.style.display=(name==="game"&&S&&S.phase==="campaign"&&isMobileUI())?"flex":"none";
   if(name!=="game"&&mobileSheetOpen)closeMobileSheet();
+  setMusicForScreen(name);
 }
 
 function partyOf(id){if(id==="player")return playerParty();return AI_PARTIES.find(p=>p.id===id);}
@@ -2581,7 +2582,80 @@ function toggleSound(){
   soundEnabled=!soundEnabled;
   try{localStorage.setItem("121towin-sound",soundEnabled?"on":"off");}catch(e){}
   refreshSoundUI();
-  if(soundEnabled)playSound("confirm");
+  if(soundEnabled){playSound("confirm");musicFromPhase();}
+  else musicStop();
+}
+
+/* ---- chiptune music engine: procedural XP-era loops, no audio files ---- */
+const MUSIC_TRACKS={
+  title:{bpm:88,steps:16,
+    melody:{type:"square",vol:.02,notes:[72,0,76,0,79,0,76,0,72,0,79,0,84,0,79,0]},
+    bass:{type:"triangle",vol:.04,notes:[48,0,55,0,52,0,55,0,45,0,52,0,43,0,52,0]},
+    hat:{type:"square",vol:.0035,dur:.018,notes:[0,84,0,84,0,84,0,84,0,84,0,84,0,84,0,84]}},
+  campaign:{bpm:120,steps:16,
+    melody:{type:"square",vol:.02,notes:[69,0,72,69,0,74,0,0,69,0,72,76,0,74,0,0]},
+    bass:{type:"triangle",vol:.045,notes:[45,45,45,45,48,48,48,48,50,50,50,50,52,52,55,55]},
+    hat:{type:"square",vol:.0035,dur:.018,notes:[0,88,0,88,0,88,0,88,0,88,0,88,0,88,0,88]}},
+  election:{bpm:140,steps:16,
+    melody:{type:"square",vol:.022,notes:[74,74,0,74,72,0,72,0,74,74,0,74,77,0,76,0]},
+    bass:{type:"triangle",vol:.05,notes:[38,0,38,0,41,0,41,0,43,0,43,0,36,0,36,0]},
+    hat:{type:"square",vol:.004,dur:.015,notes:[88,0,88,0,88,0,88,0,88,0,88,0,88,0,88,0]}},
+  calm:{bpm:96,steps:16,
+    melody:{type:"square",vol:.018,notes:[72,0,0,0,76,0,0,0,79,0,0,0,84,0,79,0]},
+    bass:{type:"triangle",vol:.04,notes:[48,0,0,0,52,0,0,0,55,0,0,0,48,0,52,0]},
+    hat:{type:"square",vol:.003,dur:.02,notes:[0,0,84,0,0,0,84,0,0,0,84,0,0,0,84,0]}}
+};
+const SCREEN_TRACKS={title:"title",setup:"title",game:"campaign",election:"election",coalition:"calm",end:"calm",review:"calm"};
+let music=null;
+function midiFreq(n){return 440*Math.pow(2,(n-69)/12);}
+function musicStart(track){
+  musicStop();
+  if(!soundEnabled)return;
+  const def=MUSIC_TRACKS[track];
+  if(!def)return;
+  const ctx=ensureAudio();
+  if(!ctx)return;
+  music={track:track,step:0,ctx:ctx,nextTime:ctx.currentTime+0.06,timer:setInterval(musicTick,80)};
+}
+function musicStop(){
+  if(!music)return;
+  clearInterval(music.timer);
+  music=null;
+}
+function musicTick(){
+  if(!music)return;
+  const ctx=music.ctx,def=MUSIC_TRACKS[music.track];
+  if(!ctx||ctx.state!=="running"){music.nextTime=ctx.currentTime+0.06;return;}
+  const spb=60/def.bpm/4;
+  while(music.nextTime<ctx.currentTime+0.25){
+    const s=music.step%def.steps,at=music.nextTime;
+    for(const ch of[def.melody,def.bass,def.hat]){
+      if(!ch)continue;
+      const n=ch.notes[s];
+      if(!n)continue;
+      const dur=ch.dur||spb*0.92;
+      const osc=ctx.createOscillator(),gain=ctx.createGain();
+      osc.type=ch.type;
+      osc.frequency.setValueAtTime(midiFreq(n),at);
+      gain.gain.setValueAtTime(ch.vol,at);
+      gain.gain.exponentialRampToValueAtTime(.0001,at+dur);
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.start(at);osc.stop(at+dur+.02);
+    }
+    music.nextTime+=spb;
+    music.step++;
+  }
+}
+function setMusicForScreen(name){
+  const track=SCREEN_TRACKS[name]||"title";
+  if(!soundEnabled){musicStop();return;}
+  if(music&&music.track===track)return;
+  musicStart(track);
+}
+function musicFromPhase(){
+  if(typeof document==="undefined")return;
+  const act=document.querySelector(".screen.active");
+  setMusicForScreen(act?act.id.replace("screen-",""):"title");
 }
 
 /* ---- T17: mobile drawer + collapsible log + map pinch-zoom ---- */
@@ -4847,6 +4921,10 @@ function init(){
   });
   if(hasSave())$("btn-continue").style.display="";
   startAliveLoop();
+  document.addEventListener("pointerdown",function(){
+    ensureAudio();
+    if(soundEnabled&&!music)musicFromPhase();
+  },{once:true});
 }
 
 if(typeof document!=="undefined"){
@@ -4891,6 +4969,7 @@ if(typeof module!=="undefined"&&module.exports){
     VIRUS_RATE:VIRUS_RATE,virusRoll:virusRoll,virusDisarm:virusDisarm,startVirusEvent:startVirusEvent,
     virusArrive:virusArrive,virusContinue:virusContinue,virusSkipTurns:virusSkipTurns,zoomToDistrict:zoomToDistrict,
     debugModal:debugModal,
+    toggleSound:toggleSound,playSound:playSound,musicStart:musicStart,musicStop:musicStop,setMusicForScreen:setMusicForScreen,MUSIC_TRACKS:MUSIC_TRACKS,musicFromPhase:musicFromPhase,
     mapZoom:()=>mapZoom,
     checkJoin:checkJoin,willOf:willOf,REL_MATRIX:REL_MATRIX,INCOMPAT_PAIRS:INCOMPAT_PAIRS,
     setPlayer:(cfg)=>{
