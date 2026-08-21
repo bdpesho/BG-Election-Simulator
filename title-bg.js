@@ -48,6 +48,9 @@
   }
 
   // ----- pixel helpers -----
+  function recordBgErr(e){
+    try{ (window.__titleBgErrors=window.__titleBgErrors||[]).push(String((e&&e.message)||e)); }catch(_){}
+  }
   function pRect(x,y,w,h,color){
     if(!color) return;
     ctx.fillStyle = color;
@@ -95,7 +98,17 @@
     cigWhite:"#f5f5f5", cigFilter:"#d4a574", cigGlow:"#ff3b30", smoke:"#d0d0d0",
     lionGold:"#c9981a", lionDark:"#8a6a0a",
     cloud:"#ffffff", cloudSh:"#dbe6f0", bird:"#1a1a1a",
-    paper:"#ffffff", paperSh:"#e8e8e8"
+    paper:"#ffffff", paperSh:"#e8e8e8",
+    // realistic smoker
+    hair:"#3a2a1c", hairHi:"#55402c", skin2:"#d9a066", skin3:"#c08550", stubble:"#b98a63",
+    jackF:"#474747", jackS:"#333333", jackHi:"#585858", tee:"#e8e8e8",
+    denim:"#3d4c6e", denimDk:"#32405e", denimHi:"#55688f",
+    shoe:"#222222", sole:"#ffffff",
+    // bulgarian extras
+    sunYellow:"#ffd23f", sunYellowDk:"#e0a92a", sunBrown:"#7a4a1a", stalk:"#5a8a3a",
+    wool:"#f7f7f2", woolSh:"#dddddd", sheepFace:"#2a2a2a",
+    storkW:"#ffffff", storkB:"#232323", beakR:"#e04a2a", nestM:"#9a7b52", nestD:"#7a5e3c",
+    rakiaGlass:"#cfe8ee", rakiaAmber:"#c67f2e", corkTan:"#c9a06a"
   };
 
   // ----- procedural sprite draw functions -----
@@ -449,50 +462,174 @@
   }
 
   function drawSmoker(ox, oy, sc, t){
-    // 8-bit character sitting/standing at bus stop smoking — chibi, 10x16
-    // legs (jeans)
-    pRect(ox+2*sc, oy+12*sc, 2*sc, 4*sc, "#2a3a5e");
-    pRect(ox+6*sc, oy+12*sc, 2*sc, 4*sc, "#2a3a5e");
-    // shoes
-    pRect(ox+1*sc, oy+16*sc, 3*sc, 1*sc, "#1a1a1a");
-    pRect(ox+6*sc, oy+16*sc, 3*sc, 1*sc, "#1a1a1a");
-    // torso (jacket)
-    pRect(ox+2*sc, oy+7*sc, 6*sc, 5*sc, "#3a3a3a");
-    pRect(ox+2*sc, oy+7*sc, 6*sc, 1*sc, "#4a4a4a");
-    // arm extended with cigarette
-    pRect(ox+8*sc, oy+8*sc, 4*sc, 2*sc, PAL.skin);
-    pRect(ox+8*sc, oy+8*sc, 4*sc, 1*sc, "#d9a066");
-    // cigarette
-    const flick = Math.floor(t*0.015)%4;
-    const glow = flick===0 ? PAL.cigGlow : (flick===2 ? "#ff6b35" : "#ff9a5a");
-    pRect(ox+12*sc, oy+8*sc, 3*sc, 1*sc, PAL.cigWhite);
-    pRect(ox+14*sc, oy+8*sc, 1*sc, 1*sc, PAL.cigFilter);
-    pRect(ox+15*sc, oy+8*sc, 1*sc, 1*sc, glow);
-    // occasional glow halo
-    if(flick<2) pRect(ox+15*sc, oy+8*sc, 1*sc, 1*sc, "rgba(255,80,30,0.35)");
-    // smoke puffs rising — 3 particles with drift
-    for(let i=0;i<3;i++){
-      const age = (t*0.002 + i*1.8)%3;
-      const sy = oy+6*sc - age*6*sc;
-      const sx = ox+13*sc + Math.sin(t*0.003 + i)*2*sc + i*1*sc;
-      const a = Math.max(0, 1 - age/3);
-      const s = 1 + age*0.6;
-      ctx.fillStyle = "rgba(210,210,210,"+(a*0.45)+")";
-      ctx.fillRect(Math.round(sx), Math.round(sy), Math.round(s*sc), Math.round(s*sc));
-      ctx.fillStyle = "rgba(255,255,255,"+(a*0.25)+")";
-      ctx.fillRect(Math.round(sx+1), Math.round(sy), 1, 1);
+    // realistic-ish side-profile smoker, facing right — 15x26 units
+    // animation clocks
+    const breathe = Math.round(Math.sin(t*0.0016));           // 1 / 0 / -1 chest shift
+    const blink = ((t*0.001)%4.7) < 0.12;
+    const dragCyc = (t*0.00045)%3;                             // ~6.7s cycle: 0-0.5 drag, 0.5-2 exhale
+    const dragging = dragCyc < 0.5;
+    const exhaling = dragCyc >= 0.5 && dragCyc < 1.8;
+    const bob = breathe;                                       // shoulders/head rise-fall
+
+    // ---- legs (jeans with seams + cuffs) ----
+    pRect(ox+3*sc, oy+16*sc, 3*sc, 8*sc, PAL.denimDk);         // back leg
+    pRect(ox+7*sc, oy+16*sc+bob*sc*0, 4*sc, 8*sc, PAL.denim);  // front leg (weight)
+    pRect(ox+4*sc, oy+16*sc, sc, 8*sc, PAL.denim);             // back seam light
+    pRect(ox+8*sc, oy+17*sc, sc, 7*sc, PAL.denimHi);           // front highlight
+    pRect(ox+3*sc, oy+22*sc, 3*sc, sc, PAL.denimHi);           // back cuff
+    pRect(ox+7*sc, oy+22*sc, 4*sc, sc, PAL.denimHi);           // front cuff
+    // ---- sneakers ----
+    pRect(ox+2*sc, oy+24*sc, 5*sc, 2*sc, PAL.shoe);
+    pRect(ox+6*sc, oy+24*sc, 5*sc, 2*sc, PAL.shoe);
+    pRect(ox+2*sc, oy+25*sc, 9*sc, sc, PAL.sole);
+    pRect(ox+6*sc, oy+24*sc, sc, sc, PAL.sole);                // toe cap
+
+    // ---- torso (open jacket, tee, zipper) ----
+    pRect(ox+3*sc, oy+(8+bob)*sc, 8*sc, 8*sc, PAL.jackF);
+    pRect(ox+9*sc, oy+(8+bob)*sc, 2*sc, 8*sc, PAL.jackS);      // shaded side
+    pRect(ox+3*sc, oy+(8+bob)*sc, 8*sc, sc, PAL.jackHi);       // shoulder light
+    pRect(ox+5*sc, oy+(9+bob)*sc, 2*sc, 5*sc, PAL.tee);        // white tee V
+    pRect(ox+6*sc, oy+(10+bob)*sc, sc, 5*sc, "#b0b0b0");       // zipper
+    pRect(ox+3*sc, oy+15*sc, 8*sc, sc, PAL.jackS);             // hem
+
+    // ---- raised right arm: elbow bent, hand at lips ----
+    pRect(ox+10*sc, oy+(8+bob)*sc, 2*sc, 4*sc, PAL.jackF);     // upper arm
+    pRect(ox+11*sc, oy+(5+bob)*sc, 2*sc, 4*sc, PAL.jackF);     // forearm up
+    pRect(ox+11*sc, oy+(5+bob)*sc, sc, 4*sc, PAL.jackS);
+    pRect(ox+11*sc, oy+(3+bob)*sc, 2*sc, 2*sc, PAL.skin);      // hand at mouth
+    // other arm relaxed, thumb in pocket
+    pRect(ox+3*sc, oy+(10+bob)*sc, sc, 4*sc, PAL.jackS);
+
+    // ---- head (profile): hair, brow, nose, stubble jaw, ear ----
+    const hy=(0+bob);
+    pRect(ox+4*sc, oy+hy*sc, 6*sc, 2*sc, PAL.hair);            // messy hair top
+    pRect(ox+3*sc, oy+(hy+1)*sc, sc, 3*sc, PAL.hair);          // hair back
+    pRect(ox+8*sc, oy+hy*sc, sc, sc, PAL.hairHi);              // fringe highlight
+    pRect(ox+4*sc, oy+(hy+2)*sc, 5*sc, 2*sc, PAL.skin);        // forehead/face
+    pRect(ox+9*sc, oy+(hy+2)*sc, 2*sc, sc, PAL.skin2);         // nose bridge
+    pRect(ox+10*sc, oy+(hy+3)*sc, sc, sc, PAL.skin2);          // nose tip
+    pRect(ox+8*sc, oy+(hy+2)*sc, sc, sc, "#6e5643");           // brow
+    if(!blink) pRect(ox+8*sc, oy+(hy+3)*sc, sc, sc, "#1a1a1a");// eye
+    else pRect(ox+8*sc, oy+(hy+3)*sc, sc, sc, PAL.skin);
+    pRect(ox+5*sc, oy+(hy+3)*sc, sc, sc, PAL.skinSh);          // ear shadow
+    pRect(ox+6*sc, oy+(hy+4)*sc, 4*sc, 2*sc, PAL.stubble);     // stubble jaw
+    pRect(ox+9*sc, oy+(hy+4)*sc, sc, sc, PAL.skin);            // mouth corner
+    pRect(ox+7*sc, oy+(hy+5)*sc, 3*sc, sc, PAL.skin);          // chin
+    pRect(ox+7*sc, oy+(hy+6)*sc, 2*sc, sc, PAL.skin2);         // neck
+
+    // ---- cigarette between fingers at lips ----
+    const flick = Math.floor(t*0.02)%4;
+    const glow = dragging ? "#ffd23f" : (flick===0 ? PAL.cigGlow : (flick===2 ? "#ff6b35" : "#ff9a5a"));
+    pRect(ox+11*sc, oy+(3+bob)*sc, sc, sc, PAL.cigFilter);     // filter at fingers
+    pRect(ox+10*sc, oy+(3+bob)*sc, sc, sc, PAL.cigWhite);      // stick to lips
+    pRect(ox+9*sc, oy+(3+bob)*sc, sc, sc, dragging?glow:"#5a4038"); // ember/lip end
+    if(!dragging && flick<2) pRect(ox+9*sc, oy+(2+bob)*sc, sc, sc, "rgba(255,80,30,0.30)");
+    // ash grows on the ember tip, then falls
+    const ashCyc = (t*0.00018)%1;
+    const ashLen = Math.floor(ashCyc*3);
+    for(let a=0;a<ashLen;a++) pRect(ox+(8-a)*sc, oy+(3+bob)*sc, sc, sc, "#9a9a9a");
+    if(ashLen===2){                                            // falling ash
+      const fall = ((ashCyc-0.66)/0.34);
+      pRect(ox+7*sc+Math.round(fall*2), Math.round((oy+(4+bob)+fall*fall*14)*sc), sc, sc, "rgba(160,160,160,"+(1-fall)+")");
     }
-    // head
-    pRect(ox+3*sc, oy+2*sc, 4*sc, 4*sc, PAL.skin);
-    pRect(ox+3*sc, oy+2*sc, 4*sc, 1*sc, "#5a3d2b"); // hair fringe
-    // cap
-    pRect(ox+2*sc, oy+1*sc, 6*sc, 2*sc, "#1e2a4a");
-    pRect(ox+2*sc, oy+1*sc, 6*sc, 1*sc, "#2f4a7a");
-    // face details
-    pRect(ox+4*sc, oy+4*sc, 1*sc, 1*sc, "#1a1a1a"); // eye
-    pRect(ox+6*sc, oy+5*sc, 1*sc, 1*sc, "#7a3a2a"); // mouth drag
-    // cheek blush
-    pRect(ox+3*sc, oy+5*sc, 1*sc, 1*sc, "rgba(255,120,120,0.5)");
+
+    // ---- smoke: drifting puffs, big plume while exhaling ----
+    const puffs = exhaling ? 6 : 3;
+    const puffAlpha = exhaling ? 0.55 : 0.32;
+    for(let i=0;i<puffs;i++){
+      const age = (t*0.00035 + i*(exhaling?0.14:0.22))%1;
+      const sx = ox+9*sc + Math.sin(age*6.5+i*1.7)*age*20*sc*0.35 + age*8*sc;
+      const sy = oy+(3+bob)*sc - age*13*sc;
+      const s = 1 + age*(exhaling?4.2:2.4);
+      ctx.fillStyle = "rgba(215,215,215,"+(Math.max(0,(1-age))*puffAlpha)+")";
+      ctx.fillRect(Math.round(sx), Math.round(sy), Math.round(s*sc), Math.round(s*sc));
+      ctx.fillStyle = "rgba(255,255,255,"+(Math.max(0,(1-age))*puffAlpha*0.5)+")";
+      ctx.fillRect(Math.round(sx+sc), Math.round(sy+sc), sc, sc);
+    }
+  }
+
+  function drawRakiaOnBench(ox, oy, sc){
+    // clear bottle with amber rakia + cork, one shot glass beside it
+    pRect(ox, oy, 3*sc, 8*sc, PAL.rakiaGlass);
+    pRect(ox, oy+4*sc, 3*sc, 4*sc, PAL.rakiaAmber);
+    pRect(ox+sc, oy-sc*2, sc, 2*sc, PAL.rakiaGlass);           // neck
+    pRect(ox+sc, oy-sc*3, sc, sc, PAL.corkTan);                // cork
+    pRect(ox, oy+2*sc, 3*sc, 2*sc, PAL.paper);                 // label
+    pRect(ox, oy+2*sc, 3*sc, sc, PAL.flagG);
+    pRect(ox, oy+3*sc, 3*sc, sc, PAL.flagR);
+    // shot glass half full
+    pRect(ox+5*sc, oy+5*sc, 2*sc, 3*sc, PAL.rakiaGlass);
+    pRect(ox+5*sc, oy+6*sc, 2*sc, 2*sc, PAL.rakiaAmber);
+  }
+
+  function drawSunflowers(oy, t){
+    // sunflower strip along the back edge of the grass, swaying
+    const step = isMobile?34:27;
+    const baseSc = isMobile?2.4:3.0;
+    for(let x=step*0.5, i=0; x<W; x+=step, i++){
+      const sway = Math.round(Math.sin(t*0.0016 + i*1.3)*baseSc*0.4);
+      const hgt = 6 + (i%3)*2;                                 // stalk height in units
+      const s = baseSc * (0.85 + (i%4)*0.08);
+      const bx = x + sway;
+      const by = oy - hgt*s;
+      // stalk + leaves
+      pRect(bx+2*s, by+5*s, s, hgt*s-5*s, PAL.stalk);
+      pRect(bx, by+7*s, 2*s, s, PAL.stalk);
+      pRect(bx+3*s, by+9*s, 2*s, s, PAL.stalk);
+      // petals (cross shape)
+      pRect(bx+s, by+2*s, 3*s, 3*s, PAL.sunYellow);
+      pRect(bx+2*s, by+s, s, 5*s, PAL.sunYellow);
+      pRect(bx, by+3*s, 5*s, s, PAL.sunYellow);
+      pRect(bx+2*s, by, s, s, PAL.sunYellow);
+      pRect(bx+2*s, by+5*s, s, s, PAL.sunYellowDk);
+      // seed core
+      pRect(bx+2*s, by+2*s, s, s, PAL.sunBrown);
+    }
+  }
+
+  function drawStorkPole(ox, oy, sc, t){
+    // power pole with stork nest — two storks, one wing-flapping
+    pRect(ox, oy-24*sc, 2*sc, 24*sc, "#7a5e42");               // pole
+    pRect(ox-3*sc, oy-24*sc, 8*sc, sc, PAL.nestD);             // crossbar
+    pRect(ox-3*sc, oy-23*sc, 2*sc, sc, PAL.nestM);
+    // nest
+    pRect(ox-2*sc, oy-25*sc, 6*sc, 2*sc, PAL.nestM);
+    pRect(ox-2*sc, oy-25*sc, 6*sc, sc, PAL.nestD);
+    // standing stork beside nest
+    pRect(ox+4*sc, oy-28*sc, 2*sc, 2*sc, PAL.storkW);          // body
+    pRect(ox+6*sc, oy-29*sc, sc, sc, PAL.storkW);              // head
+    pRect(ox+7*sc, oy-29*sc, 2*sc, sc, PAL.beakR);             // beak
+    pRect(ox+4*sc, oy-26*sc, sc, sc, PAL.storkB);              // wing/tail
+    pRect(ox+4*sc, oy-26*sc, sc, 2*sc, PAL.storkB);            // legs
+    // stork sitting in nest, flaps every few seconds
+    const flap = Math.floor(t*0.002)%6;
+    pRect(ox-1*sc, oy-26*sc, 2*sc, sc, PAL.storkW);
+    if(flap<2) pRect(ox, oy-(flap===0?28:27)*sc, 2*sc, sc, PAL.storkB);
+  }
+
+  function drawSheep(ox, oy, sc, t){
+    // three woolly sheep grazing + head bob, dark faces and legs
+    for(let i=0;i<3;i++){
+      const sx = ox + i*9*sc;
+      const graze = Math.floor((t*0.0006 + i*0.7))%3===0;
+      // wool body: bumpy alternating shades
+      pRect(sx+sc, oy+3*sc, 5*sc, 3*sc, PAL.wool);
+      pRect(sx, oy+4*sc, 7*sc, 2*sc, PAL.wool);
+      pRect(sx+2*sc, oy+2*sc, 3*sc, sc, PAL.wool);
+      pRect(sx+sc, oy+4*sc, 2*sc, sc, PAL.woolSh);
+      pRect(sx+4*sc, oy+5*sc, 2*sc, sc, PAL.woolSh);
+      // legs
+      pRect(sx+sc, oy+6*sc, sc, 2*sc, PAL.sheepFace);
+      pRect(sx+5*sc, oy+6*sc, sc, 2*sc, PAL.sheepFace);
+      // head down grazing or up
+      if(graze){
+        pRect(sx+6*sc, oy+5*sc, 2*sc, 2*sc, PAL.sheepFace);
+        pRect(sx+7*sc, oy+6*sc, sc, sc, PAL.sheepFace);
+      }else{
+        pRect(sx+6*sc, oy+2*sc, 2*sc, 2*sc, PAL.sheepFace);
+        pRect(sx+8*sc, oy+2*sc, sc, sc, PAL.sheepFace);        // ear... actually snout
+      }
+    }
   }
 
   function drawSpeechBubble(ox, oy, sc, t, text){
@@ -937,45 +1074,81 @@
     // far mountains
     drawFarMountains(t);
 
-    // grid — MAP REMOVED, FLAG ULTRA HUGE 4x+, SMOKER 15%+ FOCAL, VALLEY DENSER
-    drawNevsky(W*(isMobile?0.48:0.58), H*0.02, isMobile?3.8:7.5, t);
-    // FLAG — EVEN BIGGER 4x (desktop 18→22, mobile 8.5→10) + top-visible on mobile
-    const flagScM = 12.0, flagScD = 26.0;
-    const flagX = isMobile ? 4 : W*0.02;
-    const flagY = isMobile ? 2 : H*0.02;
-    drawFlag(flagX, flagY, isMobile?flagScM:flagScD, t);
-    drawSmallChurch(W*(isMobile?0.26:0.36), H*0.04, isMobile?3.4:6.5, t);
-    drawPriest(W*(isMobile?0.70:0.80), H*0.05, isMobile?3.6:7.0, t);
-    // Bottom row — ULTRA HUGE, ground-hugging
+    // ground FIRST so every prop can stand on the grass correctly
+    drawGroundAndRoad();
+
+    // roadside tricolor mini-flags along the curb
+    const flagStep = isMobile?42:32;
+    for(let x= W*0.04; x< W*0.96; x+= flagStep){
+      const fx = x;
+      const fy = H*0.82;
+      const pole = isMobile?8:11;
+      const fw = isMobile?5:7;
+      pRect(fx, fy-pole, 1.5, pole, "#7a4a2a");
+      pRect(fx+1.5, fy-pole, fw, 3, PAL.flagW);
+      pRect(fx+1.5, fy-pole+3, fw, 3, PAL.flagG);
+      pRect(fx+1.5, fy-pole+6, fw, 3, PAL.flagR);
+    }
+
+    // sunflower field along the back edge of the grass — Bulgarian summer
+    drawSunflowers(H - Math.round(H*0.18) + Math.round(H*0.012), t);
+
+    // ===== HERO FLAG — huge, anchored LEFT, visible on mobile too =====
+    let flagSc, flagX, flagY;
+    if(isMobile){
+      flagSc = Math.max(7, Math.min(11, Math.round(W*0.024)));
+      flagX = Math.max(6, Math.round(W*0.02));
+      flagY = 8;
+    }else{
+      flagSc = Math.max(14, Math.min(30, Math.round(W*0.37/28)));
+      flagX = Math.round(W*0.02);
+      flagY = Math.round(H*0.06);
+    }
+    drawFlag(flagX, flagY, flagSc, t);
+
+    // skyline landmarks
+    drawNevsky(W*(isMobile?0.55:0.58), isMobile?H*0.245:H*0.02, isMobile?3.8:7.5, t);
+    drawSmallChurch(W*(isMobile?0.70:0.44), isMobile?H*0.03:H*0.04, isMobile?3.4:6.5, t);
+    drawPriest(W*(isMobile?0.82:0.80), isMobile?H*0.135:H*0.05, isMobile?3.6:7.0, t);
+
+    // mid row — Bulgarian landscape props
     const bottomY = H*(isMobile?0.58:0.44);
     drawRedChurch(W*0.005, bottomY, isMobile?3.6:6.5, t);
     drawFortress(W*(isMobile?0.18:0.24), bottomY+2, isMobile?3.6:7.2, t);
     drawMonument(W*(isMobile?0.62:0.74), bottomY+2, isMobile?3.6:6.5, t);
-    // Valley of red roses — MEGA DENSE — 160+ roses, even more
+    if(!isMobile) drawSheep(W*0.58, H - Math.round(H*0.18) - 8*2.6, 2.6, t);
+
+    // stork nest on a power pole — very Balkan
+    drawStorkPole(W*(isMobile?0.90:0.94), H - Math.round(H*0.18) + 2, isMobile?3.0:3.4, t);
+
+    // Valley of red roses — MEGA DENSE
     const valleyY = H - Math.round(H*0.18) - (isMobile?30:52);
     drawRoseValley(W*0.005, valleyY, isMobile?2.8:4.4, t);
-    // Election hero elements — ULTRA HUGE
+
+    // Election hero elements
     drawLion(W*0.80, H*(isMobile?0.56:0.50), isMobile?3.6:7.0, t);
     drawBallotBox(W*(isMobile?0.04:0.08), H*(isMobile?0.62:0.50), isMobile?5.5:13.0, t);
     drawPodium(W*(isMobile?0.52:0.62), H*(isMobile?0.62:0.48), isMobile?3.6:7.0, t);
     drawPosterWall(W*(isMobile?0.24:0.40), H*(isMobile?0.62:0.48), isMobile?3.0:6.2, t);
     drawMegaphone(W*0.68, H*(isMobile?0.70:0.58), isMobile?3.6:5.8, t);
-    // Bus stop + SMOKER FOCAL — 15%+ (even bigger)
+
+    // Bus stop + rakia on the bench + REALISTIC SMOKER FOCAL
     const busSc = isMobile?3.6:5.6;
     const busX = W*(isMobile?0.28:0.38);
     const busY = H - Math.round(H*0.18) - 16*busSc - (isMobile?16:22);
     drawBusStop(busX, busY, busSc, t);
-    const smokerSc = isMobile?6.8:8.5;
-    const smokerH = 17*smokerSc;
+    drawRakiaOnBench(busX + 4*busSc, busY + 3*busSc, busSc*0.9);
+    const smokerSc = isMobile?5.6:7.5;
     const grassY2 = H - Math.round(H*0.18);
-    const smokerY = grassY2 - smokerH + (isMobile?6:8);
-    const smokerX = busX + 7*busSc;
+    const smokerY = grassY2 - 26*smokerSc + 4;
+    const smokerX = busX + 20*busSc;
     drawSmoker(smokerX, smokerY, smokerSc, t);
+
     // DOM speech bubble — focal, above smoker, tail to mouth, always on top of XP window
     const bubbleEl = document.getElementById("smoker-bubble");
     if(bubbleEl){
-      const mouthX = smokerX + 14*smokerSc;
-      const mouthY = smokerY + 8*smokerSc;
+      const mouthX = smokerX + 9.5*smokerSc;
+      const mouthY = smokerY + 4*smokerSc;
       // position bubble centered above smoker's head, offset to avoid title
       const bubbleW2 = bubbleEl.offsetWidth || (isMobile? 220: 280);
       const bubbleH2 = bubbleEl.offsetHeight || 46;
@@ -985,8 +1158,6 @@
       bx = Math.max(6, Math.min(W - bubbleW2 - 6, bx));
       by = Math.max(6, Math.min(H - bubbleH2 - 6, by));
       // if bubble would be behind title (title is centered), push it slightly up/left to stay visible
-      // title is at ~5vh from top, height ~380, so title top ~40, bottom ~420 on 800px
-      // if bubble is inside title rect, nudge it above title
       const titleEl = document.querySelector(".title-wrap");
       if(titleEl){
         const tr = titleEl.getBoundingClientRect();
@@ -1008,28 +1179,6 @@
       // subtle bob
       const bob2 = Math.round(Math.sin(t*0.002)*2);
       bubbleEl.style.transform = "translateY("+bob2+"px)";
-    }
-    ctx.strokeStyle="#0a0a0a";
-    ctx.lineWidth= Math.max(1, Math.round(smokerSc*0.35));
-    ctx.beginPath();
-    ctx.moveTo(bubbleX + bubbleW*0.30, bubbleY + 38);
-    ctx.lineTo(mouthX - 2*smokerSc, mouthY);
-    ctx.stroke();
-
-    // ground and road
-    drawGroundAndRoad();
-
-    // decorative flags on ground along road fence — bigger, denser to fill desktop
-    const flagStep = isMobile?42:32;
-    for(let x= W*0.04; x< W*0.96; x+= flagStep){
-      const fx = x;
-      const fy = H*0.82;
-      const pole = isMobile?8:11;
-      const fw = isMobile?5:7;
-      pRect(fx, fy-pole, 1.5, pole, "#7a4a2a");
-      pRect(fx+1.5, fy-pole, fw, 3, PAL.flagW);
-      pRect(fx+1.5, fy-pole+3, fw, 3, PAL.flagG);
-      pRect(fx+1.5, fy-pole+6, fw, 3, PAL.flagR);
     }
   }
 
@@ -1113,7 +1262,7 @@
     if(reduced){
       if(!needsDraw) return;
       // draw single static frame
-      try{ draw(now||0); }catch(_){}
+      try{ draw(now||0); }catch(e){ recordBgErr(e); }
       needsDraw=false;
       return;
     }
@@ -1128,8 +1277,8 @@
     // clamp large dt after tab switch
     const useDt = Math.min(dt, 100);
     last = now;
-    try{ update(useDt, now); }catch(_){}
-    try{ draw(now); }catch(_){}
+    try{ update(useDt, now); }catch(e){ recordBgErr(e); }
+    try{ draw(now); }catch(e){ recordBgErr(e); }
   }
 
   function boot(){
@@ -1155,7 +1304,7 @@
       obs.observe(screen, {attributes:true, attributeFilter:["class"]});
     }catch(_){}
     // expose for debugging / tests
-    window.__titleBg = {canvas, redraw:function(){ try{ draw(nowFn()); }catch(_){ } }, resize:handleResize};
+    window.__titleBg = {canvas, redraw:function(){ try{ draw(nowFn()); }catch(e){ recordBgErr(e); } }, resize:handleResize};
   }
   if(!boot()){
     if(document.readyState==="loading"){
