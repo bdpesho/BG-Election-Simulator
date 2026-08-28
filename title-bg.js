@@ -69,6 +69,43 @@
     }
   }
 
+  // ----- sprite sheet assets (sliced from pixelart1.png) -----
+  const SPRITE_FILES={
+    smoker:"assets/sprites/smoker.png",
+    roseRed:"assets/sprites/rose-red.png",
+    rosePink:"assets/sprites/rose-pink.png",
+    cathedral:"assets/sprites/cathedral.png",
+    monument:"assets/sprites/monument.png"
+  };
+  const SPRITES={};
+  function loadSprites(){
+    for(const key in SPRITE_FILES){
+      try{
+        const im=new Image();
+        im.onload=function(){ needsDraw=true; };
+        im.src=SPRITE_FILES[key];
+        SPRITES[key]=im;
+      }catch(_){}
+    }
+  }
+  function sprite(key){
+    const im=SPRITES[key];
+    if(im&&im.complete&&im.naturalWidth>0) return im;
+    return null;
+  }
+  function spriteSize(key,k){
+    const im=sprite(key);
+    if(!im) return null;
+    return {w:im.naturalWidth*k,h:im.naturalHeight*k};
+  }
+  function drawSprite(key,x,y,k){
+    const im=sprite(key);
+    if(!im) return false;
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(im,Math.round(x),Math.round(y),Math.round(im.naturalWidth*k),Math.round(im.naturalHeight*k));
+    return true;
+  }
+
   // ----- palettes -----
   const PAL = {
     skyTop:"#f2f6fa", skyMid:"#dde9f2", skyLow:"#cde0ee",
@@ -637,92 +674,149 @@
     }
   }
 
-  function drawRoseBed(ox,yBase,sc,n,t,seed){
-    const step=Math.round(sc*3.4)+6;
+  // rose beds built from the sprite-sheet roses (red mostly, pink accents)
+  function drawRoseBed(ox,feet,n,t,seed,k){
     for(let i=0;i<n;i++){
       const row=(i+seed)%2;
-      const x=ox+i*step+(((i*13+seed*7)%5)-2)*sc*0.5;
-      const y=yBase-row*sc*1.9;
-      const s=sc*(0.86+((i+seed)%3)*0.10);
-      const sway=Math.round(Math.sin(t*0.0016+i*1.1+seed)*s*0.55);
-      drawGrid(ROSE_GRID,ROSE_PAL,x+sway,y,s);
+      const ki=k*(row?0.78:1);
+      const key=(i+seed)%5===3?"rosePink":"roseRed";
+      const x=ox+i*(70*k+30)+(((i*13+seed*7)%5)-2)*4;
+      const im=sprite(key);
+      if(im){
+        const h=im.naturalHeight*ki;
+        const sway=Math.round(Math.sin(t*0.0015+i*1.1+seed)*ki*8);
+        if(!drawSprite(key,x+sway,feet-h-row*36*k,ki)){
+          drawGrid(ROSE_GRID,ROSE_PAL,x,feet-row*30-8*2.6,2.6);
+        }
+      }else{
+        const sc=2.6*(row?0.85:1);
+        drawGrid(ROSE_GRID,ROSE_PAL,x,feet-row*30-8*sc,sc);
+      }
     }
   }
 
   function drawRoseGardens(meadowTop,t){
-    const sc=isMobile?2.4:3.2;
-    drawRoseBed(W*0.025,meadowTop+sc*6,sc,isMobile?4:7,t,1);
-    drawRoseBed(W*0.025,meadowTop+sc*15,sc*1.2,isMobile?3:6,t,2);
-    drawRoseBed(W*0.615,meadowTop+sc*6,sc,isMobile?3:6,t,3);
-    drawRoseBed(W*0.615,meadowTop+sc*15,sc*1.2,isMobile?3:5,t,4);
-    drawRoseBed(W*0.86,meadowTop+sc*8,sc,isMobile?2:4,t,5);
+    if(isMobile){
+      drawRoseBed(W*0.03,meadowTop+10,4,t,1,0.20);
+      drawRoseBed(W*0.63,meadowTop+12,3,t,3,0.20);
+      drawRoseBed(W*0.86,meadowTop+14,2,t,5,0.18);
+    }else{
+      drawRoseBed(W*0.02,meadowTop+8,4,t,1,0.28);
+      drawRoseBed(W*0.025,meadowTop+24,5,t,2,0.36);
+      drawRoseBed(W*0.615,meadowTop+8,4,t,3,0.28);
+      drawRoseBed(W*0.62,meadowTop+24,5,t,4,0.36);
+      drawRoseBed(W*0.86,meadowTop+12,3,t,5,0.32);
+    }
   }
 
   // =========================================================
-  //  THE SMOKER
+  //  THE SMOKER (sprite from pixelart1.png) + SMOKE PUFFS
   // =========================================================
-  function drawSmoker(ox,oy,sc,t){
-    const breathe=Math.round(Math.sin(t*0.0016));
-    const blink=((t*0.001)%4.7)<0.12;
-    const dragCyc=(t*0.00045)%3;
-    const dragging=dragCyc<0.5;
-    const exhaling=dragCyc>=0.5&&dragCyc<1.8;
-    const bobY=breathe*sc*0.5;
+  const smokePuffs=[];
+  let lastPuff=0;
+  let smokeSeeded=false;
 
-    // legs + sneakers
-    pRect(ox+3*sc,oy+16*sc,3*sc,8*sc,PAL.denimDk);
-    pRect(ox+6*sc,oy+16*sc,4*sc,8*sc,PAL.denim);
-    pRect(ox+4*sc,oy+17*sc,sc,7*sc,PAL.denimHi);
-    pRect(ox+3*sc,oy+22*sc,3*sc,sc,PAL.denimHi);
-    pRect(ox+6*sc,oy+22*sc,4*sc,sc,PAL.denimHi);
-    pRect(ox+2*sc,oy+24*sc,5*sc,2*sc,PAL.shoe);
-    pRect(ox+6*sc,oy+24*sc,4*sc,2*sc,PAL.shoe);
-    pRect(ox+2*sc,oy+25*sc,8*sc,sc,PAL.sole);
-    // torso
-    const ty=oy+8*sc+bobY;
-    pRect(ox+3*sc,ty,8*sc,8*sc,PAL.jackF);
-    pRect(ox+9*sc,ty,2*sc,8*sc,PAL.jackS);
-    pRect(ox+3*sc,ty,8*sc,sc,PAL.jackHi);
-    pRect(ox+4*sc,ty+sc,2*sc,6*sc,PAL.tee);
-    pRect(ox+6*sc,ty+2*sc,sc,5*sc,PAL.zipper);
-    pRect(ox+3*sc,ty+8*sc,8*sc,sc,PAL.jackS);
-    // raised arm
-    pRect(ox+10*sc,ty,2*sc,4*sc,PAL.jackF);
-    pRect(ox+11*sc,ty-3*sc,sc,4*sc,PAL.jackS);
-    // head
-    const hy=oy+bobY;
-    const g=SMOKER_HEAD;
-    for(let r=0;r<g.length;r++){
-      for(let c=0;c<g[r].length;c++){
-        const ch=g[r][c];
-        if(ch===".") continue;
-        let col=SMOKER_HEAD_PAL[ch];
-        if(ch==="E"&&blink) col=PAL.skin;
-        if(!col) continue;
-        ctx.fillStyle=col;
-        ctx.fillRect(Math.round(ox+c*sc),Math.round(hy+r*sc),Math.ceil(sc),Math.ceil(sc));
+  function spawnPuff(cx,cy,big){
+    smokePuffs.push({
+      x:cx, y:cy,
+      sx:6+Math.random()*10,               // gentle rightward curl, like a breeze
+      sy:-(22+Math.random()*10),
+      age:0,
+      life:2.1+(big?0.7:0.0),
+      size:big?6.5:4.8,
+      drift:(Math.random()-0.5)*0.8,
+      sway:Math.random()*Math.PI*2
+    });
+    if(smokePuffs.length>40) smokePuffs.shift();
+  }
+
+  function updateSmoke(dt,now,cx,cy){
+    const s=dt/1000;
+    const cycleAt=(now*0.00045)%3;
+    const big=cycleAt>=0.5&&cycleAt<1.8;      // exhale = bigger plume
+    const interval=big?0.15:0.30;
+    if(lastPuff===0) lastPuff=now;
+    if(now-lastPuff>=interval*1000){
+      lastPuff=now;
+      spawnPuff(cx+(Math.random()-0.5)*8,cy-4,big);
+    }
+    for(let i=smokePuffs.length-1;i>=0;i--){
+      const p=smokePuffs[i];
+      p.age+=s;
+      if(p.age>=p.life){ smokePuffs.splice(i,1); continue; }
+      const a=p.age/p.life;
+      p.y+=p.sy*s*(0.6+a*1.0);
+      p.x+=p.sx*s+Math.sin(now*0.0035+p.sway)*7*s+p.drift*a;
+    }
+  }
+
+  function drawSmoke(){
+    ctx.imageSmoothingEnabled=false;
+    for(const p of smokePuffs){
+      const a=1-(p.age/p.life);
+      const grow=p.size*(1+a*2.4);
+      const csz=Math.max(2,Math.round(grow));
+      const fade=a>0.75?(1-a)/0.25:1;
+      ctx.globalAlpha=Math.max(0,Math.min(0.62,0.5*(a<0.75?1:1)))*fade;
+      ctx.fillStyle="#fafafa";
+      ctx.fillRect(Math.round(p.x-csz),Math.round(p.y-csz*0.5),csz*2,csz*1.5);
+      ctx.fillStyle="rgba(203,214,224,0.9)";
+      ctx.fillRect(Math.round(p.x-csz*0.6),Math.round(p.y-csz*0.15),csz*1.2,csz*0.7);
+      ctx.globalAlpha=1;
+    }
+  }
+
+  function drawSmoker(ox,oy,k,t){
+    // breathing bob kept subtle
+    const bob=Math.round(Math.sin(t*0.0016)*k*2);
+    // smoke origin: cig tip
+    const sx=ox+0.615*170*k, sy=oy+0.075*281*k;
+    updateSmoke(16,t,sx,sy);
+    if(!drawSprite("smoker",ox,oy+bob,k)){
+      // fallback: procedural pixel smoker
+      const sc=k*281/26;
+      pRect(ox+3*sc,oy+16*sc,3*sc,8*sc,PAL.denimDk);
+      pRect(ox+6*sc,oy+16*sc,4*sc,8*sc,PAL.denim);
+      pRect(ox+2*sc,oy+24*sc,5*sc,2*sc,PAL.shoe);
+      pRect(ox+6*sc,oy+24*sc,4*sc,2*sc,PAL.shoe);
+      pRect(ox+3*sc,oy+8*sc,8*sc,8*sc,PAL.jackF);
+      pRect(ox+9*sc,oy+8*sc,2*sc,8*sc,PAL.jackS);
+      pRect(ox+4*sc,oy+9*sc,2*sc,6*sc,PAL.tee);
+      pRect(ox+3*sc,oy+16*sc,8*sc,sc,PAL.jackS);
+      const g=SMOKER_HEAD;
+      for(let r=0;r<g.length;r++){
+        for(let c=0;c<g[r].length;c++){
+          const ch=g[r][c];
+          if(ch===".") continue;
+          const col=SMOKER_HEAD_PAL[ch];
+          if(!col) continue;
+          ctx.fillStyle=col;
+          ctx.fillRect(Math.round(ox+c*sc),Math.round(oy+r*sc),Math.ceil(sc),Math.ceil(sc));
+        }
+      }
+      // cig stick
+      pRect(ox+9*sc,oy+3*sc,sc,sc,PAL.cigWhite);
+      pRect(ox+10*sc,oy+3*sc,sc,sc,PAL.cigFilter);
+    }
+    // ember glow at the cig tip
+    const flick=Math.floor(t*0.02)%4;
+    const glow=flick===0?"#ff3b30":(flick===2?"#ff6b35":"#ff9a5a");
+    pRect(sx-k*2,sy,k*2.4,k*2.4,glow);
+    // seed the smoke column on first frames so the puffs show immediately
+    if(!smokeSeeded){
+      smokeSeeded=true;
+      for(let i=0;i<7;i++){
+        smokePuffs.push({
+          x:sx+(Math.random()-0.5)*8, y:sy-6-i*11,
+          sx:6+Math.random()*10, sy:-(22+Math.random()*10),
+          age:i*0.28, life:2.1+(i%3===0?0.7:0),
+          size:i%3===0?6.5:4.8,
+          drift:(Math.random()-0.5)*0.8, sway:Math.random()*Math.PI*2
+        });
       }
     }
-    // hand + cigarette at lips
-    pRect(ox+11*sc,hy+3*sc,sc,2*sc,PAL.skin);
-    const flick=Math.floor(t*0.02)%4;
-    const glow=dragging?"#ffd23f":(flick===0?PAL.cigGlow:(flick===2?"#ff6b35":"#ff9a5a"));
-    pRect(ox+9*sc,hy+3*sc,sc,sc,PAL.cigWhite);
-    pRect(ox+10*sc,hy+3*sc,sc,sc,PAL.cigFilter);
-    pRect(ox+8*sc,hy+3*sc+sc*0.3,sc,sc*0.7,dragging?glow:"#ff9a5a");
-    // smoke
-    const puffs=exhaling?6:3;
-    const puffAlpha=exhaling?0.55:0.32;
-    for(let i=0;i<puffs;i++){
-      const age=(t*0.0004+i*(exhaling?0.13:0.2))%1;
-      const sx=ox+9*sc+Math.sin(age*6.5+i*1.7)*age*5*sc+age*7*sc;
-      const sy=hy+3*sc-age*12*sc;
-      const s=sc*(1+age*(exhaling?3.4:2.0));
-      ctx.fillStyle="rgba(215,215,215,"+Math.max(0,(1-age))*puffAlpha+")";
-      ctx.fillRect(Math.round(sx),Math.round(sy),Math.round(s),Math.round(s));
-      ctx.fillStyle="rgba(255,255,255,"+Math.max(0,(1-age))*puffAlpha*0.5+")";
-      ctx.fillRect(Math.round(sx+sc),Math.round(sy+sc),Math.ceil(sc),Math.ceil(sc));
-    }
+    // smoke drawn in front of the guy
+    drawSmoke();
   }
 
   // poster wall: 3 campaign posters
@@ -774,16 +868,21 @@
     function stand(fn,x,base,h,sc){
       fn(x, ridgeLine+base-h*sc, sc);
     }
+    function standSprite(key,x,base,scaleY){
+      const im=sprite(key);
+      if(!im) return false;
+      const w=im.naturalWidth*scaleY, h=im.naturalHeight*scaleY;
+      const y=ridgeLine+base-h;
+      return drawSprite(key,x,y,scaleY);
+    }
     if(isMobile){
       stand(drawSmallChurch,W*0.06,42,18,2.4);
-      stand(drawRedChurch,W*0.34,52,15,2.6);
-      stand(drawNevsky,W*0.62,34,22,2.2);
+      standSprite("cathedral",W*0.36,30,0.24);
       stand(drawPodium,W*0.92,48,12,2.6);
     }else{
       stand(drawSmallChurch,W*0.075,58,18,3.4);
-      stand(drawRedChurch,W*0.165,66,15,4.4);
-      stand(drawNevsky,W*0.30,46,22,3.8);
-      stand(drawMonument,W*0.425,84,17,4.2);
+      standSprite("cathedral",W*0.30,36,0.42);
+      standSprite("monument",W*0.425,70,0.30);
       stand(drawLion,W*0.545,58,15,4.6);
       stand(drawPodium,W*0.635,72,12,4.8);
       stand(drawBallotBox,W*0.72,86,12,4.6);
@@ -802,21 +901,22 @@
       const grassY=L.meadowTop-2;
       drawBusStop(W*0.145,grassY-16*3.6,3.6);
       drawRakia(W*0.145+3.2*3.6,grassY-4.4*3.6,3.0);
-      const smokerSc=6.4;
-      const smokerY=grassY-26*smokerSc+4;
-      const smokerX=W*0.145+20*3.6-4;
-      drawSmoker(smokerX,smokerY,smokerSc,t);
+      const smokerK=0.52;
+      const smokerW=170*smokerK;
+      const smokerX=W*0.145+20*3.6-6;
+      const smokerY=grassY-281*smokerK;   // feet on the grass
+      drawSmoker(smokerX,smokerY,smokerK,t);
       drawSheep(W*0.66,grassY-8*2.4,2.4,t);
 
       // ---- bubble positioning (DOM, tail to mouth) ----
       const bubbleEl=document.getElementById("smoker-bubble");
       if(bubbleEl){
-        const mouthX=smokerX+9*smokerSc;
-        const mouthY=smokerY+4*smokerSc;
+        const mouthX=smokerX+0.615*170*smokerK;
+        const mouthY=smokerY+0.075*281*smokerK;
         const bubbleW2=bubbleEl.offsetWidth||280;
         const bubbleH2=bubbleEl.offsetHeight||46;
         let bx=mouthX-bubbleW2*0.45;
-        let by=smokerY-bubbleH2-10;
+        let by=smokerY-bubbleH2-58;
         bx=Math.max(6,Math.min(W-bubbleW2-6,bx));
         by=Math.max(6,Math.min(H-bubbleH2-6,by));
         const titleEl=document.querySelector(".title-wrap");
@@ -950,6 +1050,7 @@
     return true;
   }
   function start(){
+    try{loadSprites();}catch(_){}
     try{handleResize();}catch(_){}
     try{initEntities();}catch(_){}
     try{window.addEventListener("resize",handleResize);}catch(_){}
