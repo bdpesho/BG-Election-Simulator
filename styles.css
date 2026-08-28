@@ -905,3 +905,17 @@ input[type=radio],input[type=checkbox]{
   82%{opacity:1;}
   100%{opacity:0;transform:translateY(-42px);}
 }
+
+/* --- custom retro cursor set (arrow pointer, pointing hand, clicking hand) ---
+   Default: arrow. Interactive UI: pointing hand. While clicking: pinching hand.
+   Map crosshair / busy state keep their existing cursors above. */
+html,body{cursor:url(assets/cursor-arrow.png) 2 2,default!important;}
+button,.btn,a,[role=button],.hud-box,.mobile-tab,
+.demand-chip:not(:disabled),.swatch,select,
+input[type=range],input[type=color],.political-compass,.compass-hit-area{
+  cursor:url(assets/cursor-hand.png) 4 2,pointer!important;}
+button:active,.btn:active,a:active,[role=button]:active,
+.hud-box:active,.mobile-tab:active,.demand-chip:not(:disabled):active,
+.swatch:active,.political-compass:active{
+  cursor:url(assets/cursor-pinch.png) 8 2,pointer!important;}
+.political-compass.dragging{cursor:url(assets/cursor-pinch.png) 8 2,grabbing!important;}

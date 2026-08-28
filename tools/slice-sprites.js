@@ -65,10 +65,12 @@ function decodePNG(file){
 
 const img=decodePNG(path.join(__dirname,"..","pixelart1.png"));
 const img2=decodePNG(path.join(__dirname,"..","pixelart2.png"));
+const imgC=decodePNG(path.join(__dirname,"..","ChatGPT Image Aug 28, 2026, 08_57_03 PM.png"));
 
 // ---- crop region, flood-fill white bg transparent, downsample by f ----
-function slice(SRC,name,x0,y0,x1,y1,f){
+function slice(SRC,name,x0,y0,x1,y1,f,dir){
   const w=x1-x0,h=y1-y0;
+  const outDir=dir!==undefined?dir:"sprites";
   // flood fill region background (near-white or alpha<10) from all border pixels
   const bg=new Int8Array(w*h);
   const stack=[];
@@ -140,10 +142,18 @@ function slice(SRC,name,x0,y0,x1,y1,f){
     for(let i=0;i<dw*dh;i++)if(px[i][3]!==0)px[i][3]=0;
     for(const i of best)px[i][3]=255;
   }
-  const out=path.join(__dirname,"..","assets","sprites");
+  const out=path.join(__dirname,"..","assets",outDir);
   fs.mkdirSync(out,{recursive:true});
   fs.writeFileSync(path.join(out,name+".png"),encodePNG(dw,dh,(x,y)=>px[y*dw+x]));
   console.log(name,dw+"x"+dh,"(sheet",w+"x"+h,"at f="+f+")");
+  if(String(name).indexOf("cursor")===0){
+    // print hotspot: centre of the topmost opaque run, +2 rows down
+    for(let yy=0;yy<dh;yy++){
+      let sum=0,n=0;
+      for(let xx=0;xx<dw;xx++){ if(px[yy*dw+xx][3]>0){ sum+=xx; n++; } }
+      if(n>0){ console.log("  hotspot ≈", Math.round(sum/n), yy+2); break; }
+    }
+  }
 }
 
 // bounding boxes measured on the 1448x1086 sheets (may adjust if sheets change)
@@ -156,3 +166,7 @@ slice(img2,"booth",191,177,530,543,2);         // voting booth w/ tricolor curta
 slice(img2,"house",760,43,1419,543,2);         // traditional two-storey house
 slice(img2,"car",88,543,681,1013,2);           // beige sedan
 slice(img2,"cow",760,543,1326,1020,2);         // horned cow with bell
+// cursor set (sheet from the user): arrow, pointing hand, pinching hand
+slice(imgC,"cursor-arrow",71,423,298,640,8,"");
+slice(imgC,"cursor-hand",469,447,755,660,9,"");
+slice(imgC,"cursor-pinch",916,514,1174,660,8,"");
