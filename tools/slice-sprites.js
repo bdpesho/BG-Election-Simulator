@@ -64,11 +64,11 @@ function decodePNG(file){
 }
 
 const img=decodePNG(path.join(__dirname,"..","pixelart1.png"));
+const img2=decodePNG(path.join(__dirname,"..","pixelart2.png"));
 
 // ---- crop region, flood-fill white bg transparent, downsample by f ----
-function slice(name,x0,y0,x1,y1,f){
+function slice(SRC,name,x0,y0,x1,y1,f){
   const w=x1-x0,h=y1-y0;
-  const SRC=img; // careful: use global img, px is per (x,y) of sheet
   // flood fill region background (near-white or alpha<10) from all border pixels
   const bg=new Int8Array(w*h);
   const stack=[];
@@ -146,9 +146,13 @@ function slice(name,x0,y0,x1,y1,f){
   console.log(name,dw+"x"+dh,"(sheet",w+"x"+h,"at f="+f+")");
 }
 
-// bounding boxes measured on the 1448x1086 sheet (may adjust if sheet changes)
-slice("smoker",174,38,514,600,2);          // guy in neutral smoking pose
-slice("rose-red",650,132,859,484,2);
-slice("rose-pink",1035,132,1284,560,2);
-slice("cathedral",69,600,752,1020,2);
-slice("monument",845,600,1390,1017,2);
+// bounding boxes measured on the 1448x1086 sheets (may adjust if sheets change)
+slice(img,"smoker",174,38,514,600,2);          // guy in neutral smoking pose
+slice(img,"rose-red",650,132,859,484,2);
+slice(img,"rose-pink",1035,132,1284,560,2);
+slice(img,"cathedral",69,600,752,1020,2);
+slice(img,"monument",845,600,1390,1017,2);
+slice(img2,"booth",191,177,530,543,2);         // voting booth w/ tricolor curtain
+slice(img2,"house",760,43,1419,543,2);         // traditional two-storey house
+slice(img2,"car",88,543,681,1013,2);           // beige sedan
+slice(img2,"cow",760,543,1326,1020,2);         // horned cow with bell

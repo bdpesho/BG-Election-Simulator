@@ -75,7 +75,11 @@
     roseRed:"assets/sprites/rose-red.png",
     rosePink:"assets/sprites/rose-pink.png",
     cathedral:"assets/sprites/cathedral.png",
-    monument:"assets/sprites/monument.png"
+    monument:"assets/sprites/monument.png",
+    booth:"assets/sprites/booth.png",
+    house:"assets/sprites/house.png",
+    car:"assets/sprites/car.png",
+    cow:"assets/sprites/cow.png"
   };
   const SPRITES={};
   function loadSprites(){
@@ -674,38 +678,26 @@
     }
   }
 
-  // rose beds built from the sprite-sheet roses (red mostly, pink accents)
-  function drawRoseBed(ox,feet,n,t,seed,k){
+  // roses SPREAD across the meadow (not just a row on top)
+  function drawRoseGardens(L,t){
+    const top=L.meadowTop+10, bottom=L.roadTop-28;
+    const n=isMobile?15:26;
     for(let i=0;i<n;i++){
-      const row=(i+seed)%2;
-      const ki=k*(row?0.78:1);
-      const key=(i+seed)%5===3?"rosePink":"roseRed";
-      const x=ox+i*(70*k+30)+(((i*13+seed*7)%5)-2)*4;
+      const hash=i*2654435761;
+      const ux=((hash>>>6)%1000)/1000;
+      const uy=(((hash>>>9)^(i*7919))%1000)/1000;
+      const x=W*0.02+ux*(W*0.96-W*0.02);
+      const y=top+uy*(bottom-top);
+      // keep the smoker's footprint clear
+      const sxMin=W*0.112-24, sxMax=W*0.145+170*0.52+30;
+      if(x>sxMin&&x<sxMax&&y<top+150) continue;
+      const k=(0.24+((i*37)%10)/10*0.34)*(isMobile?0.62:1);
+      const key=i%6===4?"rosePink":"roseRed";
       const im=sprite(key);
-      if(im){
-        const h=im.naturalHeight*ki;
-        const sway=Math.round(Math.sin(t*0.0015+i*1.1+seed)*ki*8);
-        if(!drawSprite(key,x+sway,feet-h-row*36*k,ki)){
-          drawGrid(ROSE_GRID,ROSE_PAL,x,feet-row*30-8*2.6,2.6);
-        }
-      }else{
-        const sc=2.6*(row?0.85:1);
-        drawGrid(ROSE_GRID,ROSE_PAL,x,feet-row*30-8*sc,sc);
-      }
-    }
-  }
-
-  function drawRoseGardens(meadowTop,t){
-    if(isMobile){
-      drawRoseBed(W*0.03,meadowTop+10,4,t,1,0.20);
-      drawRoseBed(W*0.63,meadowTop+12,3,t,3,0.20);
-      drawRoseBed(W*0.86,meadowTop+14,2,t,5,0.18);
-    }else{
-      drawRoseBed(W*0.02,meadowTop+8,4,t,1,0.28);
-      drawRoseBed(W*0.025,meadowTop+24,5,t,2,0.36);
-      drawRoseBed(W*0.615,meadowTop+8,4,t,3,0.28);
-      drawRoseBed(W*0.62,meadowTop+24,5,t,4,0.36);
-      drawRoseBed(W*0.86,meadowTop+12,3,t,5,0.32);
+      if(!im){ drawGrid(ROSE_GRID,ROSE_PAL,x,y-8*2.6,2.6); continue; }
+      const h=im.naturalHeight*k;
+      const sway=Math.round(Math.sin(t*0.0015+i*1.3+((hash>>>5)%7))*k*10);
+      drawSprite(key,x+sway,y-h,k);
     }
   }
 
@@ -720,10 +712,10 @@
     smokePuffs.push({
       x:cx, y:cy,
       sx:6+Math.random()*10,               // gentle rightward curl, like a breeze
-      sy:-(22+Math.random()*10),
+      sy:-(20+Math.random()*8),
       age:0,
-      life:2.1+(big?0.7:0.0),
-      size:big?6.5:4.8,
+      life:1.9+(big?0.6:0.0),
+      size:big?4.4:3.2,
       drift:(Math.random()-0.5)*0.8,
       sway:Math.random()*Math.PI*2
     });
@@ -734,7 +726,7 @@
     const s=dt/1000;
     const cycleAt=(now*0.00045)%3;
     const big=cycleAt>=0.5&&cycleAt<1.8;      // exhale = bigger plume
-    const interval=big?0.15:0.30;
+    const interval=big?0.17:0.38;
     if(lastPuff===0) lastPuff=now;
     if(now-lastPuff>=interval*1000){
       lastPuff=now;
@@ -746,7 +738,7 @@
       if(p.age>=p.life){ smokePuffs.splice(i,1); continue; }
       const a=p.age/p.life;
       p.y+=p.sy*s*(0.6+a*1.0);
-      p.x+=p.sx*s+Math.sin(now*0.0035+p.sway)*7*s+p.drift*a;
+      p.x+=p.sx*s+Math.sin(now*0.0035+p.sway)*6*s+p.drift*a;
     }
   }
 
@@ -754,10 +746,10 @@
     ctx.imageSmoothingEnabled=false;
     for(const p of smokePuffs){
       const a=1-(p.age/p.life);
-      const grow=p.size*(1+a*2.4);
+      const grow=p.size*(1+a*1.6);
       const csz=Math.max(2,Math.round(grow));
       const fade=a>0.75?(1-a)/0.25:1;
-      ctx.globalAlpha=Math.max(0,Math.min(0.62,0.5*(a<0.75?1:1)))*fade;
+      ctx.globalAlpha=Math.max(0,Math.min(0.42,0.34))*fade;
       ctx.fillStyle="#fafafa";
       ctx.fillRect(Math.round(p.x-csz),Math.round(p.y-csz*0.5),csz*2,csz*1.5);
       ctx.fillStyle="rgba(203,214,224,0.9)";
@@ -807,10 +799,10 @@
       smokeSeeded=true;
       for(let i=0;i<7;i++){
         smokePuffs.push({
-          x:sx+(Math.random()-0.5)*8, y:sy-6-i*11,
-          sx:6+Math.random()*10, sy:-(22+Math.random()*10),
-          age:i*0.28, life:2.1+(i%3===0?0.7:0),
-          size:i%3===0?6.5:4.8,
+          x:sx+(Math.random()-0.5)*8, y:sy-5-i*9,
+          sx:6+Math.random()*10, sy:-(20+Math.random()*8),
+          age:i*0.26, life:1.9+(i%3===0?0.6:0),
+          size:i%3===0?4.4:3.2,
           drift:(Math.random()-0.5)*0.8, sway:Math.random()*Math.PI*2
         });
       }
@@ -876,60 +868,45 @@
       return drawSprite(key,x,y,scaleY);
     }
     if(isMobile){
-      stand(drawSmallChurch,W*0.06,42,18,2.4);
+      standSprite("house",W*0.05,34,0.30);
       standSprite("cathedral",W*0.36,30,0.24);
-      stand(drawPodium,W*0.92,48,12,2.6);
+      standSprite("booth",W*0.62,44,0.30);
     }else{
-      stand(drawSmallChurch,W*0.075,58,18,3.4);
+      standSprite("house",W*0.06,42,0.50);
       standSprite("cathedral",W*0.30,36,0.42);
-      standSprite("monument",W*0.425,70,0.30);
-      stand(drawLion,W*0.545,58,15,4.6);
-      stand(drawPodium,W*0.635,72,12,4.8);
-      stand(drawBallotBox,W*0.72,86,12,4.6);
-      stand(drawFortress,W*0.855,96,14,4.4);
-      stand(drawSmallChurch,W*0.945,110,18,3.0);
+      standSprite("monument",W*0.62,130,0.72);   // HUGE: the Shipka monument
+      standSprite("booth",W*0.86,66,0.50);
     }
 
     // ---- meadow life ----
     drawSunflowers(L.meadowTop,t);
-    drawRoseGardens(L.meadowTop,t);
+    drawRoseGardens(L,t);
 
     if(!isMobile){
       drawPosterWall(W*0.50,L.meadowTop-14*3.2+2,3.2,t);
       drawStorkPole(W*0.955,L.meadowTop+6,2.6,t);
-      // bus stop + bench + rakia + smoker (left meadow, focal)
+      // smoker standing on the left meadow (focal), bus stop gone
       const grassY=L.meadowTop-2;
-      drawBusStop(W*0.145,grassY-16*3.6,3.6);
-      drawRakia(W*0.145+3.2*3.6,grassY-4.4*3.6,3.0);
       const smokerK=0.52;
       const smokerW=170*smokerK;
-      const smokerX=W*0.145+20*3.6-6;
+      const smokerX=W*0.145;
       const smokerY=grassY-281*smokerK;   // feet on the grass
       drawSmoker(smokerX,smokerY,smokerK,t);
-      drawSheep(W*0.66,grassY-8*2.4,2.4,t);
+      // cow on the field
+      const cowK=0.5;
+      const cowX=W*0.56, cowY=grassY-239*cowK;
+      drawSprite("cow",cowX+Math.round(Math.sin(t*0.0012)*3),cowY,cowK);
+      drawSheep(W*0.775,grassY-8*2.4,2.4,t);
 
-      // ---- bubble positioning (DOM, tail to mouth) ----
+      // ---- bubble positioning (DOM): pinned above the smoker's head ----
       const bubbleEl=document.getElementById("smoker-bubble");
       if(bubbleEl){
-        const mouthX=smokerX+0.615*170*smokerK;
-        const mouthY=smokerY+0.075*281*smokerK;
         const bubbleW2=bubbleEl.offsetWidth||280;
         const bubbleH2=bubbleEl.offsetHeight||46;
-        let bx=mouthX-bubbleW2*0.45;
-        let by=smokerY-bubbleH2-58;
+        let bx=smokerX+smokerW*0.5-bubbleW2/2;
+        let by=smokerY-bubbleH2-8;
         bx=Math.max(6,Math.min(W-bubbleW2-6,bx));
         by=Math.max(6,Math.min(H-bubbleH2-6,by));
-        const titleEl=document.querySelector(".title-wrap");
-        if(titleEl){
-          const tr=titleEl.getBoundingClientRect();
-          const sr=screen.getBoundingClientRect();
-          const bxAbs=sr.left+bx,byAbs=sr.top+by;
-          const overlap=!(bxAbs+bubbleW2<tr.left||bxAbs>tr.right||byAbs+bubbleH2<tr.top||byAbs>tr.bottom);
-          if(overlap){
-            by=Math.max(6,tr.top-sr.top-bubbleH2-16);
-            bx=Math.max(6,Math.min(W-bubbleW2-6,mouthX-bubbleW2*0.35));
-          }
-        }
         bubbleEl.style.left=Math.round(bx)+"px";
         bubbleEl.style.top=Math.round(by)+"px";
         bubbleEl.style.display=screen.classList.contains("active")?"block":"none";
@@ -1006,8 +983,24 @@
     for(const b of birds){
       drawBird(b.x,b.y,isMobile?1.6:2.2,Math.floor(b.offset)%2);
     }
-    const roadY=L.roadTop-12*(isMobile?1.8:3.2);
-    for(const v of vans) drawVan(v.x,roadY,isMobile?1.8:3.2,t+v.x*1.2);
+    // campaign cars cruising the road (sprite faces left; flip when driving right)
+    for(const v of vans){
+      const carK=isMobile?0.20:0.30;
+      const carW=297*carK, carH=235*carK;
+      const carIm=sprite("car");
+      const y=L.roadTop+L.roadH-carH-5;
+      if(!carIm){ drawVan(v.x,L.roadTop-12*(isMobile?1.8:3.2),isMobile?1.8:3.2,t+v.x*1.2); continue; }
+      ctx.imageSmoothingEnabled=false;
+      if(v.dir===1){
+        ctx.save();
+        ctx.translate(Math.round(v.x+carW),Math.round(y));
+        ctx.scale(-1,1);
+        ctx.drawImage(carIm,0,0,Math.round(carW),Math.round(carH));
+        ctx.restore();
+      }else{
+        ctx.drawImage(carIm,Math.round(v.x),Math.round(y),Math.round(carW),Math.round(carH));
+      }
+    }
     if(!reduced){
       ctx.fillStyle="rgba(0,0,0,0.02)";
       for(let y=0;y<H;y+=4) ctx.fillRect(0,y,W,1);
