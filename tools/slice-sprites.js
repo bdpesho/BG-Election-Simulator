@@ -167,6 +167,6 @@ slice(img2,"house",760,43,1419,543,2);         // traditional two-storey house
 slice(img2,"car",88,543,681,1013,2);           // beige sedan
 slice(img2,"cow",760,543,1326,1020,2);         // horned cow with bell
 // cursor set (sheet from the user): arrow, pointing hand, pinching hand
-slice(imgC,"cursor-arrow",71,423,298,640,8,"");
-slice(imgC,"cursor-hand",469,447,755,660,9,"");
-slice(imgC,"cursor-pinch",916,514,1174,660,8,"");
+slice(imgC,"cursor-arrow",69,423,298,800,8,"");
+slice(imgC,"cursor-hand",469,447,800,817,8,"");
+slice(imgC,"cursor-pinch",916,514,1234,830,8,"");
