@@ -80,6 +80,9 @@ const AI_PARTIES=[
   {id:"velichie",name:"Velichie",abbr:"VEL",color:"#34495e",leader:"Albena Pekova",ideo:"Far-right nationalist",pos:{euro:.15,corruption:.60,energy:.65,judiciary:.35,pensions:.60,healthcare:.35,defense:.85,rural:.70,migration:.05},appeal:.12,favMinistry:"Energy",topIssue:"energy"}
 ];
 
+// parliamentary roster; presidential mode swaps AI_PARTIES' contents for the tickets
+const PARL_PARTIES=AI_PARTIES.slice();
+
 const INCOMPAT_PAIRS=[["bsp","gerb"],["aps","dps"],["pb","dps"],["mech","dps"],["velichie","ppdb"],
   ["vaz","gerb"],["vaz","ppdb"],["vaz","bsp"],["vaz","dps"],["vaz","itn"],["vaz","mech"],["vaz","aps"],["vaz","velichie"],
   ["ppdb","dps"]];
@@ -463,11 +466,13 @@ const FACES=[
   {bg:"#6d597a",skin:4,hairColor:"#1c1c1c",hairStyle:"bun",suitColor:"#2a2238",shirtColor:"#e6e0d0",suitStyle:"blouse",gender:"female",glasses:false}
 ];
 
+// every preset must fit the 15-point attribute budget enforced on the setup screen
+const ATTR_BUDGET=15;
 const PRESET_LEADERS=[
-  {name:"Elena Dimitrova",face:6,attrs:{stamina:5,charisma:7,intelligence:6},tag:"Reformist mayor",ethnicity:"bulgarian"},
-  {name:"Georgi Ivanov",face:0,attrs:{stamina:8,charisma:5,intelligence:5},tag:"Former minister",ethnicity:"bulgarian"},
-  {name:"Maria Stoyanova",face:2,attrs:{stamina:5,charisma:6,intelligence:7},tag:"Investigative journalist",ethnicity:"turkish"},
-  {name:"Stefan Kolev",face:3,attrs:{stamina:6,charisma:6,intelligence:6},tag:"Business founder",ethnicity:"roma"}
+  {name:"Elena Dimitrova",face:6,attrs:{stamina:4,charisma:6,intelligence:5},tag:"Reformist mayor",ethnicity:"bulgarian"},
+  {name:"Georgi Ivanov",face:0,attrs:{stamina:6,charisma:4,intelligence:5},tag:"Former minister",ethnicity:"bulgarian"},
+  {name:"Maria Stoyanova",face:2,attrs:{stamina:4,charisma:5,intelligence:6},tag:"Investigative journalist",ethnicity:"turkish"},
+  {name:"Stefan Kolev",face:3,attrs:{stamina:5,charisma:5,intelligence:5},tag:"Business founder",ethnicity:"roma"}
 ];
 
 const CANDIDATE_NAMES=["Aleksandar Vasilev","Elena Dimitrova","Georgi Ivanov","Maria Stoyanova","Stefan Kolev","Ralitsa Petkova","Dimitar Georgiev","Krasimira Todorova","Boris Angelov","Yana Hristova","Nikola Stoyanov","Vesela Marinova","Kamen Radev","Iliana Krusteva"];
@@ -655,11 +660,26 @@ function showScreen(name){
   setMusicForScreen(name);
 }
 
-function partyOf(id){if(id==="player")return playerParty();return AI_PARTIES.find(p=>p.id===id);}
-function partyName(p){return p.name===p.abbr?p.name:p.name+" ("+p.abbr+")";}
-function playerParty(){return{id:"player",name:S.party.name,abbr:S.party.abbr,color:S.party.color,pos:S.party.pos,appeal:playerAppeal()};}
-function playerAppeal(){return 0.74+(getAttr("charisma")+getAttr("intelligence"))*0.012;}
-function allParties(){return[playerParty(),...AI_PARTIES];}
+function partyOf(id){
+  if(id==="player")return playerParty();
+  return AI_PARTIES.find(p=>p.id===id)||(PRES_TICKET_BY_ID[id]?presTicketParty(PRES_TICKET_BY_ID[id]):null)||PARL_PARTIES.find(p=>p.id===id);
+}
+function partyName(p){return p.isTicket||p.name===p.abbr?p.name:p.name+" ("+p.abbr+")";}
+function playerParty(){
+  if(isPres()){const vp=S.pres.ticket?PRES_TICKET_BY_ID[S.pres.ticket].vp:(PRES_VP_OPTIONS.find(v=>v.id===S.pres.vp)||{}).name;
+    return{id:"player",name:S.player.name+(vp?" – "+vp:""),abbr:S.party.abbr,color:S.party.color,pos:S.party.pos,appeal:playerAppeal(),isTicket:true};}
+  return{id:"player",name:S.party.name,abbr:S.party.abbr,color:S.party.color,pos:S.party.pos,appeal:playerAppeal()};
+}
+function playerAppeal(){
+  const base=0.74+(getAttr("charisma")+getAttr("intelligence"))*0.012;
+  if(isPres()){
+    // a real ticket keeps its calibrated pull (a 5/5 candidate = exactly the ticket's appeal)
+    if(S.pres&&S.pres.ticket)return PRES_TICKET_BY_ID[S.pres.ticket].appeal*base/0.86;
+    return base*PRES_OWN_APPEAL*((S.pres&&S.pres.recognition)||1);
+  }
+  return base;
+}
+function allParties(){return presPlayerOut()?[...AI_PARTIES]:[playerParty(),...AI_PARTIES];}
 
 function getAttr(a){let v=S.player.attrs[a];for(const m of S.modifiers){const e=m.effects["attr_"+a];if(e)v+=e;}return clamp(v,1,12);}
 function modSum(key){let v=0;for(const m of S.modifiers){if(m.effects[key])v+=m.effects[key];}return v;}
@@ -720,7 +740,7 @@ function districtShares(d,noisy,boostOv){
   const scores={};
   for(const p of allParties()){
     let sc=(0.30+0.70*issueAlign(p,d))*p.appeal;
-    const ln=d.lean&&d.lean[p.id]?d.lean[p.id]:0;
+    const ln=partyLean(p,d);
     sc*=1+ln;
     sc*=ent;
     const performance=S&&S.perfMod&&S.perfMod[p.id];
@@ -735,7 +755,8 @@ function districtShares(d,noisy,boostOv){
     }
     scores[p.id]=Math.max(0.001,sc);
   }
-  scores.others=0.055*ent;
+  // presidential: "others" are the 21 minor tickets in round 1, then "I don't support anyone" in the runoff
+  scores.others=0.055*ent*(isPres()?(S.pres&&S.pres.round===2?PRES_NONE_WEIGHT:PRES_OTHERS_WEIGHT):1);
   let sum=0;for(const k in scores)sum+=scores[k];
   const out={};
   for(const k in scores){let sh=scores[k]/sum;if(noisy)sh+=pollNoiseFor(d.id,k);out[k]=Math.max(0,sh);}
@@ -1190,7 +1211,7 @@ function virusSkipTurns(){
   saveGame();
   S.paused=false;
   updateAll();
-  if(S.week>20){runElection();return;}
+  if(S.week>lastWeek()){if(isPres())presVote();else runElection();return;}
 }
 
 function buildEventPool(){
@@ -1464,6 +1485,7 @@ function buildEventPool(){
     else if(o.index===P.length)P.push(o.event);
   }
   for(const index of EVENT_EDITOR_DELETIONS.slice().sort((a,b)=>b-a))if(Number.isInteger(index)&&index>=0&&index<P.length)P.splice(index,1);
+  if(isPres())presEventPool(P);
 }
 
 function closestAlly(){
@@ -1528,7 +1550,9 @@ function applyFx(fx,prefix){
   }
   if(fx.rel){
     for(const k in fx.rel)S.rel[k]=(S.rel[k]||0)+fx.rel[k];
-    log(tag+"Relationship: "+Object.keys(fx.rel).map(k=>"<b>"+partyOf(k).abbr+"</b> "+(fx.rel[k]>0?"+":"")+fx.rel[k]).join(", ")+".",Object.keys(fx.rel).some(k=>fx.rel[k]<0)?"bad":"good");
+    // only parties in the current race (presidential mode has no parliamentary parties)
+    const relKeys=Object.keys(fx.rel).filter(k=>AI_PARTIES.some(p=>p.id===k));
+    if(relKeys.length)log(tag+"Relationship: "+relKeys.map(k=>"<b>"+esc(partyOf(k).abbr)+"</b> "+(fx.rel[k]>0?"+":"")+fx.rel[k]).join(", ")+".",relKeys.some(k=>fx.rel[k]<0)?"bad":"good");
   }
   if(fx.posShift&&ISSUE_BY_ID[fx.posShift.issue]){S.party.pos[fx.posShift.issue]=clamp(S.party.pos[fx.posShift.issue]+fx.posShift.delta,0,1);log(tag+"Platform shift on <b>"+ISSUE_BY_ID[fx.posShift.issue].name+"</b> "+(fx.posShift.delta>0?"+":"")+fx.posShift.delta+".","info");}
   if(fx.attrTemp){addModifier({name:"Sharp form",desc:"+"+fx.attrTemp.v+" "+fx.attrTemp.attr+" for "+fx.attrTemp.turns+" weeks",turns:fx.attrTemp.turns,effects:{["attr_"+fx.attrTemp.attr]:fx.attrTemp.v}});log(tag+"+"+fx.attrTemp.v+" "+fx.attrTemp.attr+" for "+fx.attrTemp.turns+" weeks.","good");}
@@ -1711,6 +1735,16 @@ function ensureDiksyObserver(){
 }
 
 function helpModal(){
+  if(isPres()){
+    openModal('<h3>How to play — Presidential race</h3>'
+      +'<p>You have <b>'+PRES_WEEKS+' weeks</b> until round one on <b>'+PRES_ROUND1_DATE+'</b>. Travel, rally, run ads and build HQs exactly as in the parliamentary campaign — but there is one national vote and no seats.</p>'
+      +'<ul><li>Win outright only with <b>more than 50%</b> of valid votes <b>and turnout above 50%</b>. That has never happened in Bulgaria.</li>'
+      +'<li>Otherwise the <b>top two</b> go to a runoff on <b>'+PRES_RUNOFF_DATE+'</b>. Voters of the eliminated tickets drift toward the closer finalist (or split), you pick one outreach move, then get one runoff week and a head-to-head debate.</li>'
+      +'<li>Knocked out in round one? Endorse a finalist and watch the runoff.</li>'
+      +'<li>The '+PRES_TICKETS.length+' named tickets are the real 2026 candidates with their late-September polling; the other '+PRES_OTHER_TICKETS+' tickets are grouped as “Others”. In-game events never attribute statements or scandals to them.</li></ul>'
+      +'<div class="center-row"><button class="btn primary" data-close>Got it</button></div>');
+    return;
+  }
   openModal('<h3>How to play</h3>'
     +'<p>You have <b>20 weeks</b> until Election Day. Each week you receive stamina points (SP) based on your candidate\'s Stamina attribute. Spend them to travel between the 29 districts and hold targeted rallies — each campaign draws <b>5 issues from a pool of nine</b> (Eurozone Entry, Anticorruption Reform, Energy Subsidies, Judicial Independence, Pension Reform, Healthcare, Defense Spending, Rural Development, Migration).</p>'
     +'<ul><li>Rallies are strongest on high-weight issues where your platform matches the district stance.</li><li>Campaign HQs cost 40 000 лв but pay 9 000 лв per week and slowly grow local support.</li><li>Local media ads scale with Intelligence and suffer diminishing returns.</li></ul>'
@@ -1734,7 +1768,7 @@ function menuModal(){
     +(mb&&S&&S.cheat?'<p class="dc-note" style="margin:0;margin-top:8px"><b>CHEAT MODE ACTIVE</b> — Debug is available above.</p>':''));
   $("m-resume").onclick=closeModal;
   $("m-save").onclick=()=>{saveGame();closeModal();log("Campaign saved.","info");renderLog();};
-  $("m-load").onclick=()=>{closeModal();if(!loadGame())alert("No save found.");};
+  $("m-load").onclick=()=>{closeModal();if(!loadGame(saveKey()))alert("No save found.");};
   $("m-help").onclick=helpModal;
   const ms=$("m-sound");
   if(ms)ms.onclick=()=>{toggleSound();ms.textContent="Sound: "+(soundEnabled?"On":"Off");};
@@ -1800,13 +1834,14 @@ function debugModal(){
   $("dbg-close").onclick=closeModal;
 }
 
-function saveGame(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
-function hasSave(){try{return !!localStorage.getItem(SAVE_KEY);}catch(e){return false;}}
-function loadGame(){
+function saveGame(){try{localStorage.setItem(saveKey(),JSON.stringify(S));}catch(e){}}
+function hasSave(key){try{return !!localStorage.getItem(key||SAVE_KEY);}catch(e){return false;}}
+function loadGame(key){
   try{
-    const raw=localStorage.getItem(SAVE_KEY);
+    const raw=localStorage.getItem(key||saveKey());
     if(!raw)return false;
     S=JSON.parse(raw);
+    applyModeParties();
     if(!S.term)S.term=1;
     if(!S.termHistory||!Array.isArray(S.termHistory))S.termHistory=[];
     if(!S.player.appearance)S.player.appearance=Object.assign(defaultAppearance(),FACES[S.player.face||0]||{});
@@ -1942,15 +1977,16 @@ function pollSparkline(){
   return '<svg class="hud-spark" viewBox="0 0 48 12" aria-hidden="true"><polyline points="'+points+'" fill="none" stroke="currentColor" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>';
 }
 function renderTopbar(){
+  {const mt=document.querySelector&&document.querySelector("#map-toolbar .map-title, .map-title");if(mt)mt.textContent=isPres()?"Bulgaria · presidential race · one national vote":"Electoral map of Bulgaria · 240 seats · threshold 4%";}
   $("tb-banner").style.background=S.party.color;
   $("tb-banner").innerHTML=S.party.logo
     ?'<img src="'+S.party.logo+'" alt="">'
     :emblemSVG(EMBLEM_IDS[S.party.emblemIdx],contrast(S.party.color),26);
-  $("tb-pm").innerHTML='<div class="pm-face">'+portraitHTML()+'</div><div><b>'+esc(S.player.name)+'</b><span>'+esc(S.party.abbr)+' · PM candidate</span></div>';
-  const clock=$("tb-clock");
-  clock.textContent="WEEK "+Math.min(S.week,20)+"/20";
-  clock.classList.toggle("urgent",S.week>=18&&S.week<=20);
-  $("tb-days").textContent=S.week>20?"ELECTION DAY":Math.max(0,(21-S.week))*7+" days to "+ELECTION_DATE;
+  $("tb-pm").innerHTML='<div class="pm-face">'+portraitHTML()+'</div><div><b>'+esc(S.player.name)+'</b><span>'+esc(S.party.abbr)+(isPres()?" · presidential candidate":" · PM candidate")+'</span></div>';
+  const clock=$("tb-clock"),LW=lastWeek();
+  clock.textContent=isPres()&&S.pres.round===2?"RUNOFF WEEK":"WEEK "+Math.min(S.week,LW)+"/"+LW;
+  clock.classList.toggle("urgent",S.week>=LW-(isPres()?1:2)&&S.week<=LW);
+  $("tb-days").textContent=S.week>LW?"ELECTION DAY":Math.max(0,(LW+1-S.week))*7+" days to "+electionDateLabel();
   const income=weeklyIncomeBreakdown();
   const trend=pollTrend();
   $("tb-cash").innerHTML='<span class="sc-ico">лв</span><span>Funds <b>'+fmtMoney(S.cash)+"</b><small>+"+fmtMoney(income.income)+" next</small></span>";
@@ -2231,8 +2267,8 @@ function pushNews(html){
 function seedMobileNews(){
   if(typeof document==="undefined"||newsSeeded||!S)return;
   newsSeeded=true;
-  const days=Math.max(0,(21-S.week))*7;
-  pushNews('<b>Election Commission</b> — election day '+(S.week>20?"is here":("in "+days+" days"))+'. '+esc(S.party.abbr)+' is polling at <b>'+pct(S.pollNat.player||0)+'</b> nationally.');
+  const days=Math.max(0,(lastWeek()+1-S.week))*7;
+  pushNews('<b>Election Commission</b> — election day '+(S.week>lastWeek()?"is here":("in "+days+" days"))+'. '+esc(S.party.abbr)+' is polling at <b>'+pct(S.pollNat.player||0)+'</b> nationally.');
   pushNews('<b>Campaign HQ</b> — '+esc(S.player.name)+' opens this week\'s push, funds at <b>'+fmtMoney(S.cash)+'</b>.');
 }
 function bindRallyPopOutsideClose(){
@@ -2414,7 +2450,7 @@ function renderDistrictDetail(){
     ?'<div class="dc-geo">'+geoTop.map(gg=>'<div class="geo-chip" title="'+esc(gg.l)+'"><span>'+esc(gg.l)+'</span><div class="bar"><div class="fill" style="width:'+(gg.v*100)+'%"></div></div><em>'+Math.round(gg.v*100)+'%</em></div>').join("")+'</div>'
     :"";
   let actions=actionButtonsHtml(d,here);
-  return '<div class="dc-head"><div><b>'+esc(d.name)+'</b><div class="dc-bg">'+esc(d.bg)+'</div></div><span class="seat-chip">'+d.seats+' seats</span></div>'
+  return '<div class="dc-head"><div><b>'+esc(d.name)+'</b><div class="dc-bg">'+esc(d.bg)+'</div></div><span class="seat-chip">'+(isPres()?"~"+Math.round(d.seats*DOMESTIC_POPULATION_PER_SEAT/1000)+"k residents":d.seats+" seats")+'</span></div>'
     +'<div class="dc-enthusiasm"><div class="mini-label"><span>Voter enthusiasm</span><span>'+entDisp+'%</span></div>'
     +'<div class="bar"><div class="fill" style="width:'+entDisp+'%;background:var(--acc)"></div></div></div>'
     +issues
@@ -2447,6 +2483,7 @@ function projectNationalSeats(est){
 }
 
 function renderNationalPolls(){
+  if(isPres())return renderPresPolls();
   const est=S.pollNat&&Object.keys(S.pollNat).length?S.pollNat:nationalShares(true);
   const rows=Object.keys(est).filter(k=>k!=="others").map(k=>({k:k,v:est[k]||0})).sort((a,b)=>b.v-a.v);
   const top=rows.length?Math.max(rows[0].v,0.001):1;
@@ -2471,6 +2508,23 @@ function renderNationalPolls(){
     +'<div class="np-note">Polling estimate — seat projection assumes the 4% threshold. Real polls are never exact; the final results will differ.</div>';
 }
 
+function renderPresPolls(){
+  const est=S.pollNat&&Object.keys(S.pollNat).length?S.pollNat:nationalShares(true);
+  const rows=Object.keys(est).filter(k=>k!=="others").map(k=>({k:k,v:est[k]||0})).sort((a,b)=>b.v-a.v);
+  const top=rows.length?Math.max(rows[0].v,.001):1,place=rows.findIndex(r=>r.k==="player")+1;
+  const half=.5/top*100;
+  const rowsHtml=rows.map((r,i)=>{const p=partyOf(r.k);
+    return '<div class="np-row '+(r.k==="player"?"you":"")+'"><span class="pdot" style="background:'+(p?p.color:"#888")+'"></span>'
+      +'<span class="pname">'+esc(p?p.abbr:r.k)+'</span>'
+      +'<span class="np-bar"><span class="np-fill" style="width:'+Math.max(2,r.v/top*100)+'%;background:'+(p?p.color:"#888")+'"></span>'+(half<=100?'<span class="np-thresh" style="left:'+half+'%" title="50% — outright win"></span>':"")+'</span>'
+      +'<span class="np-pct">'+pct(r.v)+'</span><span class="np-seats">'+(S.pres.round===1&&i<2?"R2":"")+'</span></div>';}).join("");
+  const othersRow=(est.others||0)>.001?'<div class="np-row np-others"><span class="pdot" style="background:#bbb"></span><span class="pname">'+(S.pres.round===2?"None":"Others")+'</span><span class="np-bar"></span><span class="np-pct">'+pct(est.others)+'</span><span class="np-seats"></span></div>':"";
+  return '<div class="np-head"><div class="mini-label"><span>'+(S.pres.round===2?"Runoff polling":"Round 1 polling")+'</span><span>'+(S.pres.round===2?"Runoff week":"Week "+Math.min(S.week,PRES_WEEKS))+'</span></div>'
+    +'<div class="np-sum">You are <b style="color:var(--gold)">'+presOrdinal(place)+'</b> at <b style="color:var(--gold)">'+pct(est.player||0)+'</b>'+(S.pres.round===1?(place<=2?" · on course for the runoff":" · outside the runoff places"):"")+'</div></div>'
+    +rowsHtml+othersRow
+    +'<div class="np-note">'+(S.pres.round===1?"Top two go to the runoff unless someone passes 50% with turnout above 50%. ":"")+'Polling estimate — the count will differ.</div>';
+}
+
 function renderMods(){
   const list=$("mods-list");
   if(!S.modifiers.length){list.innerHTML='<span class="hint">None — for now.</span>';return;}
@@ -2493,7 +2547,7 @@ function renderLog(){
 }
 
 function log(html,cls){
-  S.log.push({week:Math.min(S.week,20),html:html,cls:cls||"info"});
+  S.log.push({week:Math.min(S.week,lastWeek()),html:html,cls:cls||"info"});
   if(S.log.length>80)S.log.shift();
   if(isPhoneUI()&&mobileSheetOpen!=="log")mobileUnread++;
   renderMobileTabbar();
@@ -3333,6 +3387,7 @@ function doRally(issueId){
   const before={...S.districtPoll[d.id]};
   const gain=rallyGainFor(d,issueId);
   addBoost(d.id,"player",gain);
+  presSpill(d.id,gain);
   S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+0.04,0.5,1.4);
   S.stamina-=COSTS.rallySP;
   S.ralliesThisTurn++;
@@ -3355,6 +3410,7 @@ function buyAd(){
   const gain=adGainFor(d);
   S.cash-=COSTS.ad;
   addBoost(d.id,"player",gain);
+  presSpill(d.id,gain);
   S.stats.ads++;
   S.touched.push(d.id);
   recomputePolls();
@@ -3538,7 +3594,7 @@ function endTurn(){
   S.week++;
   for(const d of DISTRICTS){
     const b=S.boost[d.id]||{};
-    for(const k in b)b[k]*=0.72;
+    for(const k in b)b[k]*=isPres()?PRES_BOOST_DECAY:0.72;
     const e=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
     S.enthusiasm[d.id]=e+(d.ent-e)*0.15;
   }
@@ -3561,7 +3617,7 @@ function endTurn(){
   S.ralliesThisTurn=0;
   S.touched=[];
   saveGame();
-  if(S.week>20){runElection();return;}
+  if(S.week>lastWeek()){if(isPres())presVote();else runElection();return;}
   if(S.cheatEasyWin){S.cheatEasyWin=false;recomputePolls();}
   if(S.week>=S.debateWeek&&!S.debateDone){S.eventQueue.push("__DEBATE__");S.debateDone=true;}
   if(S.week>=S.pigWeek&&S.pigPending&&!S.pigDone){S.eventQueue.push("__PIG__");S.pigDone=true;}
@@ -3792,6 +3848,8 @@ function startElectionNight(){
   if(typeof window==="undefined")finishElectionNight();else electionNightTimers.push(setTimeout(advanceElectionNight,250));
 }
 function renderElectionScreen(){
+  if(S.results&&S.results.pres){renderPresElectionScreen();return;}
+  {const scr=$("screen-election");if(scr&&scr.classList)scr.classList.remove("pres");const t=$("election-title");if(t)t.textContent="ELECTION NIGHT";}
   const r=S.results,night=S.electionNight||{progress:1,step:5,tick:0},progress=night.progress===undefined?1:night.progress,est=progress>=1?r.natShare:electionNightPoll(progress,night.tick),seats=progress>=1?r.seats:projectNationalSeats(est);
   ensureElectionChart();
   const counted=Math.round(r.totalVotes*progress),activity=counted/DOMESTIC_POPULATION_ESTIMATE*100;
@@ -4184,6 +4242,7 @@ function beginNextTerm(){
 }
 
 function endingInfo(){
+  if(isPres())return presEndingInfo();
   const r=S.results||{seats:{},natShare:{}};
   const ps=r.seats.player||0;
   const C=S.coalition;
@@ -4240,17 +4299,30 @@ function renderEndScreen(){
   $("end-banner").innerHTML=bannerInner();
   $("end-title").textContent=title+" — Term "+S.term+" of "+TERM_MAX;
   const nextBtn=$("btn-next-term");
-  if(nextBtn)nextBtn.style.display=S.term<TERM_MAX?"":"none";
+  if(nextBtn)nextBtn.style.display=(!isPres()&&S.term<TERM_MAX)?"":"none";
+  if(isPres())$("end-title").textContent=title+" — Presidential election 2026";
   $("end-text").textContent=text;
-  $("end-stats").innerHTML=[
+  $("end-stats").innerHTML=(isPres()?presEndStats():[
     ["Seats won",ps],["National vote",pct(r.natShare.player||0)],["Rallies",S.stats.rallies],
     ["Media ads",S.stats.ads],["HQs built",S.stats.hqs],["Weeks on trail",20]
-  ].map(x=>'<div class="end-stat"><b>'+x[1]+'</b>'+x[0]+'</div>').join("");
+  ]).map(x=>'<div class="end-stat"><b>'+x[1]+'</b>'+x[0]+'</div>').join("");
   renderRunCardPreview();
 }
 
 /* ---- T19: shareable run card (1200x675 canvas, 2x export) ---- */
 function runCardData(){
+  if(isPres()){
+    const fr=S.results||{natShare:{}},r1=S.pres.rounds[1]||{natShare:{}},r2=S.pres.rounds[2];
+    const tally=Object.keys(fr.natShare).sort((a,b)=>fr.natShare[b]-fr.natShare[a]).map(k=>{const p=partyOf(k);
+      return{id:k,seats:Math.round(fr.natShare[k]*1000),color:p?p.color:"#888",abbr:p?p.abbr:k,label:(p?p.abbr:k)+" "+pct(fr.natShare[k])};});
+    return{
+      party:{name:S.party.name,abbr:S.party.abbr,color:S.party.color,slogan:S.party.slogan,bgStyle:S.party.bgStyle,emblemIdx:S.party.emblemIdx},
+      player:{name:S.player.name,face:S.player.face,appearance:S.player.appearance,photo:S.player.photo},
+      info:endingInfo(),term:1,ending:S.ending,seats:0,natShare:r1.natShare.player||0,tally:tally,stats:{...S.stats},cheat:S.cheat,kosyo:false,
+      weeks:Math.min(S.week,lastWeek()),
+      subline:"Presidential 2026 · round one "+pct(r1.natShare.player||0)+(r2&&!S.pres.playerOut?" · runoff "+pct(r2.natShare.player||0):"")
+    };
+  }
   const r=S.results||{seats:{},natShare:{}};
   const tally=Object.keys(r.seats).sort((a,b)=>(r.seats[b]||0)-(r.seats[a]||0))
     .filter(k=>(r.seats[k]||0)>0)
@@ -4298,7 +4370,7 @@ function drawRunCard(canvas,data){
   ctx.fillText(data.party.abbr+" — "+data.player.name,110,56);
   ctx.font="26px 'Pixelated MS Sans Serif',monospace";
   ctx.fillStyle="#f0f4ff";
-  ctx.fillText(data.party.name+' — "'+data.party.slogan+'"',110,106);
+  ctx.fillText(data.party.slogan?data.party.name+' — "'+data.party.slogan+'"':data.party.name,110,106);
   // portrait
   const px=60,py=200,psize=132;
   ctx.fillStyle="#d8d8d8";ctx.fillRect(px-6,py-6,psize+12,psize+12);
@@ -4320,7 +4392,7 @@ function drawRunCard(canvas,data){
   ctx.fillText(data.info.title,250,205);
   ctx.fillStyle="#333";
   ctx.font="26px 'Pixelated MS Sans Serif',monospace";
-  ctx.fillText("Term "+data.term+" of 3 · "+data.seats+" seats ("+(data.natShare*100).toFixed(1)+"% of the vote)",250,255);
+  ctx.fillText(data.subline||("Term "+data.term+" of 3 · "+data.seats+" seats ("+(data.natShare*100).toFixed(1)+"% of the vote)"),250,255);
   // seat tally bar
   const bx=250,by=300,bw=880,bh=34;
   ctx.fillStyle="#d8d8d8";ctx.fillRect(bx,by,bw,bh);
@@ -4335,7 +4407,7 @@ function drawRunCard(canvas,data){
   // legend
   let lx=bx,ly=by+bh+34;
   data.tally.slice(0,10).forEach((t,idx)=>{
-    const label=t.abbr+" "+t.seats;
+    const label=t.label||(t.abbr+" "+t.seats);
     ctx.font="20px 'Pixelated MS Sans Serif',monospace";
     const w=ctx.measureText(label).width+34;
     if(lx+w>W-20){lx=bx;ly+=34;}
@@ -4345,7 +4417,9 @@ function drawRunCard(canvas,data){
     lx+=w+18;
   });
   // campaign stats
-  const stats=[["Rallies",data.stats.rallies],["Ads",data.stats.ads],["HQs",data.stats.hqs],["Campaigns",data.stats.campaigns],["Weeks",20],["Term",data.term+" / 3"]];
+  const stats=data.weeks
+    ?[["Rallies",data.stats.rallies],["Ads",data.stats.ads],["HQs",data.stats.hqs],["Campaigns",data.stats.campaigns],["Weeks",data.weeks],["Race","President"]]
+    :[["Rallies",data.stats.rallies],["Ads",data.stats.ads],["HQs",data.stats.hqs],["Campaigns",data.stats.campaigns],["Weeks",20],["Term",data.term+" / 3"]];
   ctx.font="24px 'Pixelated MS Sans Serif',monospace";
   stats.forEach((st,idx)=>{
     const x=250+idx*150;
@@ -4401,7 +4475,7 @@ function gotoStep(n){
     $("step-tab-"+i).classList.toggle("done",i<n);
   }
   $("btn-setup-back").style.visibility=n===0?"hidden":"visible";
-  $("btn-setup-next").textContent=n===2?"Start Campaign ▸":"Next ›";
+  $("btn-setup-next").textContent=n===2?(isPres()?"Start the Race ▸":"Start Campaign ▸"):"Next ›";
   if(n===2)renderSummary();
 }
 
@@ -4500,7 +4574,7 @@ function updateAttrUI(){
     $("val-attr-"+k).textContent=S.player.attrs[k];
   }
   const sum=S.player.attrs.stamina+S.player.attrs.charisma+S.player.attrs.intelligence;
-  const rem=15-sum;
+  const rem=ATTR_BUDGET-sum;
   if(rem>=0)clearSetupError();
   const el=$("attr-remaining");
   el.textContent=rem>=0?rem+" points left":(-rem)+" over budget";
@@ -4652,6 +4726,7 @@ function renderBannerPreview(){
 }
 
 function renderSummary(){
+  if(isPres()){$("setup-summary").innerHTML=presSummaryHTML();return;}
   const idLines=identityEffectLines();
   $("setup-summary").innerHTML='<div class="sum-portrait">'+portraitHTML()+'</div><div class="sum-lines">'
     +'PM candidate: <b>'+esc(S.player.name||"Unnamed candidate")+'</b> · Stamina '+S.player.attrs.stamina+' · Charisma '+S.player.attrs.charisma+' · Intelligence '+S.player.attrs.intelligence+'<br>'
@@ -4679,9 +4754,11 @@ function readImage(file,maxSide,cb){
   fr.readAsDataURL(file);
 }
 
-function initSetup(){
+function initSetup(mode){
   S=freshState();
   randomizeNewGame();
+  if(mode==="presidential")presSetupInit();
+  applyModeParties();
   drawActiveIssues();
   buildEventPool();
   $("in-cand-name").value=S.player.name;
@@ -4696,6 +4773,8 @@ function initSetup(){
   renderSwatches();
   renderPlatformSliders();
   renderBannerPreview();
+  presSetupLabels();
+  if(isPres()){presRenderTicketPicker();presRenderVpPicker();}
   showScreen("setup");
   gotoStep(0);
 }
@@ -4716,7 +4795,7 @@ function randomizeNewGame(){
   S.player.face=-1;
   S.player.photo=null;
   const a=[rnd(1,8),rnd(1,8),rnd(1,8)];
-  while(a[0]+a[1]+a[2]>15){
+  while(a[0]+a[1]+a[2]>ATTR_BUDGET){
     a[a.indexOf(Math.max.apply(null,a))]--;
   }
   S.player.attrs={stamina:a[0],charisma:a[1],intelligence:a[2]};
@@ -4743,6 +4822,7 @@ function startCampaign(){
   S.sofiaFired=false;
   S.cheatFloor=false;
   if(!S.activeIssues||!S.activeIssues.length)drawActiveIssues();
+  if(isPres())presStartCampaign();else applyModeParties();
   S.debateWeek=14+rnd(0,2);
   S.debateDone=false;
   S.debate=null;
@@ -4763,7 +4843,7 @@ function startCampaign(){
   newsSeeded=false;
   mobileSheetOpen=null;mobileUnread=0;
   S.debugBoost={};S.cheatEasyWin=false;
-  rollPerformance();
+  if(isPres())S.perfMod={};else rollPerformance();
   S.log=[];
   S.stats={rallies:0,ads:0,hqs:0,travels:0,campaigns:0};
   S.cashHist=[];
@@ -4785,8 +4865,14 @@ function startCampaign(){
   S.pollHist=[S.pollNat.player||0];
   buildMap();
   showScreen("game");
+  if(isPres()){
+    presAfterStartCampaign();
+    log("The presidential race begins. Round one is on "+PRES_ROUND1_DATE+", "+PRES_WEEKS+" weeks away. First stop: <b>Sofia</b>.","info");
+    log("National poll: <b>"+esc(S.player.name)+"</b> at "+pct(S.pollNat.player||0)+". Win outright only with 50%+ <i>and</i> 50%+ turnout — otherwise the top two meet in a runoff.","info");
+  }else{
   log("The campaign begins. "+ELECTION_DATE+" is 20 weeks away. First stop: <b>Sofia</b>.","info");
   log("National poll: <b>"+esc(S.party.abbr)+"</b> at "+pct(S.pollNat.player||0)+". Threshold: 4%.","info");
+  }
   for(const line of performanceLines())log("CAMPAIGN FORM — <b>"+esc(line)+"</b>.","info");
   if(S.cheat)log("CHEAT MODE ENABLED — the gods smile upon <b>"+esc(S.player.name)+"</b>.","info");
   updateAll();
@@ -4794,9 +4880,544 @@ function startCampaign(){
   saveGame();
 }
 
+/* =====================================================================
+   PRESIDENTIAL MODE — Bulgaria, 25 October 2026 (runoff 1 November)
+   One national vote, two rounds. A candidate wins outright in round 1
+   only with more than half of the valid votes AND turnout above 50%;
+   otherwise the top two meet in a runoff a week later. No seats, no
+   coalition. The six polled tickets are real (registered tickets and
+   their late-September/early-October 2026 polling); everything that
+   happens to them in play is simulation, never attributed statements.
+   ===================================================================== */
+const PRES_WEEKS=6;
+const PRES_ROUND1_DATE="Sunday, 25 October";
+const PRES_RUNOFF_DATE="Sunday, 1 November";
+const PRES_SAVE_KEY="121towin-pres-save-v1";
+const PRES_OTHER_TICKETS=21;
+// poll = Market Links / bTV, 26–29 Sep 2026 (share of all respondents); appeal is calibrated
+// so the opening national estimate lands near those numbers among decided voters
+const PRES_TICKETS=[
+  {id:"iotova",leader:"Iliana Iotova",vp:"Kiril Valchev",short:"Iotova",color:"#e67e22",gender:"female",backers:"Independent · backed by Progressive Bulgaria and BSP–United Left",note:"Incumbent president",leanFrom:["pb","bsp"],posFrom:["pb","bsp"],appeal:2.237,poll:.414,mainRival:true},
+  {id:"gyurov",leader:"Andrey Gyurov",vp:"Georgi Kandev",short:"Gyurov",color:"#2fa84f",gender:"male",backers:"Initiative committee · backed by PP and DB",note:"Former caretaker prime minister",leanFrom:["ppdb"],posFrom:["ppdb"],appeal:1.281,poll:.219},
+  {id:"kostadinov",leader:"Kostadin Kostadinov",vp:"Petar Volgin",short:"Kostadinov",color:"#e0a71e",gender:"male",backers:"Nominated by Vazrazhdane",note:"Vazrazhdane leader",leanFrom:["vaz"],posFrom:["vaz"],appeal:0.4,poll:.064},
+  {id:"mihaylov",leader:"Ivelin Mihaylov",vp:"Yuliana Mateeva",short:"Mihaylov",color:"#34495e",gender:"male",backers:"Nominated by Velichie",note:"Velichie nominee",leanFrom:["velichie"],posFrom:["velichie"],appeal:0.248,poll:.039},
+  {id:"vasilev",leader:"Radostin Vasilev",vp:null,short:"Vasilev",color:"#6d4c41",gender:"male",backers:"running mate not listed in polls",note:"MECh leader",leanFrom:["mech"],posFrom:["mech"],appeal:0.101,poll:.016},
+  {id:"hristanov",leader:"Ivan Hristanov",vp:null,short:"Hristanov",color:"#17a2b8",gender:"male",backers:"running mate not listed in polls",note:"Edinenie leader",leanFrom:[],posFrom:null,appeal:0.056,poll:.009}
+];
+const PRES_TICKET_BY_ID={};PRES_TICKETS.forEach(t=>PRES_TICKET_BY_ID[t.id]=t);
+// fictional running mates for a player-made ticket
+const PRES_VP_OPTIONS=[
+  {id:"general",name:"Plamen Stoev",role:"Retired general",perk:"+3% appeal in nationalist-leaning districts, Defence credibility",effects:{appealMult:.01},nationalist:.06},
+  {id:"doctor",name:"Vesela Ilieva",role:"Hospital director",perk:"+1 Intelligence for the whole race",effects:{attr_intelligence:1}},
+  {id:"mayor",name:"Todor Kanev",role:"Regional mayor",perk:"+2 stamina every week",effects:{maxStamina:2}},
+  {id:"presenter",name:"Daria Kostova",role:"TV presenter",perk:"+1 Charisma and +3% enthusiasm nationwide",effects:{attr_charisma:1},enthusiasm:.03}
+];
+// own tickets start as unknowns: a balanced 5/5/5 candidate opens near 4–5%
+const PRES_OWN_APPEAL=.25;
+const PRES_OTHERS_WEIGHT=3.6, PRES_NONE_WEIGHT=1.6;
+
+function isPres(){return !!(S&&S.mode==="presidential");}
+function lastWeek(){return isPres()?(S.pres&&S.pres.round===2?PRES_WEEKS+1:PRES_WEEKS):20;}
+function electionDateLabel(){return isPres()?(S.pres&&S.pres.round===2?PRES_RUNOFF_DATE:PRES_ROUND1_DATE):ELECTION_DATE;}
+function saveKey(){return isPres()?PRES_SAVE_KEY:SAVE_KEY;}
+
+function presAvgPos(ids){
+  const out={};
+  for(const iss of ISSUE_POOL){
+    const vals=(ids||[]).map(id=>{const p=PARL_PARTIES.find(x=>x.id===id);return p?p.pos[iss.id]:null;}).filter(v=>v!==null&&v!==undefined);
+    out[iss.id]=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:.5;
+  }
+  return out;
+}
+function presTicketParty(t){
+  return {id:t.id,name:t.leader+(t.vp?" – "+t.vp:""),abbr:t.short,color:t.color,leader:t.leader,ideo:t.backers,
+    pos:presAvgPos(t.posFrom),appeal:t.appeal,mainRival:!!t.mainRival,leanFrom:t.leanFrom,isTicket:true};
+}
+function presActiveTickets(){
+  const mine=S&&S.pres?S.pres.ticket:null;
+  let list=PRES_TICKETS.filter(t=>t.id!==mine);
+  if(S&&S.pres&&S.pres.round===2&&S.pres.finalists)list=list.filter(t=>S.pres.finalists.indexOf(t.id)>=0);
+  const parties=list.map(presTicketParty);
+  // keep a "main rival" for the AI log line even if the player took the frontrunner's ticket
+  if(parties.length&&!parties.some(p=>p.mainRival)){
+    let best=parties[0];for(const p of parties)if(p.appeal>best.appeal)best=p;best.mainRival=true;
+  }
+  return parties;
+}
+// swap the rival roster for the current mode (AI_PARTIES is shared by the whole engine)
+function applyModeParties(){
+  const list=isPres()?presActiveTickets():PARL_PARTIES;
+  AI_PARTIES.splice(0,AI_PARTIES.length,...list);
+}
+function partyLean(p,d){
+  if(!d.lean)return 0;
+  let from=p.leanFrom;
+  if(p.id==="player"&&isPres()&&S.pres&&S.pres.ticket)from=PRES_TICKET_BY_ID[S.pres.ticket].leanFrom;
+  if(from){let v=0;for(const k of from)v+=d.lean[k]||0;return v;}
+  return d.lean[p.id]||0;
+}
+function presPlayerOut(){return isPres()&&S.pres&&S.pres.playerOut;}
+// a presidential race is one national contest: every rally or ad also echoes through national
+// TV and social media, and momentum fades more slowly over the short campaign
+const PRES_SPILL=.25, PRES_BOOST_DECAY=.85, PRES_RECOGNITION=1.25;
+function presSpill(fromId,gain){
+  if(!isPres())return;
+  // an outsider ticket also builds name recognition, which scales its whole national appeal
+  if(!S.pres.ticket)S.pres.recognition=(S.pres.recognition||1)+gain*PRES_RECOGNITION;
+  for(const dd of DISTRICTS)if(dd.id!==fromId)addBoost(dd.id,"player",gain*PRES_SPILL);
+}
+
+/* ---- setup ---- */
+function presSetupInit(){
+  S.mode="presidential";
+  S.pres={ticket:null,vp:PRES_VP_OPTIONS[0].id,round:1,rounds:{},finalists:null,playerOut:false,endorsements:{},outreach:null};
+  S.party.name="Citizens for "+(S.player.name||"the Republic");
+  S.party.abbr=presShortName(S.player.name);
+  S.party.slogan="One president for all Bulgarians";
+}
+function presShortName(name){
+  const parts=String(name||"").trim().split(/\s+/);
+  return (parts[parts.length-1]||"YOU").slice(0,10);
+}
+function presSetupLabels(){
+  const pres=isPres();
+  const set=(id,txt)=>{const el=$(id);if(el)el.textContent=txt;};
+  set("step-tab-0",pres?"1 · Ticket & Candidate":"1 · Candidate");
+  set("step-tab-1",pres?"2 · Committee & Running mate":"2 · Party & Banner");
+  const h=document.querySelector("#screen-setup .setup-head h2");
+  if(h)h.textContent=pres?"Presidential Race Setup":"Campaign Setup";
+  const st=document.querySelector("#screen-setup .title-bar-text");
+  if(st)st.textContent=pres?"Presidential Race Setup":"Campaign Setup";
+  const picker=$("pres-ticket-picker");if(picker)picker.style.display=pres?"":"none";
+  const vp=$("pres-vp-picker");if(vp)vp.style.display=pres?"":"none";
+  const idH=$("party-identity-h");if(idH)idH.textContent=pres?"Campaign identity":"Party identity";
+  const nameL=$("party-name-label");if(nameL)nameL.textContent=pres?"Initiative committee":"Party name";
+  const abbrL=$("party-abbr-label");if(abbrL)abbrL.textContent=pres?"Ballot name":"Abbreviation";
+  const abbr=$("in-party-abbr");if(abbr)abbr.maxLength=pres?10:6;
+}
+function presRenderTicketPicker(){
+  const el=$("pres-ticket-picker-list");if(!el)return;
+  const sel=S.pres.ticket||"own";
+  const card=(id,title,sub,color,pollTxt)=>'<div class="preset-card pres-ticket'+(sel===id?" sel":"")+'" data-ticket="'+id+'">'
+    +'<span class="pres-swatch" style="background:'+color+'"></span><div><b>'+esc(title)+'</b><span>'+esc(sub)+'</span></div>'
+    +(pollTxt?'<em class="pres-poll">'+pollTxt+'</em>':'')+'</div>';
+  el.innerHTML=card("own","Your own ticket","Create a candidate, pick a running mate, start as an outsider","#888","")
+    +PRES_TICKETS.map(t=>card(t.id,t.leader+(t.vp?" – "+t.vp:""),t.note+" · "+t.backers,t.color,pct(t.poll,1))).join("");
+  el.querySelectorAll("[data-ticket]").forEach(c=>{c.onclick=()=>presPickTicket(c.dataset.ticket);});
+  const note=$("pres-ticket-note");
+  if(note)note.textContent=sel==="own"
+    ?"Build your candidate below, then name your committee and pick a running mate."
+    :"You take over this ticket with its real starting support. Real candidates play with neutral 5/5/5 attributes and a generic portrait — the game makes no claims about the people themselves.";
+  const own=$("pres-own-fields");
+  if(own)own.classList.toggle("pres-locked",sel!=="own");
+}
+function presPickTicket(id){
+  if(id==="own"){
+    S.pres.ticket=null;
+    S.player.name=$("in-cand-name").value||pick(CANDIDATE_NAMES);
+    S.party.name="Citizens for "+S.player.name;S.party.abbr=presShortName(S.player.name);
+  }else{
+    const t=PRES_TICKET_BY_ID[id];
+    S.pres.ticket=id;
+    S.player.name=t.leader;S.player.photo=null;S.player.face=-1;
+    const face=FACES.find(f=>f.gender===t.gender)||FACES[0];
+    S.player.appearance=Object.assign(defaultAppearance(),face,{ethnicity:"bulgarian",glasses:false});
+    S.player.attrs={stamina:5,charisma:5,intelligence:5};
+    S.party.name=t.leader+(t.vp?" – "+t.vp:"");S.party.abbr=t.short;S.party.color=t.color;S.party.logo=null;
+    S.party.slogan="";
+    S.party.pos=presAvgPos(t.posFrom);
+  }
+  $("in-cand-name").value=S.player.name;
+  updateAttrUI();renderAppearanceUI();renderPortraitPreview();renderFaceGrid();
+  presRenderTicketPicker();
+}
+function presRenderVpPicker(){
+  const el=$("pres-vp-list");if(!el)return;
+  el.innerHTML=PRES_VP_OPTIONS.map(v=>'<div class="preset-card'+(S.pres.vp===v.id?" sel":"")+'" data-vp="'+v.id+'"><div><b>'+esc(v.name)+'</b><span>'+esc(v.role)+' · '+esc(v.perk)+'</span></div></div>').join("");
+  el.querySelectorAll("[data-vp]").forEach(c=>{c.onclick=()=>{S.pres.vp=c.dataset.vp;presRenderVpPicker();};});
+}
+function presRunningMateName(){
+  if(!isPres())return null;
+  if(S.pres.ticket){const t=PRES_TICKET_BY_ID[S.pres.ticket];return t.vp;}
+  const v=PRES_VP_OPTIONS.find(x=>x.id===S.pres.vp);return v?v.name+" ("+v.role.toLowerCase()+")":null;
+}
+function presSummaryHTML(){
+  const t=S.pres.ticket?PRES_TICKET_BY_ID[S.pres.ticket]:null;
+  const lines=[
+    'Ticket: <b>'+esc(S.player.name)+'</b>'+(presRunningMateName()?' – <b>'+esc(presRunningMateName())+'</b>':' (running mate not listed)'),
+    t?'Starting point: '+esc(t.note)+' · '+esc(t.backers)+' · polled '+pct(t.poll,1)+' (Market Links, 30 Sep 2026)':'Initiative committee: <b>'+esc(S.party.name)+'</b> · an outsider ticket starting near 4–5%',
+    'Race: '+PRES_WEEKS+' weeks to round 1 on '+PRES_ROUND1_DATE+'. Win outright only with more than 50% <i>and</i> turnout above 50% — otherwise the top two go to a runoff on '+PRES_RUNOFF_DATE+'.',
+    'Platform: '+activeIssueList().map(i=>i.name+" "+Math.round(S.party.pos[i.id]*100)).join(" · ")
+  ];
+  return '<div class="sum-portrait">'+portraitHTML()+'</div><div class="sum-lines">'+lines.join("<br>")+'</div>';
+}
+
+/* ---- campaign start ---- */
+function presStartCampaign(){
+  S.pres.round=1;S.pres.rounds={};S.pres.finalists=null;S.pres.playerOut=false;S.pres.endorsements={};S.pres.outreach=null;
+  if(S.pres.ticket){S.party.abbr=PRES_TICKET_BY_ID[S.pres.ticket].short;}
+  else if(!String(S.party.abbr||"").trim())S.party.abbr=presShortName(S.player.name);
+  applyModeParties();
+}
+function presAfterStartCampaign(){
+  S.debateWeek=5;
+  S.pigPending=false;S.pigDone=true;S.virusDone=true;
+  S.perfMod={};
+  if(!S.pres.ticket){
+    const v=PRES_VP_OPTIONS.find(x=>x.id===S.pres.vp)||PRES_VP_OPTIONS[0];
+    addModifier({name:"Running mate: "+v.name,desc:v.perk,turns:null,effects:v.effects});
+    if(v.nationalist)for(const d of DISTRICTS)if((d.geo&&d.geo.nationalism)>=.6)addBoost(d.id,"player",v.nationalist);
+    if(v.enthusiasm)for(const d of DISTRICTS)S.enthusiasm[d.id]=clamp(S.enthusiasm[d.id]+v.enthusiasm,.5,1.4);
+    S.stamina=getMaxStamina();
+  }
+  recomputePolls();
+  S.pollHist=[S.pollNat.player||0];
+}
+
+/* ---- the vote ---- */
+function presVote(){
+  const round=S.pres.round;
+  S.phase="election";
+  closeModal();
+  const votes={},dist=[];
+  let total=0,elecW=0,turnW=0,othersV=0,noneV=0;
+  for(const d of DISTRICTS){
+    const sh=districtShares(d,false);
+    const ent=S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent;
+    // presidential turnout runs lower than parliamentary (~40–45% in 2021/2026 polling)
+    const t=clamp((round===2?.37:.40)+rng()*.06+(ent-1)*.05,.25,.62);
+    const elec=d.seats*DOMESTIC_POPULATION_PER_SEAT,V=elec*t;
+    elecW+=elec;turnW+=elec*t;
+    const dv={};let dvOthers=0;
+    for(const k in sh){
+      const v=sh[k]*V*(.96+rng()*.08);
+      if(k==="others"){dvOthers=v;continue;}
+      dv[k]=v;
+    }
+    // round 1: "others" are the 21 minor tickets; runoff: they become "I don't support anyone"
+    const none=round===2?dvOthers:V*(.025+rng()*.015);
+    if(round===2)dvOthers=0;
+    const valid=Object.values(dv).reduce((a,b)=>a+b,0)+dvOthers;
+    dist.push({id:d.id,shares:sh,votes:dv,turnout:t,totalVotes:valid,others:dvOthers,none:none});
+    for(const k in dv){votes[k]=(votes[k]||0)+dv[k];}
+    total+=valid;othersV+=dvOthers;noneV+=none;
+  }
+  const natShare={};for(const k in votes)natShare[k]=votes[k]/total;
+  const turnout=turnW/elecW;
+  const order=Object.keys(votes).sort((a,b)=>votes[b]-votes[a]);
+  let winner=null,finalists=null;
+  if(round===2)winner=order[0];
+  else if(natShare[order[0]]>.5&&turnout>.5)winner=order[0];
+  else finalists=order.slice(0,2);
+  const res={pres:true,round:round,votes:votes,natShare:natShare,seats:{},qualified:[],totalVotes:total,turnout:turnout,
+    others:othersV/total,none:noneV/(total+noneV),order:order,winner:winner,finalists:finalists,
+    districts:dist.map(x=>({id:x.id,shares:x.shares,votes:x.votes,turnout:x.turnout,totalVotes:x.totalVotes}))};
+  S.pres.rounds[round]=res;
+  S.results=res;
+  startElectionNight();
+  saveGame();
+}
+function presTicketLabel(id){
+  if(id==="player")return S.player.name;
+  const t=PRES_TICKET_BY_ID[id];return t?t.leader:id;
+}
+function presElectionLeader(item,progress){
+  // early in the count every district shows the eventual leader once ~1/6 is in
+  let leader=null,score=-1;
+  for(const k in item.votes)if(item.votes[k]>score){score=item.votes[k];leader=k;}
+  if(progress>=1/6)return leader;
+  const keys=Object.keys(item.votes).sort();
+  return keys[(Math.floor(progress*60)+item.id.length)%keys.length];
+}
+function presNightPoll(progress){
+  const fin=S.results.natShare,out={},keys=Object.keys(fin);
+  const t=clamp(progress*2.2,0,1),even=1/keys.length;
+  for(const k of keys){
+    const wobble=Math.sin(progress*30+k.length*1.9)*.01*(1-progress);
+    out[k]=Math.max(0,even*(1-t)+fin[k]*t+wobble);
+  }
+  const sum=Object.values(out).reduce((a,b)=>a+b,0)||1;
+  for(const k in out)out[k]/=sum;
+  if(progress>=1)for(const k of keys)out[k]=fin[k];
+  return out;
+}
+const PRES_NIGHT_HEADLINES=[
+  "Polls close at 20:00 — the first protocols reach the CIK.",
+  "Early protocols are in. The order at the top is taking shape.",
+  "Regional centres report. Turnout is the number everyone is watching.",
+  "Sofia's count moves the national picture.",
+  "The last districts report. Margins settle.",
+  "The count is complete."
+];
+function renderPresElectionScreen(){
+  const r=S.results,night=S.electionNight||{progress:1},progress=night.progress===undefined?1:night.progress;
+  const est=progress>=1?r.natShare:presNightPoll(progress);
+  const scr=$("screen-election");if(scr)scr.classList.add("pres");
+  const title=$("election-title");
+  if(title)title.textContent=r.round===2?"PRESIDENTIAL RUNOFF":"PRESIDENTIAL ELECTION · ROUND 1";
+  ensureElectionChart();
+  const box=$("election-results");
+  Array.from(box.querySelectorAll(".res-row")).forEach(row=>{
+    const k=row.dataset.party,share=est[k]||0;
+    const flag=row.querySelector(".rflag"),seatsEl=row.querySelector(".rseats");
+    if(seatsEl)seatsEl.textContent=progress>=1?Math.round(r.votes[k]||0).toLocaleString("en-US")+" votes":"";
+    if(flag){
+      let chip="";
+      if(progress>=1){
+        if(r.winner===k)chip='<span class="chip green">'+(r.round===2?"ELECTED":"WINS OUTRIGHT")+'</span>';
+        else if(r.finalists&&r.finalists.indexOf(k)>=0)chip='<span class="chip gold">RUNOFF</span>';
+        else if(r.round===1)chip='<span class="chip red">OUT</span>';
+      }
+      flag.innerHTML=chip;
+    }
+  });
+  const rows=Array.from(box.querySelectorAll(".res-row"));
+  const max=Math.max.apply(null,Object.values(est).concat([.01]));
+  rows.sort((a,b)=>(est[b.dataset.party]||0)-(est[a.dataset.party]||0)).forEach(row=>{
+    box.appendChild(row);
+    const k=row.dataset.party;
+    row.querySelector(".rpct").textContent=pct(est[k]||0);
+    row.querySelector(".fill").style.width=((est[k]||0)/max*100).toFixed(1)+"%";
+  });
+  const counted=Math.round(r.totalVotes*progress);
+  const startMin=r.round===2?20*60:20*60,minutes=startMin+Math.round(clamp(progress,0,1)*300);
+  $("election-clock").textContent=String(Math.floor(minutes/60)%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0");
+  $("election-step").textContent=progress>=1?"FINAL RESULTS":"CIK COUNT · "+Math.round(progress*100)+"%";
+  $("election-live").textContent=progress>=1?"● FINAL":"● LIVE";
+  let head=PRES_NIGHT_HEADLINES[Math.min(5,Math.floor(progress*6))];
+  if(progress>=1){
+    if(r.winner)head=presTicketLabel(r.winner)+(r.round===2?" is elected President of Bulgaria.":" wins in the first round — a first in Bulgarian history.");
+    else if(r.finalists)head="No outright winner. "+presTicketLabel(r.finalists[0])+" and "+presTicketLabel(r.finalists[1])+" go to the runoff on "+PRES_RUNOFF_DATE+".";
+  }
+  $("election-headline").textContent=head;
+  $("election-sub").textContent=(progress>=1?"Final count":"Live count")+" · turnout "+pct(r.turnout,1)
+    +(r.round===1?" · "+PRES_OTHER_TICKETS+" other tickets "+pct(r.others||0):"")+" · “I don't support anyone” "+pct(r.none||0);
+  $("election-votes-counted").textContent=String(counted).replace(/\B(?=(\d{3})+(?!\d))/g," ");
+  $("election-activity").textContent=(counted/DOMESTIC_POPULATION_ESTIMATE*100).toFixed(1)+"%";
+  // district map
+  const svg=$("election-map");
+  if(svg&&!svg.dataset.ready){
+    svg.innerHTML=DISTRICTS.map(d=>'<path class="election-region" data-id="'+d.id+'" d="'+(REGION_PATHS[d.id]||"")+'" fill="#c5cbd1"><title>'+esc(d.name)+' — counting</title></path>').join("");
+    const byId={};(r.districts||[]).forEach(it=>byId[it.id]=it);
+    DISTRICTS.forEach(d=>{const node=svg.querySelector('.election-region[data-id="'+d.id+'"]'),it=byId[d.id];if(node&&it)wirePreviewTarget(node,()=>presRegionTooltip(d,it));});
+    svg.dataset.ready="1";
+  }
+  if(svg&&progress>0)(r.districts||[]).forEach(it=>{
+    const node=svg.querySelector('.election-region[data-id="'+it.id+'"]');if(!node)return;
+    const lid=presElectionLeader(it,progress),p=partyOf(lid);
+    node.classList.add("revealed");node.style.fill=p?p.color:"#c5cbd1";
+    if(node.dataset.party!==lid){node.classList.remove("leader-change");void node.offsetWidth;node.classList.add("leader-change");node.dataset.party=lid;}
+    const ttl=node.querySelector("title");if(ttl)ttl.textContent=DIST_BY_ID[it.id].name+" — "+(p?p.abbr:"");
+  });
+  $("btn-election-continue").disabled=progress<1;
+  $("btn-election-skip").style.display=progress<1?"":"none";
+}
+function presRegionTooltip(d,item){
+  const votes=item.votes||{},total=item.totalVotes||1;
+  const rows=Object.keys(votes).sort((a,b)=>votes[b]-votes[a]).map(k=>{const p=partyOf(k);
+    return '<div class="election-tip-row"><span><i style="background:'+(p?p.color:"#888")+'"></i>'+esc(p?p.abbr:k)+'</span><b>'+pct(votes[k]/total)+'</b></div>';}).join("");
+  return '<div class="preview-title">'+esc(d.name)+'</div><div class="preview-note">Turnout '+pct(item.turnout||0,0)+'</div><div class="election-tip-list">'+rows+'</div>';
+}
+
+/* ---- between rounds ---- */
+function presAfterCount(){
+  const r=S.results;
+  if(r.round===2||r.winner){presFinish();return;}
+  const fin=r.finalists;
+  const eliminated=r.order.filter(k=>fin.indexOf(k)<0);
+  // where each eliminated ticket's voters drift: toward the ideologically closer finalist, or they
+  // split / stay home if both are far. Simulated voter behaviour, not a statement by the candidate.
+  const endorse={};
+  for(const k of eliminated){
+    if(k==="player")continue;
+    const me=partyOf(k);
+    const d0=partyViewDist(me,partyOf(fin[0])),d1=partyViewDist(me,partyOf(fin[1]));
+    const best=d0<=d1?fin[0]:fin[1],bd=Math.min(d0,d1);
+    endorse[k]=bd<.32?best:null;
+  }
+  S.pres.endorsements=endorse;
+  if(fin.indexOf("player")<0){presEliminatedModal(eliminated,endorse);return;}
+  presRunoffModal(eliminated,endorse);
+}
+function presEndorseLines(eliminated,endorse){
+  return eliminated.filter(k=>k!=="player").map(k=>{
+    const share=S.results.natShare[k]||0,to=endorse[k];
+    return '<div class="db-row"><b>'+esc(presTicketLabel(k))+'\'s voters</b><span>'+pct(share)+' in round 1</span><span class="db-choice">— '+(to?"lean "+esc(presTicketLabel(to)):"split or stay home")+'</span></div>';
+  }).join("");
+}
+function presRunoffModal(eliminated,endorse){
+  const fin=S.results.finalists,rival=fin[0]==="player"?fin[1]:fin[0];
+  const courtable=eliminated.filter(k=>k!=="player"&&(S.results.natShare[k]||0)>=.01);
+  const opts=courtable.map(k=>{
+    const p=partyOf(k),iss=presBiggestGap(p);
+    return '<button class="btn" data-court="'+k+'">Court '+esc(presTicketLabel(k))+'\'s voters<small>Move toward their position on '+esc(iss.name)+'; their voters lean your way</small></button>';
+  }).join("");
+  openModal('<div class="ev-head choice"><span>RUNOFF · '+PRES_RUNOFF_DATE.toUpperCase()+'</span><span class="paused-badge">ONE WEEK</span></div>'
+    +'<div class="ev-body"><h3>You are in the runoff against '+esc(presTicketLabel(rival))+'</h3>'
+    +'<p>One week, one opponent. Where the eliminated tickets\' voters are drifting:</p><div class="db-list">'+presEndorseLines(eliminated,endorse)+'</div>'
+    +'<p>Pick one outreach move before the runoff campaign starts:</p>'
+    +'<div class="ev-opts">'+opts+'<button class="btn" data-court="">Stay the course<small>No platform change; +1 stamina this week</small></button></div></div>');
+  document.querySelectorAll("#modal-root [data-court]").forEach(b=>{b.onclick=()=>{closeModal();presStartRunoff(b.dataset.court||null);};});
+}
+function presBiggestGap(p){
+  let best=activeIssueList()[0],gap=-1;
+  for(const i of activeIssueList()){const g=Math.abs((p.pos[i.id]||.5)-(S.party.pos[i.id]||.5));if(g>gap){gap=g;best=i;}}
+  return best;
+}
+function presApplyEndorsements(){
+  const r=S.pres.rounds[1];
+  for(const k in S.pres.endorsements){
+    const to=S.pres.endorsements[k];if(!to)continue;
+    const item=r.districts;
+    for(const it of item){const tot=it.totalVotes||1,sh=(it.votes[k]||0)/tot;addBoost(it.id,to,sh*1.2);}
+    log("Runoff transfer: <b>"+esc(presTicketLabel(k))+"</b>'s round-one voters lean toward <b>"+esc(presTicketLabel(to))+"</b>.","info");
+  }
+}
+function presStartRunoff(courtId){
+  S.pres.round=2;
+  S.pres.finalists=S.results.finalists.slice();
+  S.pres.outreach=courtId;
+  S.phase="campaign";
+  applyModeParties();
+  for(const d of DISTRICTS){const b=S.boost[d.id]||{};for(const k in b)if(k!=="player"&&S.pres.finalists.indexOf(k)<0)delete b[k];}
+  presApplyEndorsements();
+  if(courtId){
+    const p=partyOf(courtId),iss=presBiggestGap(p);
+    const delta=((p.pos[iss.id]||.5)-(S.party.pos[iss.id]||.5))*.5;
+    S.party.pos[iss.id]=clamp(S.party.pos[iss.id]+delta,0,1);
+    const r1=S.pres.rounds[1];
+    for(const it of r1.districts){const sh=(it.votes[courtId]||0)/(it.totalVotes||1);addBoost(it.id,"player",sh*.9);}
+    log("Runoff outreach: you move toward <b>"+esc(iss.name)+"</b> to win over "+esc(presTicketLabel(courtId))+"'s voters.","good");
+  }
+  S.week=PRES_WEEKS+1;
+  S.stamina=getMaxStamina()+(courtId?0:1);
+  S.ralliesThisTurn=0;S.touched=[];
+  S.results=null;S.electionNight=null;
+  S.debate=null;S.debateDone=true;
+  recomputePolls();
+  S.pollsPrev=null;S.pollHist=[S.pollNat.player||0];
+  showScreen("game");buildMap();
+  log("RUNOFF WEEK — "+esc(S.player.name)+" vs "+esc(presTicketLabel(S.pres.finalists.find(k=>k!=="player")))+". Election day: "+PRES_RUNOFF_DATE+".","info");
+  S.eventQueue.push("__DEBATE__");
+  updateAll();
+  saveGame();
+  maybeEvents();
+}
+function presEliminatedModal(eliminated,endorse){
+  const fin=S.results.finalists;
+  const place=S.results.order.indexOf("player")+1;
+  openModal('<div class="ev-head bad"><span>ROUND 1 · RESULT</span><span class="paused-badge">ELIMINATED</span></div>'
+    +'<div class="ev-body"><h3>You finished '+presOrdinal(place)+' with '+pct(S.results.natShare.player||0)+'</h3>'
+    +'<p>'+esc(presTicketLabel(fin[0]))+' and '+esc(presTicketLabel(fin[1]))+' go to the runoff. Your voters are listening for a signal.</p>'
+    +'<div class="db-list">'+presEndorseLines(eliminated,endorse)+'</div>'
+    +'<div class="ev-opts">'
+    +fin.map(k=>'<button class="btn" data-endorse="'+k+'">Endorse '+esc(presTicketLabel(k))+'</button>').join("")
+    +'<button class="btn" data-endorse="">Endorse no one</button></div></div>');
+  document.querySelectorAll("#modal-root [data-endorse]").forEach(b=>{b.onclick=()=>{closeModal();presSimulateRunoff(b.dataset.endorse||null);};});
+}
+function presOrdinal(n){return n+(["th","st","nd","rd"][(n%100-20)%10]||["th","st","nd","rd"][n%100]||"th");}
+function presSimulateRunoff(endorseId){
+  S.pres.playerEndorsed=endorseId;
+  S.pres.playerOut=true;
+  S.pres.round=2;
+  S.pres.finalists=S.results.finalists.slice();
+  applyModeParties();
+  presApplyEndorsements();
+  if(endorseId){
+    const r1=S.pres.rounds[1];
+    for(const it of r1.districts){const sh=(it.votes.player||0)/(it.totalVotes||1);addBoost(it.id,endorseId,sh*1.4);}
+    log("You endorse <b>"+esc(presTicketLabel(endorseId))+"</b> in the runoff.","info");
+  }
+  S.week=PRES_WEEKS+1;
+  presVote();
+}
+function presFinish(){
+  const r=S.results,r1=S.pres.rounds[1],r2=S.pres.rounds[2];
+  let ending;
+  if(S.pres.playerOut)ending="pres_out";
+  else if(r.winner==="player")ending=r.round===1?"pres_win_r1":"pres_win";
+  else if(r.round===2)ending="pres_runoff_loss";
+  else ending="pres_r1_loss";
+  S.ending=ending;
+  S.phase="end";
+  renderEndScreen();
+  showScreen("end");
+  saveGame();
+}
+function presEndingInfo(){
+  const r1=S.pres.rounds[1]||{natShare:{}},r2=S.pres.rounds[2];
+  const p1=r1.natShare.player||0,p2=r2?(r2.natShare.player||0):null;
+  const winnerId=(r2||r1).winner,winner=presTicketLabel(winnerId);
+  const vp=presRunningMateName();
+  let title="",text="";
+  switch(S.ending){
+    case "pres_win_r1":
+      title="Elected in Round One";
+      text=S.player.name+" wins "+pct(p1)+" on "+PRES_ROUND1_DATE+" with turnout above 50% — the first first-round win in Bulgarian history.\n\nNo runoff needed. "+(vp?vp+" will be sworn in as vice president.":"")+" The inauguration is set for January.";
+      break;
+    case "pres_win":
+      title="President-Elect";
+      text="Round one: "+pct(p1)+". Runoff: "+pct(p2)+" on "+PRES_RUNOFF_DATE+".\n\n"+S.player.name+" is elected President of the Republic of Bulgaria"+(vp?", with "+vp+" as vice president":"")+". Five years at Dondukov 2 begin in January.";
+      break;
+    case "pres_runoff_loss":
+      title="Runoff Defeat";
+      text="You made the runoff with "+pct(p1)+" in round one, but "+winner+" wins the second round. You finish with "+pct(p2)+".\n\n"+S.player.name+" concedes on election night and promises to keep the movement together.";
+      break;
+    case "pres_r1_loss":
+      title="Decided in Round One";
+      text=winner+" clears 50% with turnout above half the electorate — a first-round win. You finish with "+pct(p1)+".";
+      break;
+    default:{
+      const ord=presOrdinal((r1.order||[]).indexOf("player")+1);
+      const end=S.pres.playerEndorsed?"You endorsed "+presTicketLabel(S.pres.playerEndorsed)+" for the runoff. ":"You stayed neutral in the runoff. ";
+      title="Out in Round One";
+      text="You finish "+ord+" with "+pct(p1)+" on "+PRES_ROUND1_DATE+".\n\n"+end+(r2?winner+" wins the runoff with "+pct(r2.natShare[winnerId]||0)+".":"");
+    }
+  }
+  if(S.cheat)text+="\n\n(Played in CHEAT MODE.)";
+  return {title,text};
+}
+function presEndStats(){
+  const r1=S.pres.rounds[1]||{natShare:{}},r2=S.pres.rounds[2];
+  return [["Round 1",pct(r1.natShare.player||0)],["Runoff",r2&&!S.pres.playerOut?pct(r2.natShare.player||0):"—"],
+    ["Turnout R1",pct(r1.turnout||0,0)],["Rallies",S.stats.rallies],["Media ads",S.stats.ads],["Weeks on trail",Math.min(S.week,lastWeek())]];
+}
+
+/* ---- events: no invented misconduct for real candidates ---- */
+const PRES_EXCLUDED_EVENTS=["Rival gaffe","Debate night win","Leaked rival memo","Rival air dominance","Prime-time debate invitation",
+  "Attack ad package","Investigative interview offer","Anonymous dossier","Pre-electoral signal"];
+function presEventPool(P){
+  for(let i=P.length-1;i>=0;i--)if(PRES_EXCLUDED_EVENTS.indexOf(P[i].title)>=0)P.splice(i,1);
+  P.push({kind:"good",title:"Mayors' association endorsement",text:"A cross-party group of small-town mayors backs your ticket as 'a president for the regions'.",opts:[{label:"Tour their towns",fx:{nationBoost:.012,enthusiasmAll:.02}}]});
+  P.push({kind:"good",title:"Diaspora turnout drive",text:"Volunteers abroad organise transport to polling stations in Germany, Spain and the UK.",opts:[{label:"Thank them on air",fx:{nationBoost:.01,cash:8000}}]});
+  P.push({kind:"choice",title:"Presidential powers debate",text:"A TV panel presses every ticket: would you veto laws you disagree with, or act as a unifying figure?",opts:[
+    {label:"Promise an active veto",sub:"Energises your base",fx:{enthusiasmAll:.04,mod:{name:"Strong-president message",desc:"Rally power +10% for 2 weeks",turns:2,effects:{rallyMult:.1}}}},
+    {label:"Promise to unite",sub:"Wins over moderates",fx:{nationBoost:.012}}
+  ]});
+  P.push({kind:"choice",title:"Rival ad blitz",text:"A rival ticket books every prime-time slot this week with ads aimed at your voters.",opts:[
+    {label:"Answer with your own spots",sub:"−20 000 лв, hold your ground",fx:{cash:-20000,nationBoost:.006}},
+    {label:"Let it pass",sub:"Rivals gain a little",fx:{rivalBoost:{n:4,v:.025}}}
+  ]});
+  P.push({kind:"choice",title:"Head-to-head TV offer",text:"A national network offers a one-on-one slot with the polling frontrunner's campaign.",opts:[
+    {label:"Accept",sub:"−2 SP, rally power +15% for 2 weeks",fx:{stamina:-2,mod:{name:"Media trained",desc:"Rally power +15% for 2 weeks",turns:2,effects:{rallyMult:.15}}}},
+    {label:"Decline",sub:"You look evasive",fx:{mod:{name:"Seen as evasive",desc:"Rally power −10% for 2 weeks",turns:2,bad:true,effects:{rallyMult:-.1}}}}
+  ]});
+  P.push({kind:"bad",title:"Low-turnout warning",text:"Pollsters expect barely 40% turnout. Your less committed supporters may stay home.",opts:[{label:"Worrying",fx:{enthusiasmAll:-.04}}]});
+  P.push({kind:"choice",title:"Get-out-the-vote push",text:"Your field team wants 25 000 лв for buses and phone banks on election weekend.",opts:[
+    {label:"Fund it",sub:"−25 000 лв, enthusiasm +5% nationwide",fx:{cash:-25000,enthusiasmAll:.05}},
+    {label:"Save the money",sub:"",fx:{}}
+  ]});
+  if(!S.pres.ticket){
+    P.push({kind:"good",flavor:true,title:"Running mate's big interview",text:"Your running mate holds a confident hour-long interview on morning TV.",opts:[{label:"Share the clips",fx:{nationBoost:.01}}]});
+    P.push({kind:"bad",title:"Running mate stumbles",text:"Your running mate fumbles a question about the constitution on live radio.",opts:[{label:"Laugh it off",fx:{nationBoost:-.008}},{label:"Send them to a quiet tour",fx:{stamina:-1}}]});
+  }
+}
+
 function bindUI(){
-  $("btn-new-game").onclick=initSetup;
-  $("btn-continue").onclick=()=>{if(!loadGame())alert("No save found.");};
+  $("btn-new-game").onclick=()=>initSetup("parliamentary");
+  $("btn-continue").onclick=()=>{if(!loadGame(SAVE_KEY))alert("No save found.");};
+  const presNew=$("btn-new-pres");if(presNew)presNew.onclick=()=>initSetup("presidential");
+  const presCont=$("btn-continue-pres");if(presCont)presCont.onclick=()=>{if(!loadGame(PRES_SAVE_KEY))alert("No save found.");};
   $("btn-title-help").onclick=helpModal;
   $("tb-cash").onclick=openFundsModal;
   $("tb-stamina").onclick=openStaminaModal;
@@ -4805,13 +5426,23 @@ function bindUI(){
   $("hud-stamina").onclick=openStaminaModal;
   $("hud-poll").onclick=openPollDetails;
 
-  for(let i=0;i<3;i++)$("step-tab-"+i).onclick=()=>gotoStep(i);
-  $("btn-setup-back").onclick=()=>gotoStep(Math.max(0,S.setupStep-1));
+  // a real presidential ticket skips the committee step: it arrives fully formed
+  const realTicket=()=>isPres()&&S.pres&&!!S.pres.ticket;
+  for(let i=0;i<3;i++)$("step-tab-"+i).onclick=()=>gotoStep(realTicket()&&i===1?2:i);
+  $("btn-setup-back").onclick=()=>gotoStep(realTicket()&&S.setupStep===2?0:Math.max(0,S.setupStep-1));
   $("btn-setup-next").onclick=()=>{
     if(S.setupStep===0){
       const sum=S.player.attrs.stamina+S.player.attrs.charisma+S.player.attrs.intelligence;
-      if(sum>15){showSetupError("Attribute points exceed the budget of 15.");return;}
+      if(sum>ATTR_BUDGET){showSetupError("Attribute points exceed the budget of "+ATTR_BUDGET+".");return;}
       if(!$("in-cand-name").value.trim())$("in-cand-name").value="Aleksandar Vasilev";
+      if(realTicket()){gotoStep(2);return;}
+      if(isPres()){
+        // keep the auto-named committee and ballot name in step with the candidate's name
+        S.player.name=$("in-cand-name").value;
+        if(/^Citizens for /.test(S.party.name)){S.party.name="Citizens for "+S.player.name;$("in-party-name").value=S.party.name;}
+        S.party.abbr=presShortName(S.player.name);$("in-party-abbr").value=S.party.abbr;
+        renderBannerPreview();
+      }
       gotoStep(1);
     }else if(S.setupStep===1){
       if(!S.party.abbr.trim())S.party.abbr="NRM";
@@ -4901,6 +5532,7 @@ function bindUI(){
   if(startBtn)startBtn.onclick=menuModal;
 
   $("btn-election-continue").onclick=()=>{
+    if(isPres()){presAfterCount();return;}
     if(!S.interview)startInterview();
     else continueAfterInterview();
   };
@@ -4934,7 +5566,8 @@ function init(){
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });
-  if(hasSave())$("btn-continue").style.display="";
+  if(hasSave(SAVE_KEY))$("btn-continue").style.display="";
+  if(hasSave(PRES_SAVE_KEY)&&$("btn-continue-pres"))$("btn-continue-pres").style.display="";
   startAliveLoop();
   document.addEventListener("pointerdown",function(){
     ensureAudio();
@@ -4960,7 +5593,7 @@ if(typeof module!=="undefined"&&module.exports){
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
-    portraitHTML:portraitHTML,
+    portraitHTML:portraitHTML,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
     defaultPartyMachine:defaultPartyMachine,launchCampaign:launchCampaign,allocateStaff:allocateStaff,hireStaff:hireStaff,trainStaff:trainStaff,upgradePartyHQ:upgradePartyHQ,
     partyEnergyMax:partyEnergyMax,partyStaffCap:partyStaffCap,partyUpkeep:partyUpkeep,partyQuality:partyQuality,partyHireCost:partyHireCost,partyTrainCost:partyTrainCost,partyHqUpgradeCost:partyHqUpgradeCost,
     releaseCampaign:releaseCampaign,partyMachineTick:partyMachineTick,aiFlavorCampaign:aiFlavorCampaign,stanceLabel:stanceLabel,renderPartyMachine:renderPartyMachine,CAMPAIGN_CAP:CAMPAIGN_CAP,PHASE_NAMES:PHASE_NAMES,
