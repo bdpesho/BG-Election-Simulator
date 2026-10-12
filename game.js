@@ -1576,10 +1576,22 @@ function applyFx(fx,prefix){
 }
 
 function drawEvent(){
-  if(S.eventCursor>=S.eventBag.length){S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
-  return S.eventBag[S.eventCursor++];
+  for(let tries=0;tries<EVENT_POOL.length+2;tries++){
+    if(S.eventCursor>=S.eventBag.length){S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
+    const i=S.eventBag[S.eventCursor++],ev=EVENT_POOL[i];
+    // each real headline happens once per race
+    if(ev&&ev.news&&isPres()){const used=S.pres.newsUsed=S.pres.newsUsed||[];if(used.indexOf(ev.title)>=0)continue;used.push(ev.title);}
+    return i;
+  }
+  return S.eventBag[0];
 }
 function maybeEvents(){
+  // presidential race: most weeks bring one headline from the real autumn news cycle
+  if(isPres()&&rng()<.75){
+    const used=S.pres.newsUsed=S.pres.newsUsed||[];
+    const fresh=EVENT_POOL.map((e,i)=>({e,i})).filter(x=>x.e.news&&used.indexOf(x.e.title)<0);
+    if(fresh.length){const x=pick(fresh);used.push(x.e.title);S.eventQueue.push(x.i);}
+  }
   const r=rng();
   const n=r<0.08?2:(r<0.80?1:0);
   for(let i=0;i<n;i++)S.eventQueue.push(drawEvent());
@@ -1673,11 +1685,11 @@ function debateHeadless(){
 function renderEventModal(ev){
   const root=$("modal-root");
   const headCls=ev.kind==="good"?"good":ev.kind==="bad"?"bad":"choice";
-  const headTxt=ev.kind==="good"?"GOOD NEWS":ev.kind==="bad"?"BAD NEWS":"DECISION REQUIRED";
+  const headTxt=ev.news?"IN THE NEWS · "+ev.news.toUpperCase():ev.kind==="good"?"GOOD NEWS":ev.kind==="bad"?"BAD NEWS":"DECISION REQUIRED";
   const optsHtml=ev.opts.map((o,i)=>'<button class="btn" data-i="'+i+'">'+esc(o.label)+(o.sub?'<small>'+esc(o.sub)+'</small>':"")+'</button>').join("");
   root.innerHTML='<div class="modal-back"><div class="modal">'
     +'<div class="ev-head '+headCls+'"><span>'+headTxt+'</span><span class="paused-badge">GAME PAUSED</span></div>'
-    +'<div class="ev-body"><h3>'+esc(ev.title)+'</h3><p>'+esc(ev.text)+'</p><div class="ev-opts">'+optsHtml+'</div></div>'
+    +'<div class="ev-body"><h3>'+esc(ev.title)+'</h3><p>'+esc(ev.text)+'</p>'+(ev.src?'<p class="hint">Based on reporting by '+esc(ev.src)+', 2026.</p>':"")+'<div class="ev-opts">'+optsHtml+'</div></div>'
     +'</div></div>';
   root.querySelectorAll(".ev-opts .btn").forEach(b=>{
     b.onclick=()=>{
@@ -1738,6 +1750,7 @@ function helpModal(){
   if(isPres()){
     openModal('<h3>How to play — Presidential race</h3>'
       +'<p>You have <b>'+PRES_WEEKS+' weeks</b> until round one on <b>'+PRES_ROUND1_DATE+'</b>. Travel, rally, run ads and build HQs exactly as in the parliamentary campaign — but there is one national vote and no seats.</p>'
+      +'<p>Instead of issue rallies you make <b>campaign stops</b>: each one is a town hall question, a local-news situation, a meeting or a heckler. Answers that match the district\'s stance win support that also spreads nationally; answers that miss it cost you, and every answer nudges your platform. Most weeks bring a real headline from September–October 2026 to respond to. Right-click any district to travel or act.</p>'
       +'<ul><li>Win outright only with <b>more than 50%</b> of valid votes <b>and turnout above 50%</b>. That has never happened in Bulgaria.</li>'
       +'<li>Otherwise the <b>top two</b> go to a runoff on <b>'+PRES_RUNOFF_DATE+'</b>. Voters of the eliminated tickets drift toward the closer finalist (or split), you pick one outreach move, then get one runoff week and a head-to-head debate.</li>'
       +'<li>Knocked out in round one? Endorse a finalist and watch the runoff.</li>'
@@ -1909,6 +1922,12 @@ function buildMap(){
     const body=svgEl("path",{class:"body region",d:(cellData.cells[d.id])||"",fill:"#44506b"});
     node.appendChild(title);node.appendChild(body);
     node.addEventListener("click",()=>selectDistrict(d.id));
+    node.addEventListener("contextmenu",e=>{
+      e.preventDefault();
+      if(!S||S.phase!=="campaign")return;
+      selectDistrict(d.id);
+      openMapMenu(d,e.clientX,e.clientY);
+    });
     g.appendChild(node);
   }
   svg.appendChild(svgEl("path",{class:"map-borders",d:cellData.borders||"",fill:"none",stroke:"#0b1220","stroke-width":"2","pointer-events":"none"}));
@@ -2063,6 +2082,7 @@ function renderDistrictCard(){
       const d=DIST_BY_ID[S.selDistrict];
       if(act==="travel")travelTo(d.id);
       else if(act==="rally")doRally(b.dataset.issue);
+      else if(act==="stop")presCampaignStop();
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
     };
@@ -2135,7 +2155,8 @@ function renderMobileActions(){
   }else{
     const here=S.location===d.id,ral=activeIssueList();
     if(here){
-      html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
+      if(isPres())html+='<button class="btn wide" data-act="stop" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+'>Campaign stop <span class="cost">'+COSTS.rallySP+' SP</span></button>';
+      else html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
       html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
       if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
       else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
@@ -2158,6 +2179,7 @@ function renderMobileActions(){
         doRally(b.dataset.issue);
         setMobileRallyOpen(false);
       }
+      else if(act==="stop")presCampaignStop();
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
     };
@@ -2404,7 +2426,8 @@ function actionButtonsHtml(d,here){
     const c=travelCost(S.location,d.id);
     actions+='<button class="btn wide" data-act="travel" '+((S.stamina<c||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+c+' SP</span></button>';
   }else{
-    for(const i of activeIssueList()){
+    if(isPres())actions+='<button class="btn wide" data-act="stop" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Meet voters: answer a local question or situation">Campaign stop <span class="cost">'+COSTS.rallySP+' SP</span></button>';
+    else for(const i of activeIssueList()){
       actions+='<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">Rally: '+i.name+' <span class="cost">'+COSTS.rallySP+' SP</span></button>';
     }
     actions+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
@@ -2459,7 +2482,7 @@ function renderDistrictDetail(){
     +polls
     +ethLine
     +'<div class="dc-actions">'+actions+'</div>'
-    +'<div class="dc-note">'+(here?"You are campaigning here now.":"Your candidate is in <b>"+DIST_BY_ID[S.location].name+"</b>.")+' Rallies are strongest on high-weight issues close to the district stance. HQs pay '+fmtMoney(COSTS.hqIncome)+'/week.</div>';
+    +'<div class="dc-note">'+(here?"You are campaigning here now.":"Your candidate is in <b>"+DIST_BY_ID[S.location].name+"</b>.")+(isPres()?' Campaign stops reward answers close to the district stance (the markers above). Right-click any district for quick actions.':' Rallies are strongest on high-weight issues close to the district stance. Right-click any district for quick actions.')+' HQs pay '+fmtMoney(COSTS.hqIncome)+'/week.</div>';
 }
 
 function projectNationalSeats(est){
@@ -2554,6 +2577,7 @@ function log(html,cls){
 }
 
 function updateAll(){
+  closeMapMenu();
   if(!S||S.phase!=="campaign")return;
   renderTopbar();
   redrawMap();
@@ -3310,6 +3334,7 @@ function previewForButton(b){
   const act=b.dataset.act;
   if(act==="travel")return previewLine(previewTravel(DIST_BY_ID[S.selDistrict].id));
   if(act==="rally")return previewLine(previewRally(b.dataset.issue));
+  if(act==="stop")return '<div class="preview-title">Campaign stop</div><div class="preview-note">Voters here put a question or a situation to you. Answers that match the district\'s stance win support (and spill nationally); answers that miss can cost you. Each answer nudges your platform.</div>';
   if(act==="ad")return previewLine(previewAd());
   if(act==="hq")return previewLine(previewHQ());
   return "";
@@ -5388,6 +5413,7 @@ const PRES_EXCLUDED_EVENTS=["Rival gaffe","Debate night win","Leaked rival memo"
   "Attack ad package","Investigative interview offer","Anonymous dossier","Pre-electoral signal"];
 function presEventPool(P){
   for(let i=P.length-1;i>=0;i--)if(PRES_EXCLUDED_EVENTS.indexOf(P[i].title)>=0)P.splice(i,1);
+  for(const ev of presNewsEvents())P.push(ev);
   P.push({kind:"good",title:"Mayors' association endorsement",text:"A cross-party group of small-town mayors backs your ticket as 'a president for the regions'.",opts:[{label:"Tour their towns",fx:{nationBoost:.012,enthusiasmAll:.02}}]});
   P.push({kind:"good",title:"Diaspora turnout drive",text:"Volunteers abroad organise transport to polling stations in Germany, Spain and the UK.",opts:[{label:"Thank them on air",fx:{nationBoost:.01,cash:8000}}]});
   P.push({kind:"choice",title:"Presidential powers debate",text:"A TV panel presses every ticket: would you veto laws you disagree with, or act as a unifying figure?",opts:[
@@ -5411,6 +5437,265 @@ function presEventPool(P){
     P.push({kind:"good",flavor:true,title:"Running mate's big interview",text:"Your running mate holds a confident hour-long interview on morning TV.",opts:[{label:"Share the clips",fx:{nationBoost:.01}}]});
     P.push({kind:"bad",title:"Running mate stumbles",text:"Your running mate fumbles a question about the constitution on live radio.",opts:[{label:"Laugh it off",fx:{nationBoost:-.008}},{label:"Send them to a quiet tour",fx:{stamina:-1}}]});
   }
+}
+
+
+/* ---- presidential gameplay: campaign stops instead of issue rallies ----
+   A campaign stop is a small decision, not a button press: the district puts a
+   question or a situation to you and the answer you give is judged against what
+   that district wants. Good reads of the district pay off; answers also nudge
+   your platform, so promising everything everywhere catches up with you. */
+const PRES_STOP_QUESTIONS={
+  euro:"Since the euro arrived, prices at the market feel higher. What would you do about it?",
+  corruption:"People here say nobody ever goes to jail for stealing public money. Will you change that?",
+  energy:"Heating and electricity bills are the first worry this autumn. Who should carry the cost?",
+  judiciary:"Should a president lean on the prosecutors, or keep well away from them?",
+  pensions:"Pensioners in the front row ask if their pensions will keep up with prices.",
+  healthcare:"The local hospital is short of doctors. Public money or private clinics?",
+  defense:"After the drone strikes in the Black Sea, should Bulgaria spend more on defence?",
+  rural:"The villages around here are emptying. Is that the state's problem?",
+  migration:"How strict should the southern border be?"
+};
+const PRES_STOP_ANSWERS={
+  euro:["The changeover failed; reopen the euro question","Keep the euro, add fair-price checks","Finish the job: deeper EU integration pays off"],
+  corruption:["It's exaggerated; stability matters more","Strengthen what exists, carefully","Back a fully independent anti-corruption body"],
+  energy:["Let prices reflect costs, help only the poorest","Targeted help for households","Cap bills and subsidise heating for everyone"],
+  judiciary:["A strong hand over the prosecution","Reform it slowly from the inside","Full independence, whatever it costs"],
+  pensions:["Hold the line on spending first","Index pensions to inflation","A big pension rise now"],
+  healthcare:["Open the system to private providers","Mixed model with clear rules","Public money into public hospitals"],
+  defense:["Defence spending can wait","Meet NATO commitments, no more","Rearm and protect the coast"],
+  rural:["Cities first; that's where growth is","Some help, tied to results","Roads, clinics and internet for every village"],
+  migration:["Humane, open to workers we need","Firm but fair","Seal the border"]
+};
+const PRES_STOP_VALUES=[.15,.5,.85];
+// places in the news this autumn get their own stop (paraphrased from BTA / Sofia Globe reporting)
+const PRES_NEWS_STOPS={
+  varna:{title:"Port of Varna after the drone strikes",text:"Two merchant ships were hit by drones in Bulgaria's Black Sea zone on 6 October and one sank. Dock workers and fishermen want to know what you would do.",
+    opts:[{label:"Call for joint EU/NATO patrols",issue:"defense",v:.9},{label:"Keep Bulgaria out of other people's war",issue:"defense",v:.15},{label:"Promise compensation for fishermen",issue:"rural",v:.75,cash:-8000}]},
+  pernik:{title:"Smog over Pernik",text:"Inspectors found sulphur and dust above the limits from the town's power plant and capped one of its boilers. Workers fear for their jobs; parents fear for their kids.",
+    opts:[{label:"Clean air first, enforce the limits",issue:"energy",v:.3},{label:"Protect the plant and its jobs",issue:"energy",v:.85},{label:"Fund new filters from the state",issue:"energy",v:.65,cash:-10000}]},
+  burgas:{title:"Burgas gets ready for Eurovision 2027",text:"Tourism revenue is up and the city is preparing a port Eurovillage for next year's contest. Local business wants the state to help with roads and the airport.",
+    opts:[{label:"Back state money for transport links",issue:"rural",v:.35},{label:"Let the city and investors pay",issue:"rural",v:.2},{label:"Promise the same for small coastal towns",issue:"rural",v:.8}]},
+  haskovo:{title:"After the summer fires",text:"A nearly 1,000-hectare wildfire burned near Dinevo in August, the driest August since 1988. Farmers lost crops and the winter sowing is behind.",
+    opts:[{label:"Drought aid for farmers now",issue:"rural",v:.85,cash:-6000},{label:"Better fire services, not handouts",issue:"rural",v:.45},{label:"Say the market will adjust",issue:"rural",v:.15}]},
+  shumen:{title:"Union rally in Shumen",text:"Public-sector unions are touring Varna, Shumen and Ruse demanding at least a 10% pay rise in the 2027 budget.",
+    opts:[{label:"Stand with the workers",issue:"pensions",v:.85},{label:"Rises only with reforms",issue:"pensions",v:.45},{label:"The budget can't afford it",issue:"pensions",v:.15}]},
+  ruse:{title:"Union rally in Ruse",text:"Public-sector unions end their regional tour in Ruse, asking for a 10% pay rise and no job cuts from merging agencies.",
+    opts:[{label:"Stand with the workers",issue:"pensions",v:.85},{label:"Rises only with reforms",issue:"pensions",v:.45},{label:"The budget can't afford it",issue:"pensions",v:.15}]},
+  "sofia-city":{title:"Sofia: prices, metro and bike lanes",text:"The consumer watchdog found butter and cheese markups above 130% in big chains, and the city is arguing over Ring Road bike lanes and a new metro station.",
+    opts:[{label:"Back a fair-price law for big chains",issue:"euro",v:.55},{label:"Promise a faster metro and cycle network",issue:"rural",v:.15},{label:"Say prices are the euro's fault",issue:"euro",v:.1}]}
+};
+function presTopIssues(d){
+  return activeIssueList().map(i=>({i,w:d.w[i.id]||0})).sort((a,b)=>b.w-a.w).slice(0,3).map(x=>x.i);
+}
+let presCurrentStop=null;
+function presCampaignStop(){
+  if(!isPres()||S.paused||S.phase!=="campaign"||S.stamina<COSTS.rallySP)return;
+  const d=DIST_BY_ID[S.location];
+  S.paused=true;
+  const news=PRES_NEWS_STOPS[d.id]&&!(S.pres.newsStopsDone||[]).includes(d.id)?PRES_NEWS_STOPS[d.id]:null;
+  let scen;
+  if(news){
+    scen={kind:"news",title:news.title,text:news.text,opts:news.opts};
+  }else{
+    const r=rng(),top=presTopIssues(d);
+    if(r<.62||!top.length){
+      const iss=pick(top.slice(0,2).length?top.slice(0,2):activeIssueList());
+      scen={kind:"townhall",title:"Town hall in "+d.name,text:PRES_STOP_QUESTIONS[iss.id]||("What is your position on "+iss.name+"?"),
+        opts:PRES_STOP_ANSWERS[iss.id].map((label,k)=>({label,issue:iss.id,v:PRES_STOP_VALUES[k]}))};
+    }else if(r<.82){
+      scen={kind:"leaders",title:"Local leaders in "+d.name,text:"The mayor's office, a union branch and the chamber of commerce all want an hour with you. You only have time for one.",
+        opts:[{label:"Walk the centre with the mayor",flat:1.1,ent:.03},{label:"Factory gate with the union",flat:.9,ent:.06},{label:"Breakfast with local business",flat:.7,cash:9000}]};
+    }else{
+      scen={kind:"heckler",title:"A heckler in "+d.name,text:"Halfway through your speech a man with a megaphone starts shouting that all politicians are the same.",
+        opts:[{label:"Invite him up to the stage",gamble:true},{label:"Stay calm and keep going",flat:.75},{label:"Fire back",gamble:true,risk:.55}]};
+    }
+  }
+  presCurrentStop=scen;
+  const root=$("modal-root");
+  const head=scen.kind==="news"?"IN THE NEWS · CAMPAIGN STOP":"CAMPAIGN STOP · "+COSTS.rallySP+" SP";
+  root.innerHTML='<div class="modal-back"><div class="modal">'
+    +'<div class="ev-head choice"><span>'+head+'</span><span class="paused-badge">'+esc(d.short.toUpperCase())+'</span></div>'
+    +'<div class="ev-body"><h3>'+esc(scen.title)+'</h3><p>'+esc(scen.text)+'</p>'
+    +(scen.kind==="townhall"?'<p class="hint">Answers are judged against this district\'s stance (see the markers in the District tab) and nudge your platform.</p>':"")
+    +'<div class="ev-opts">'+scen.opts.map((o,k)=>'<button class="btn" data-k="'+k+'">'+esc(o.label)+(o.cash?'<small>'+(o.cash>0?"+":"−")+fmtMoney(Math.abs(o.cash))+'</small>':"")+'</button>').join("")
+    +'<button class="btn ghost" data-k="-1">Cancel<small>No SP spent</small></button></div></div></div></div>';
+  root.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{
+    const k=+b.dataset.k;
+    root.innerHTML="";S.paused=false;
+    if(k>=0){presResolveStop(d,scen,scen.opts[k]);if(scen.kind==="news")(S.pres.newsStopsDone=S.pres.newsStopsDone||[]).push(d.id);}
+    updateAll();
+  };});
+}
+function presResolveStop(d,scen,o){
+  const before=(S.districtPoll&&S.districtPoll[d.id]&&S.districtPoll[d.id].player)||0;
+  const base=(0.055+getAttr("charisma")*0.0075)*(1+modSum("rallyMult"))/(1+S.ralliesThisTurn*0.5);
+  let gain,verdict;
+  if(o.issue){
+    const w=Math.max(.08,d.w[o.issue]||0),fit=1-Math.abs(o.v-(d.ideal[o.issue]===undefined?.5:d.ideal[o.issue]));
+    gain=base*(0.1+1.5*fit*fit)*(0.6+w*2);
+    if(fit<.45)gain=-base*0.4;
+    verdict=fit>=.8?"The room is with you.":fit>=.6?"Polite applause.":fit>=.45?"A lukewarm reception.":"That landed badly here.";
+    S.party.pos[o.issue]=clamp(S.party.pos[o.issue]+(o.v-S.party.pos[o.issue])*0.12,0,1);
+  }else if(o.gamble){
+    const win=rng()<(o.risk||.6);
+    gain=win?base*1.8:-base*0.6;
+    verdict=win?"The clip goes viral for the right reasons.":"It turns into a shouting match on camera.";
+  }else{
+    gain=base*o.flat;verdict="A solid, quiet win.";
+  }
+  if(o.cash)S.cash+=o.cash;
+  if(o.ent)S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+o.ent,.5,1.4);
+  addBoost(d.id,"player",gain);
+  if(gain>0)presSpill(d.id,gain);
+  S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+(gain>0?.03:-.01),.5,1.4);
+  S.stamina-=COSTS.rallySP;S.ralliesThisTurn++;S.stats.rallies++;S.touched.push(d.id);
+  recomputePolls();
+  const after=S.districtPoll[d.id].player||0;
+  log("Campaign stop in <b>"+d.name+"</b> — "+esc(o.label)+". "+verdict+" YOU "+(after-before>=0?"+":"")+pts(after-before)+" pts here.",gain>0?"good":"bad");
+  playSound(gain>0?"confirm":"click");
+}
+
+/* ---- presidential news events: September–October 2026 ----
+   Paraphrased from BTA, Sofia Globe and BNR reporting. Each one asks how YOU respond;
+   none of them puts words in the mouths of the real candidates. */
+function presGeoList(key,min){return DISTRICTS.filter(d=>((d.geo&&d.geo[key])||0)>=min).map(d=>d.id);}
+function presNewsEvents(){
+  const nato=presGeoList("proNATO",.7),ru=presGeoList("proRussia",.5),nat=presGeoList("nationalism",.6),urban=presGeoList("urbanization",.75);
+  const mb=(ids,v)=>ids.map(id=>({d:id,v}));
+  const rural=DISTRICTS.filter(d=>(d.w.rural||0)>=.18).map(d=>d.id);
+  return [
+    {news:"6 Oct",src:"BTA / Sofia Globe",kind:"choice",title:"Drone strikes in the Black Sea",text:"Two merchant ships were hit by drones in Bulgaria's exclusive economic zone off Varna; one sank. The government has asked the EU and NATO to help investigate. Reporters want your answer tonight.",opts:[
+      {label:"Demand allied patrols off our coast",sub:"Pro-NATO districts approve; platform moves to Rearm",fx:{multiBoost:mb(nato,.025),posShift:{issue:"defense",delta:.08}}},
+      {label:"Call for calm and neutrality",sub:"Plays well in Russia-friendly regions",fx:{multiBoost:mb(ru,.025),posShift:{issue:"defense",delta:-.08}}},
+      {label:"Go to Varna and meet the crews' families",sub:"−2 SP, enthusiasm up on the coast",fx:{stamina:-2,entDistrict:{d:"varna",v:.08},nationBoost:.006}}]},
+    {news:"15 Sep",src:"Sofia Globe / NSI",kind:"choice",title:"Inflation hits 5.1%",text:"Annual inflation rose to 5.1% in August, with transport up almost 14%. The finance minister says the euro is not to blame; shoppers are not convinced.",opts:[
+      {label:"Blame retailers, not the euro",sub:"Nationwide +1%",fx:{nationBoost:.01}},
+      {label:"Say the changeover was botched",sub:"Eurosceptic voters warm to you; platform moves Eurosceptic",fx:{multiBoost:mb(nat,.03),posShift:{issue:"euro",delta:-.08}}},
+      {label:"Talk fuel, Hormuz and global prices",sub:"Safe, small gain",fx:{nationBoost:.004}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Butter up 141%",text:"Consumer-protection inspectors found markups of 141% on butter and 133% on cheese at big chains and plan a 'fair value' benchmark with penalties.",opts:[
+      {label:"Back a fair-price law",sub:"Popular, +1.2% nationwide; donors grumble",fx:{nationBoost:.012,cash:-8000}},
+      {label:"Warn against price controls",sub:"Business donors grateful",fx:{cash:15000,nationBoost:-.004}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Unions march for a 10% raise",text:"Public-sector unions launched rallies in Varna, Shumen and Ruse for a 10% pay rise in the 2027 budget and against job cuts.",opts:[
+      {label:"Join the march in Varna",sub:"−2 SP, big local enthusiasm",fx:{stamina:-2,multiBoost:[{d:"varna",v:.04},{d:"shumen",v:.04},{d:"ruse",v:.04}],posShift:{issue:"pensions",delta:.06}}},
+      {label:"Call for pay tied to reforms",sub:"Moderates approve",fx:{nationBoost:.006}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Teachers' pay and polling-day schools",text:"An education union says teacher pay lags its promised target and is weighing strike readiness; it also wants the day after the vote off, since schools are polling stations.",opts:[
+      {label:"Pledge teacher pay at 125% of the average wage",sub:"Teachers and parents notice, −10 000 лв for the ad",fx:{nationBoost:.012,cash:-10000}},
+      {label:"Promise a school reform plan instead",sub:"+1 Intelligence for 2 weeks",fx:{attrTemp:{attr:"intelligence",v:1,turns:2}}}]},
+    {news:"25 Sep",src:"BTA / Sofia Globe",kind:"choice",title:"A windfall tax on banks",text:"The government wants a windfall tax from 2027 on banks, insurers, big retailers and telecoms. The central bank governor warns it could raise borrowing costs.",opts:[
+      {label:"Support it: profits should share the burden",sub:"Popular, but bank-friendly donors pull back",fx:{nationBoost:.01,cash:-12000}},
+      {label:"Oppose it: it will hit every borrower",sub:"Donations rise",fx:{cash:20000,nationBoost:-.005}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Rubbish fees double in the villages",text:"Mayors say the new 'polluter pays' waste-fee system cut business charges but raised household bills, two or three times in some villages.",opts:[
+      {label:"Promise to fix fees for rural households",sub:"Village districts +3%; platform moves toward villages",fx:{multiBoost:mb(rural,.03),posShift:{issue:"rural",delta:.06}}},
+      {label:"Leave it to the municipalities",sub:"Nothing gained, nothing lost",fx:{}}]},
+    {news:"12 Sep",src:"Reuters",kind:"choice",title:"Another arms-depot fire",text:"Explosions hit a weapons storage site near Tsareva Livada, weeks after a fire at another depot. Investigators have not ruled out sabotage.",opts:[
+      {label:"Demand a full security review",sub:"+0.8% nationwide; platform moves to Rearm",fx:{nationBoost:.008,posShift:{issue:"defense",delta:.05}}},
+      {label:"Warn against panic before the facts",sub:"Steady; small gain",fx:{nationBoost:.004}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"Bomb threats at schools",text:"Fake bomb threats hit schools and institutions across the country. The interior minister says they were coordinated from abroad.",opts:[
+      {label:"Visit a school and reassure parents",sub:"−1 SP, enthusiasm up nationwide",fx:{stamina:-1,enthusiasmAll:.03}},
+      {label:"Propose a cyber-threat agency",sub:"Urban voters approve",fx:{multiBoost:mb(urban,.025)}}]},
+    {news:"10 Oct",src:"BTA",kind:"choice",title:"Can you trust the machines?",text:"The election commission says voting machines are offline and voters can check a hash code on their receipt. Some voters still don't know how to use them.",opts:[
+      {label:"Fund voter-education videos",sub:"−15 000 лв, enthusiasm +4% nationwide",fx:{cash:-15000,enthusiasmAll:.04}},
+      {label:"Raise doubts about the machines",sub:"Your base fires up, moderates recoil",fx:{multiBoost:mb(nat,.03),nationBoost:-.008}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"Fuel could jump under EU carbon rules",text:"Fuel traders warn new EU emissions rules from 2028 could add up to €1.40 a litre; regional energy bodies want a two-year delay.",opts:[
+      {label:"Back the call for a delay",sub:"Drivers and rural voters approve; platform moves to subsidies",fx:{multiBoost:mb(rural,.02),posShift:{issue:"energy",delta:.06}}},
+      {label:"Stick with EU climate rules",sub:"Pro-EU cities approve",fx:{multiBoost:mb(urban,.025)}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"The crash-barrier contracts",text:"A parliamentary hearing heard that four linked companies won every regional lot of a road crash-barrier tender, which grew by over 60% after amendments.",opts:[
+      {label:"Promise an audit of every road contract",sub:"+1.2% nationwide; platform moves to Zero Tolerance",fx:{nationBoost:.012,posShift:{issue:"corruption",delta:.06}}},
+      {label:"Stay out of parliament's business",sub:"No change",fx:{}}]},
+    {news:"Aug–Sep",src:"Sofia Globe",kind:"choice",title:"The driest August since 1988",text:"Drought, a near-1,000-hectare wildfire near Haskovo and flash floods in Strumyani, Peshtera and Batak have hit farmers hard; winter sowing is behind.",opts:[
+      {label:"Promise drought aid for farmers",sub:"Farm districts +3%",fx:{multiBoost:mb(rural,.03)}},
+      {label:"Promise a modern fire and flood service",sub:"+0.8% nationwide",fx:{nationBoost:.008}}]},
+    {news:"12 Oct",src:"BTA",kind:"good",title:"Tourism's record summer",text:"Revenue from overnight stays rose 13% in August, and Burgas is preparing to host Eurovision 2027.",opts:[{label:"Campaign on the coast",fx:{multiBoost:[{d:"burgas",v:.03},{d:"varna",v:.02}]}}]}
+  ];
+}
+
+
+/* ---- right-click district menu (XP-style context menu) ----
+   Right-click any district: travel there, or open "Take action" for the moves
+   available there. From another district the actions travel first, then act. */
+let mapMenuEl=null;
+function closeMapMenu(){if(mapMenuEl){mapMenuEl.remove();mapMenuEl=null;}}
+function mapMenuItems(d){
+  const here=S.location===d.id,tc=here?0:travelCost(S.location,d.id);
+  const busy=S.paused||S.phase!=="campaign",canTravel=here||(!busy&&S.stamina>=tc);
+  const go=fn=>()=>{if(!here){travelTo(d.id);if(S.location!==d.id)return;}fn();};
+  const sp=n=>(tc?tc+" + ":"")+n+" SP";
+  const sub=[];
+  if(isPres())sub.push({label:"Campaign stop",cost:sp(COSTS.rallySP),disabled:busy||S.stamina<tc+COSTS.rallySP,run:go(presCampaignStop)});
+  else for(const i of activeIssueList())sub.push({label:"Rally: "+i.name,cost:sp(COSTS.rallySP),disabled:busy||S.stamina<tc+COSTS.rallySP,run:go(()=>doRally(i.id))});
+  sub.push({label:"Local media ads",cost:fmtMoney(COSTS.ad)+(tc?" + "+tc+" SP":""),disabled:busy||!canTravel||S.cash<COSTS.ad,run:go(buyAd)});
+  if(S.hq[d.id])sub.push({label:"Campaign HQ operational",disabled:true});
+  else sub.push({label:"Build Campaign HQ",cost:fmtMoney(COSTS.hq)+(tc?" + "+tc+" SP":""),disabled:busy||!canTravel||S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax,run:go(buildHQ)});
+  const items=[{header:d.name+(here?" · you are here":"")}];
+  if(!here)items.push({label:"Travel here",cost:tc+" SP",disabled:busy||S.stamina<tc,run:()=>travelTo(d.id)});
+  items.push({label:here?"Take action":"Travel & take action",submenu:sub,disabled:busy});
+  items.push({sep:true});
+  items.push({label:"Inspect district",run:()=>{inspectorTab="district";selectDistrict(d.id);}});
+  items.push({label:"National polls",run:()=>setInspectorTab("national")});
+  return items;
+}
+function buildMapMenu(items,cls){
+  const m=document.createElement("div");
+  m.className="ctx-menu"+(cls?" "+cls:"");
+  m.setAttribute("role","menu");
+  for(const it of items){
+    if(it.sep){const s=document.createElement("div");s.className="ctx-sep";m.appendChild(s);continue;}
+    if(it.header){const h=document.createElement("div");h.className="ctx-head";h.textContent=it.header;m.appendChild(h);continue;}
+    const b=document.createElement("button");
+    b.type="button";b.className="ctx-item"+(it.submenu?" has-sub":"");b.setAttribute("role","menuitem");
+    b.disabled=!!it.disabled;
+    b.innerHTML='<span class="ctx-label">'+esc(it.label)+'</span>'+(it.cost?'<span class="ctx-cost">'+esc(it.cost)+'</span>':"")+(it.submenu?'<span class="ctx-arrow">▸</span>':"");
+    if(it.submenu){
+      const sub=buildMapMenu(it.submenu,"ctx-sub");
+      const wrap=document.createElement("div");wrap.className="ctx-sub-wrap";
+      wrap.appendChild(b);wrap.appendChild(sub);
+      const open=()=>{if(b.disabled)return;wrap.classList.add("open");placeSubMenu(wrap,sub);};
+      wrap.addEventListener("mouseenter",open);
+      wrap.addEventListener("mouseleave",()=>wrap.classList.remove("open"));
+      b.addEventListener("click",e=>{e.stopPropagation();open();const f=sub.querySelector(".ctx-item:not(:disabled)");if(f)f.focus();});
+      b.addEventListener("keydown",e=>{if(e.key==="ArrowRight"){open();const f=sub.querySelector(".ctx-item:not(:disabled)");if(f)f.focus();}});
+      sub.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){wrap.classList.remove("open");b.focus();e.stopPropagation();}});
+      m.appendChild(wrap);
+      continue;
+    }
+    b.addEventListener("click",e=>{e.stopPropagation();if(b.disabled)return;closeMapMenu();it.run();});
+    m.appendChild(b);
+  }
+  m.addEventListener("keydown",e=>{
+    if(e.key!=="ArrowDown"&&e.key!=="ArrowUp")return;
+    const list=Array.from(m.querySelectorAll(":scope > .ctx-item:not(:disabled), :scope > .ctx-sub-wrap > .ctx-item:not(:disabled)"));
+    const i=list.indexOf(document.activeElement);
+    const n=list[(i+(e.key==="ArrowDown"?1:-1)+list.length)%list.length];
+    if(n){n.focus();e.preventDefault();e.stopPropagation();}
+  });
+  return m;
+}
+function placeSubMenu(wrap,sub){
+  sub.classList.remove("flip");
+  sub.style.top="";
+  const r=sub.getBoundingClientRect();
+  if(r.right>window.innerWidth-4)sub.classList.add("flip");
+  if(r.bottom>window.innerHeight-4)sub.style.top=Math.round(window.innerHeight-4-r.bottom)+"px";
+}
+function openMapMenu(d,x,y){
+  closeMapMenu();
+  if(!S||S.phase!=="campaign")return;
+  mapMenuEl=buildMapMenu(mapMenuItems(d));
+  document.body.appendChild(mapMenuEl);
+  const r=mapMenuEl.getBoundingClientRect();
+  const left=Math.min(x,window.innerWidth-r.width-4),top=Math.min(y,window.innerHeight-r.height-4);
+  mapMenuEl.style.left=Math.max(4,left)+"px";mapMenuEl.style.top=Math.max(4,top)+"px";
+  const first=mapMenuEl.querySelector(".ctx-item:not(:disabled)");
+  if(first)first.focus({preventScroll:true});
+}
+function bindMapMenu(){
+  if(typeof document==="undefined"||typeof window==="undefined"||typeof document.addEventListener!=="function")return;
+  document.addEventListener("pointerdown",e=>{if(mapMenuEl&&!mapMenuEl.contains(e.target))closeMapMenu();},true);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMapMenu();});
+  window.addEventListener("resize",closeMapMenu);
+  window.addEventListener("blur",closeMapMenu);
+  document.addEventListener("scroll",closeMapMenu,true);
 }
 
 function bindUI(){
@@ -5563,6 +5848,7 @@ function init(){
   bindRallyPopOutsideClose();
   bindMobilePreviewSafety();
   bindInteractionFx();
+  bindMapMenu();
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });
@@ -5593,7 +5879,7 @@ if(typeof module!=="undefined"&&module.exports){
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
-    portraitHTML:portraitHTML,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
+    portraitHTML:portraitHTML,openMapMenu:openMapMenu,closeMapMenu:closeMapMenu,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
     defaultPartyMachine:defaultPartyMachine,launchCampaign:launchCampaign,allocateStaff:allocateStaff,hireStaff:hireStaff,trainStaff:trainStaff,upgradePartyHQ:upgradePartyHQ,
     partyEnergyMax:partyEnergyMax,partyStaffCap:partyStaffCap,partyUpkeep:partyUpkeep,partyQuality:partyQuality,partyHireCost:partyHireCost,partyTrainCost:partyTrainCost,partyHqUpgradeCost:partyHqUpgradeCost,
     releaseCampaign:releaseCampaign,partyMachineTick:partyMachineTick,aiFlavorCampaign:aiFlavorCampaign,stanceLabel:stanceLabel,renderPartyMachine:renderPartyMachine,CAMPAIGN_CAP:CAMPAIGN_CAP,PHASE_NAMES:PHASE_NAMES,

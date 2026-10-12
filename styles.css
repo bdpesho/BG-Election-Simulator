@@ -970,3 +970,22 @@ button:disabled,.btn:disabled,.demand-chip:disabled,.demand-chip.done,.insp-tab.
 #map-canvas,#map-canvas *,.node,.node *{cursor:url(assets/cursors/cross.png) 9 9,crosshair!important; cursor:-webkit-image-set(url(assets/cursors/cross.png) 1x,url(assets/cursors/cross@2x.png) 2x,url(assets/cursors/cross@3x.png) 3x) 9 9,crosshair!important; cursor:image-set(url(assets/cursors/cross.png) 1x,url(assets/cursors/cross@2x.png) 2x,url(assets/cursors/cross@3x.png) 3x) 9 9,crosshair!important;}
 input[type=text],input[type=search],input:not([type]),textarea,[contenteditable=true]{cursor:text!important;}
 body.busy,body.busy *{cursor:url(assets/cursors/busy.png) 6 9,wait!important; cursor:-webkit-image-set(url(assets/cursors/busy.png) 1x,url(assets/cursors/busy@2x.png) 2x,url(assets/cursors/busy@3x.png) 3x) 6 9,wait!important; cursor:image-set(url(assets/cursors/busy.png) 1x,url(assets/cursors/busy@2x.png) 2x,url(assets/cursors/busy@3x.png) 3x) 6 9,wait!important;}
+
+/* ---- right-click district menu (XP context menu) ---- */
+.ctx-menu{position:fixed; z-index:40000; min-width:210px; padding:2px; background:#fff; border:1px solid #808080;
+  box-shadow:inset -1px -1px #404040, inset 1px 1px #dfdfdf, 3px 3px 0 rgba(0,0,0,.25);
+  font:400 .82rem/1.2 'Pixelated MS Sans Serif',Tahoma,sans-serif; color:#000;}
+.ctx-head{padding:4px 22px 4px 8px; font-weight:700; color:#fff; background:linear-gradient(90deg,var(--xp-title1),var(--xp-title2)); margin-bottom:2px; white-space:nowrap;}
+.ctx-item{display:flex; align-items:center; gap:14px; width:100%; min-height:0; padding:4px 10px 4px 22px; border:0; border-radius:0; background:transparent; box-shadow:none; color:#000; font:inherit; text-align:left; white-space:nowrap;}
+.ctx-item .ctx-label{flex:1;}
+.ctx-item .ctx-cost{color:#555; font-size:.74rem;}
+.ctx-item .ctx-arrow{margin-left:6px;}
+.ctx-item:hover:not(:disabled),.ctx-item:focus-visible:not(:disabled),.ctx-sub-wrap.open > .ctx-item{background:#316ac5; color:#fff; outline:none;}
+.ctx-item:hover:not(:disabled) .ctx-cost,.ctx-sub-wrap.open > .ctx-item .ctx-cost{color:#dbe6ff;}
+.ctx-item:disabled{color:#a0a0a0; text-shadow:1px 1px #fff; background:transparent;}
+.ctx-item:disabled .ctx-cost{color:#b8b8b8;}
+.ctx-sep{height:0; margin:3px 2px; border-top:1px solid #808080; border-bottom:1px solid #fff;}
+.ctx-sub-wrap{position:relative;}
+.ctx-sub{display:none; position:absolute; left:calc(100% - 3px); top:-3px;}
+.ctx-sub.flip{left:auto; right:calc(100% - 3px);}
+.ctx-sub-wrap.open > .ctx-sub{display:block;}
