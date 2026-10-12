@@ -463,11 +463,13 @@ const FACES=[
   {bg:"#6d597a",skin:4,hairColor:"#1c1c1c",hairStyle:"bun",suitColor:"#2a2238",shirtColor:"#e6e0d0",suitStyle:"blouse",gender:"female",glasses:false}
 ];
 
+// every preset must fit the 15-point attribute budget enforced on the setup screen
+const ATTR_BUDGET=15;
 const PRESET_LEADERS=[
-  {name:"Elena Dimitrova",face:6,attrs:{stamina:5,charisma:7,intelligence:6},tag:"Reformist mayor",ethnicity:"bulgarian"},
-  {name:"Georgi Ivanov",face:0,attrs:{stamina:8,charisma:5,intelligence:5},tag:"Former minister",ethnicity:"bulgarian"},
-  {name:"Maria Stoyanova",face:2,attrs:{stamina:5,charisma:6,intelligence:7},tag:"Investigative journalist",ethnicity:"turkish"},
-  {name:"Stefan Kolev",face:3,attrs:{stamina:6,charisma:6,intelligence:6},tag:"Business founder",ethnicity:"roma"}
+  {name:"Elena Dimitrova",face:6,attrs:{stamina:4,charisma:6,intelligence:5},tag:"Reformist mayor",ethnicity:"bulgarian"},
+  {name:"Georgi Ivanov",face:0,attrs:{stamina:6,charisma:4,intelligence:5},tag:"Former minister",ethnicity:"bulgarian"},
+  {name:"Maria Stoyanova",face:2,attrs:{stamina:4,charisma:5,intelligence:6},tag:"Investigative journalist",ethnicity:"turkish"},
+  {name:"Stefan Kolev",face:3,attrs:{stamina:5,charisma:5,intelligence:5},tag:"Business founder",ethnicity:"roma"}
 ];
 
 const CANDIDATE_NAMES=["Aleksandar Vasilev","Elena Dimitrova","Georgi Ivanov","Maria Stoyanova","Stefan Kolev","Ralitsa Petkova","Dimitar Georgiev","Krasimira Todorova","Boris Angelov","Yana Hristova","Nikola Stoyanov","Vesela Marinova","Kamen Radev","Iliana Krusteva"];
@@ -4500,7 +4502,7 @@ function updateAttrUI(){
     $("val-attr-"+k).textContent=S.player.attrs[k];
   }
   const sum=S.player.attrs.stamina+S.player.attrs.charisma+S.player.attrs.intelligence;
-  const rem=15-sum;
+  const rem=ATTR_BUDGET-sum;
   if(rem>=0)clearSetupError();
   const el=$("attr-remaining");
   el.textContent=rem>=0?rem+" points left":(-rem)+" over budget";
@@ -4716,7 +4718,7 @@ function randomizeNewGame(){
   S.player.face=-1;
   S.player.photo=null;
   const a=[rnd(1,8),rnd(1,8),rnd(1,8)];
-  while(a[0]+a[1]+a[2]>15){
+  while(a[0]+a[1]+a[2]>ATTR_BUDGET){
     a[a.indexOf(Math.max.apply(null,a))]--;
   }
   S.player.attrs={stamina:a[0],charisma:a[1],intelligence:a[2]};
@@ -4810,7 +4812,7 @@ function bindUI(){
   $("btn-setup-next").onclick=()=>{
     if(S.setupStep===0){
       const sum=S.player.attrs.stamina+S.player.attrs.charisma+S.player.attrs.intelligence;
-      if(sum>15){showSetupError("Attribute points exceed the budget of 15.");return;}
+      if(sum>ATTR_BUDGET){showSetupError("Attribute points exceed the budget of "+ATTR_BUDGET+".");return;}
       if(!$("in-cand-name").value.trim())$("in-cand-name").value="Aleksandar Vasilev";
       gotoStep(1);
     }else if(S.setupStep===1){
@@ -4960,7 +4962,7 @@ if(typeof module!=="undefined"&&module.exports){
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
-    portraitHTML:portraitHTML,
+    portraitHTML:portraitHTML,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
     defaultPartyMachine:defaultPartyMachine,launchCampaign:launchCampaign,allocateStaff:allocateStaff,hireStaff:hireStaff,trainStaff:trainStaff,upgradePartyHQ:upgradePartyHQ,
     partyEnergyMax:partyEnergyMax,partyStaffCap:partyStaffCap,partyUpkeep:partyUpkeep,partyQuality:partyQuality,partyHireCost:partyHireCost,partyTrainCost:partyTrainCost,partyHqUpgradeCost:partyHqUpgradeCost,
     releaseCampaign:releaseCampaign,partyMachineTick:partyMachineTick,aiFlavorCampaign:aiFlavorCampaign,stanceLabel:stanceLabel,renderPartyMachine:renderPartyMachine,CAMPAIGN_CAP:CAMPAIGN_CAP,PHASE_NAMES:PHASE_NAMES,
