@@ -143,6 +143,42 @@ em{font-style:normal; color:var(--dim); font-size:.78rem; text-transform:none; l
 .title-buttons{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
 .title-foot{margin-top:30px; color:#555; font-size:.78rem;}
 
+/* ---- title entrance (driven by title-bg.js toggling .title-intro on #screen-title) ---- */
+#screen-title{--intro-delay:.95s;}
+#screen-title.title-intro-quick{--intro-delay:.35s;}
+#screen-title.title-intro .title-wrap{animation:title-window-in .55s cubic-bezier(.2,1.5,.45,1) var(--intro-delay) both;}
+#screen-title.title-intro .title-wrap .flag-stripe span{animation:title-stripe-in .45s steps(6,end) both;}
+#screen-title.title-intro .title-wrap .fs-w{animation-delay:calc(var(--intro-delay) + .35s)!important;}
+#screen-title.title-intro .title-wrap .fs-g{animation-delay:calc(var(--intro-delay) + .45s)!important;}
+#screen-title.title-intro .title-wrap .fs-r{animation-delay:calc(var(--intro-delay) + .55s)!important;}
+#screen-title.title-intro .title-logo{animation:title-logo-in .5s steps(5,end) calc(var(--intro-delay) + .25s) both;}
+#screen-title.title-intro .title-sub,#screen-title.title-intro .title-desc,
+#screen-title.title-intro .title-buttons .btn,#screen-title.title-intro .title-foot{animation:title-rise .4s ease-out both;}
+#screen-title.title-intro .title-sub{animation-delay:calc(var(--intro-delay) + .45s);}
+#screen-title.title-intro .title-desc{animation-delay:calc(var(--intro-delay) + .55s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(1){animation-delay:calc(var(--intro-delay) + .7s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(2){animation-delay:calc(var(--intro-delay) + .8s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(3){animation-delay:calc(var(--intro-delay) + .9s);}
+#screen-title.title-intro .title-foot{animation-delay:calc(var(--intro-delay) + 1s);}
+/* periodic pixel glint across the logo + gentle pulse on the main call to action */
+.title-logo{position:relative; overflow:hidden; display:inline-block;}
+.title-logo::after{content:""; position:absolute; top:0; bottom:0; left:-30%; width:10%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:skewX(-20deg); animation:title-glint 5s steps(14,end) 3.2s infinite; pointer-events:none;}
+#btn-new-game{animation:cta-pulse 1.6s steps(2,end) 3.4s infinite;}
+#btn-new-game:hover,#btn-new-game:focus-visible{animation:none;}
+.smoker-bubble{animation:bubble-pop .32s cubic-bezier(.2,1.6,.4,1) both; transform-origin:28% 100%;}
+.smoker-bubble .sb-text::after{content:"_"; animation:caret-blink .8s steps(1,end) infinite;}
+@keyframes title-window-in{0%{opacity:0; transform:translateY(-28px) scale(.92);}100%{opacity:1; transform:none;}}
+@keyframes title-stripe-in{0%{transform:scaleX(0); transform-origin:left;}100%{transform:scaleX(1); transform-origin:left;}}
+@keyframes title-logo-in{0%{opacity:0; letter-spacing:.5em; filter:blur(2px);}100%{opacity:1; letter-spacing:.1em; filter:none;}}
+@keyframes title-rise{0%{opacity:0; transform:translateY(10px);}100%{opacity:1; transform:none;}}
+@keyframes title-glint{0%{left:-30%;}35%,100%{left:130%;}}
+@keyframes cta-pulse{0%,100%{outline:2px solid transparent; outline-offset:2px;}50%{outline:2px solid #ffcc33; outline-offset:2px;}}
+@keyframes bubble-pop{0%{opacity:0; scale:.6;}100%{opacity:1; scale:1;}}
+@keyframes caret-blink{50%{opacity:0;}}
+@media(prefers-reduced-motion:reduce){
+  #screen-title.title-intro *,.title-logo::after,#btn-new-game,.smoker-bubble,.smoker-bubble .sb-text::after{animation:none!important;}
+}
+
 /* ---- setup wizard ---- */
 .setup-wrap{margin:24px auto; width:min(1060px,96vw); padding:0;}
 .setup-head h2{margin-bottom:12px;}
