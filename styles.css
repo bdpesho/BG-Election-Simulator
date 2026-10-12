@@ -46,14 +46,6 @@ body{
   overflow:hidden;
   scrollbar-width:auto; scrollbar-color:#ece9d8 #d4d0c8;
 }
-@media (pointer:fine){
-  html,body{cursor:url(assets/cursor-arrow.svg) 2 1,default!important;}
-  button,.btn,a,[role=button],.hud-box,.mobile-tab{cursor:url(assets/cursor-hand.svg) 6 2,pointer!important;}
-  button:disabled,.btn:disabled{cursor:url(assets/cursor-arrow.svg) 2 1,default!important;}
-  #map-canvas,#map-canvas *,.node,.node *{cursor:url(assets/cursor-crosshair.svg) 12 12,crosshair!important;}
-  input[type=text],input[type=search],textarea{cursor:text!important;}
-  body.busy,body.busy *{cursor:url(assets/cursor-busy.svg) 12 12,wait!important;}
-}
 button{font-family:inherit;}
 input,label,textarea,select{font-family:inherit; font-size:inherit;}
 img{image-rendering:pixelated;}
@@ -150,6 +142,42 @@ em{font-style:normal; color:var(--dim); font-size:.78rem; text-transform:none; l
 .title-desc{margin:16px auto 26px; color:#555; max-width:560px; line-height:1.55; font-size:.9rem;}
 .title-buttons{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
 .title-foot{margin-top:30px; color:#555; font-size:.78rem;}
+
+/* ---- title entrance (driven by title-bg.js toggling .title-intro on #screen-title) ---- */
+#screen-title{--intro-delay:.95s;}
+#screen-title.title-intro-quick{--intro-delay:.35s;}
+#screen-title.title-intro .title-wrap{animation:title-window-in .55s cubic-bezier(.2,1.5,.45,1) var(--intro-delay) both;}
+#screen-title.title-intro .title-wrap .flag-stripe span{animation:title-stripe-in .45s steps(6,end) both;}
+#screen-title.title-intro .title-wrap .fs-w{animation-delay:calc(var(--intro-delay) + .35s)!important;}
+#screen-title.title-intro .title-wrap .fs-g{animation-delay:calc(var(--intro-delay) + .45s)!important;}
+#screen-title.title-intro .title-wrap .fs-r{animation-delay:calc(var(--intro-delay) + .55s)!important;}
+#screen-title.title-intro .title-logo{animation:title-logo-in .5s steps(5,end) calc(var(--intro-delay) + .25s) both;}
+#screen-title.title-intro .title-sub,#screen-title.title-intro .title-desc,
+#screen-title.title-intro .title-buttons .btn,#screen-title.title-intro .title-foot{animation:title-rise .4s ease-out both;}
+#screen-title.title-intro .title-sub{animation-delay:calc(var(--intro-delay) + .45s);}
+#screen-title.title-intro .title-desc{animation-delay:calc(var(--intro-delay) + .55s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(1){animation-delay:calc(var(--intro-delay) + .7s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(2){animation-delay:calc(var(--intro-delay) + .8s);}
+#screen-title.title-intro .title-buttons .btn:nth-child(3){animation-delay:calc(var(--intro-delay) + .9s);}
+#screen-title.title-intro .title-foot{animation-delay:calc(var(--intro-delay) + 1s);}
+/* periodic pixel glint across the logo + gentle pulse on the main call to action */
+.title-logo{position:relative; overflow:hidden; display:inline-block;}
+.title-logo::after{content:""; position:absolute; top:0; bottom:0; left:-30%; width:10%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:skewX(-20deg); animation:title-glint 5s steps(14,end) 3.2s infinite; pointer-events:none;}
+#btn-new-game{animation:cta-pulse 1.6s steps(2,end) 3.4s infinite;}
+#btn-new-game:hover,#btn-new-game:focus-visible{animation:none;}
+.smoker-bubble{animation:bubble-pop .32s cubic-bezier(.2,1.6,.4,1) both; transform-origin:28% 100%;}
+.smoker-bubble .sb-text::after{content:"_"; animation:caret-blink .8s steps(1,end) infinite;}
+@keyframes title-window-in{0%{opacity:0; transform:translateY(-28px) scale(.92);}100%{opacity:1; transform:none;}}
+@keyframes title-stripe-in{0%{transform:scaleX(0); transform-origin:left;}100%{transform:scaleX(1); transform-origin:left;}}
+@keyframes title-logo-in{0%{opacity:0; letter-spacing:.5em; filter:blur(2px);}100%{opacity:1; letter-spacing:.1em; filter:none;}}
+@keyframes title-rise{0%{opacity:0; transform:translateY(10px);}100%{opacity:1; transform:none;}}
+@keyframes title-glint{0%{left:-30%;}35%,100%{left:130%;}}
+@keyframes cta-pulse{0%,100%{outline:2px solid transparent; outline-offset:2px;}50%{outline:2px solid #ffcc33; outline-offset:2px;}}
+@keyframes bubble-pop{0%{opacity:0; scale:.6;}100%{opacity:1; scale:1;}}
+@keyframes caret-blink{50%{opacity:0;}}
+@media(prefers-reduced-motion:reduce){
+  #screen-title.title-intro *,.title-logo::after,#btn-new-game,.smoker-bubble,.smoker-bubble .sb-text::after{animation:none!important;}
+}
 
 /* ---- setup wizard ---- */
 .setup-wrap{margin:24px auto; width:min(1060px,96vw); padding:0;}
@@ -906,16 +934,26 @@ input[type=radio],input[type=checkbox]{
   100%{opacity:0;transform:translateY(-42px);}
 }
 
-/* --- custom retro cursor set (arrow pointer, pointing hand, clicking hand) ---
-   Default: arrow. Interactive UI: pointing hand. While clicking: pinching hand.
-   Map crosshair / busy state keep their existing cursors above. */
-html,body{cursor:url(assets/cursor-arrow.png) 2 2,default!important;}
-button,.btn,a,[role=button],.hud-box,.mobile-tab,
-.demand-chip:not(:disabled),.swatch,select,
-input[type=range],input[type=color],.political-compass,.compass-hit-area{
-  cursor:url(assets/cursor-hand.png) 4 2,pointer!important;}
-button:active,.btn:active,a:active,[role=button]:active,
-.hud-box:active,.mobile-tab:active,.demand-chip:not(:disabled):active,
-.swatch:active,.political-compass:active{
-  cursor:url(assets/cursor-pinch.png) 8 2,pointer!important;}
-.political-compass.dragging{cursor:url(assets/cursor-pinch.png) 8 2,grabbing!important;}
+/* ---- retro XP cursor set (generated by tools/gen-cursors.js) ----
+   Pixel-perfect PNGs at 1x/2x/3x via image-set, so they stay crisp on hi-DPI screens.
+   Every cursor is <=32px so Chromium never swaps it for the system arrow near the tab bar.
+   One rule set only: arrow by default, XP hand on anything clickable, pressed hand while
+   clicking, crosshair on the map, open/closed hand on the draggable compass. */
+html,body{cursor:url(assets/cursors/arrow.png) 0 0,default!important; cursor:-webkit-image-set(url(assets/cursors/arrow.png) 1x,url(assets/cursors/arrow@2x.png) 2x,url(assets/cursors/arrow@3x.png) 3x) 0 0,default!important; cursor:image-set(url(assets/cursors/arrow.png) 1x,url(assets/cursors/arrow@2x.png) 2x,url(assets/cursors/arrow@3x.png) 3x) 0 0,default!important;}
+button,.btn,a[href],[role=button],summary,label[for],select,
+input[type=checkbox],input[type=radio],input[type=range],input[type=color],
+.hud-box,.mobile-tab,.mobile-sheet-close,#tb-cash,.preset-card,.face-cell,.diff-opt,.start-btn,
+.insp-tab,.demand-chip,.swatch{
+  cursor:url(assets/cursors/hand.png) 5 0,pointer!important; cursor:-webkit-image-set(url(assets/cursors/hand.png) 1x,url(assets/cursors/hand@2x.png) 2x,url(assets/cursors/hand@3x.png) 3x) 5 0,pointer!important; cursor:image-set(url(assets/cursors/hand.png) 1x,url(assets/cursors/hand@2x.png) 2x,url(assets/cursors/hand@3x.png) 3x) 5 0,pointer!important;}
+button:active,.btn:active,a[href]:active,[role=button]:active,.hud-box:active,.mobile-tab:active,
+.preset-card:active,.face-cell:active,.diff-opt:active,.start-btn:active,.insp-tab:active,
+.demand-chip:not(:disabled):active,.swatch:active,#tb-cash:active{
+  cursor:url(assets/cursors/press.png) 5 4,pointer!important; cursor:-webkit-image-set(url(assets/cursors/press.png) 1x,url(assets/cursors/press@2x.png) 2x,url(assets/cursors/press@3x.png) 3x) 5 4,pointer!important; cursor:image-set(url(assets/cursors/press.png) 1x,url(assets/cursors/press@2x.png) 2x,url(assets/cursors/press@3x.png) 3x) 5 4,pointer!important;}
+button:disabled,.btn:disabled,.demand-chip:disabled,.demand-chip.done,.insp-tab.active{
+  cursor:url(assets/cursors/arrow.png) 0 0,default!important; cursor:-webkit-image-set(url(assets/cursors/arrow.png) 1x,url(assets/cursors/arrow@2x.png) 2x,url(assets/cursors/arrow@3x.png) 3x) 0 0,default!important; cursor:image-set(url(assets/cursors/arrow.png) 1x,url(assets/cursors/arrow@2x.png) 2x,url(assets/cursors/arrow@3x.png) 3x) 0 0,default!important;}
+.political-compass,.compass-hit-area{cursor:url(assets/cursors/grab.png) 8 8,grab!important; cursor:-webkit-image-set(url(assets/cursors/grab.png) 1x,url(assets/cursors/grab@2x.png) 2x,url(assets/cursors/grab@3x.png) 3x) 8 8,grab!important; cursor:image-set(url(assets/cursors/grab.png) 1x,url(assets/cursors/grab@2x.png) 2x,url(assets/cursors/grab@3x.png) 3x) 8 8,grab!important;}
+.political-compass:active,.political-compass.dragging,.political-compass.dragging *{
+  cursor:url(assets/cursors/grabbing.png) 8 6,grabbing!important; cursor:-webkit-image-set(url(assets/cursors/grabbing.png) 1x,url(assets/cursors/grabbing@2x.png) 2x,url(assets/cursors/grabbing@3x.png) 3x) 8 6,grabbing!important; cursor:image-set(url(assets/cursors/grabbing.png) 1x,url(assets/cursors/grabbing@2x.png) 2x,url(assets/cursors/grabbing@3x.png) 3x) 8 6,grabbing!important;}
+#map-canvas,#map-canvas *,.node,.node *{cursor:url(assets/cursors/cross.png) 9 9,crosshair!important; cursor:-webkit-image-set(url(assets/cursors/cross.png) 1x,url(assets/cursors/cross@2x.png) 2x,url(assets/cursors/cross@3x.png) 3x) 9 9,crosshair!important; cursor:image-set(url(assets/cursors/cross.png) 1x,url(assets/cursors/cross@2x.png) 2x,url(assets/cursors/cross@3x.png) 3x) 9 9,crosshair!important;}
+input[type=text],input[type=search],input:not([type]),textarea,[contenteditable=true]{cursor:text!important;}
+body.busy,body.busy *{cursor:url(assets/cursors/busy.png) 6 9,wait!important; cursor:-webkit-image-set(url(assets/cursors/busy.png) 1x,url(assets/cursors/busy@2x.png) 2x,url(assets/cursors/busy@3x.png) 3x) 6 9,wait!important; cursor:image-set(url(assets/cursors/busy.png) 1x,url(assets/cursors/busy@2x.png) 2x,url(assets/cursors/busy@3x.png) 3x) 6 9,wait!important;}
