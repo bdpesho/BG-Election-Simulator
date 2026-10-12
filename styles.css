@@ -219,6 +219,19 @@ em{font-style:normal; color:var(--dim); font-size:.78rem; text-transform:none; l
 .preset-card b{font-size:.85rem; display:block;}
 .preset-card span{font-size:.74rem; color:#555;}
 .attr-row{display:grid; grid-template-columns:1fr 150px 34px; gap:10px; align-items:center; margin:7px 0;}
+/* ---- presidential mode ---- */
+.pres-picker{margin-bottom:14px;}
+.pres-ticket-list{display:grid; grid-template-columns:1fr; gap:6px; margin-bottom:6px;}
+.pres-ticket{position:relative;}
+.pres-ticket .pres-swatch{width:14px; align-self:stretch; flex:none; box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);}
+.pres-ticket .pres-poll{margin-left:auto; font-style:normal; font-weight:700; color:#000080; font-size:.85rem;}
+#pres-own-fields.pres-locked{opacity:.4; pointer-events:none; filter:grayscale(.6);}
+#pres-vp-picker{margin-top:14px;}
+.pres-cta{background:#fffbe8;}
+.pres-cta .chip{margin-left:6px; font-size:.62rem; vertical-align:middle;}
+#screen-election.pres .seats-heading,#screen-election.pres #seat-strip{display:none;}
+#screen-election.pres .rseats{min-width:7.5em; text-align:right;}
+
 .attr-row label{font-size:.85rem;}
 .attr-row label em{display:block;}
 .attr-val{font-weight:700; color:#8a6d00; text-align:right;}

@@ -28,11 +28,13 @@
       <div class="title-desc">
         20 weeks, 29 electoral districts, and a strict 4% threshold to get in. Dozens of rivals want your voters.
         Raise your banner and hit the trail, and try to win a 121-seat majority, or form a coalition to rule
-        as the country deserves to be ruled.
+        as the country deserves to be ruled. Or run for president in the 25 October race against the real 2026 field.
       </div>
       <div class="title-buttons">
-        <button id="btn-new-game" class="btn primary big">New Campaign</button>
+        <button id="btn-new-game" class="btn primary big">Parliamentary Campaign</button>
+        <button id="btn-new-pres" class="btn big pres-cta">Presidential Race <span class="chip gold">NEW · 25 OCT</span></button>
         <button id="btn-continue" class="btn big ghost" style="display:none">Continue Saved Campaign</button>
+        <button id="btn-continue-pres" class="btn big ghost" style="display:none">Continue Presidential Race</button>
         <button id="btn-title-help" class="btn big ghost">How to Play</button>
       </div>
       <div class="title-foot">A single-page political strategy game · inspired by The Political Machine</div>
@@ -63,6 +65,12 @@
       <div class="setup-panel active" id="setup-step-0">
         <div class="cols">
           <div class="col">
+            <div id="pres-ticket-picker" class="pres-picker" style="display:none">
+              <h3>Choose your ticket <em class="hint">2026 presidential election</em></h3>
+              <div id="pres-ticket-picker-list" class="pres-ticket-list"></div>
+              <div id="pres-ticket-note" class="hint"></div>
+            </div>
+            <div id="pres-own-fields">
             <h3>Preset candidates</h3>
             <div id="preset-leaders" class="preset-list"></div>
             <h3>Or create your own</h3>
@@ -85,6 +93,7 @@
               <label>Intelligence <em>ad efficiency &amp; poll accuracy</em></label>
               <input type="range" id="in-attr-intelligence" min="1" max="8" step="1">
               <span class="attr-val" id="val-attr-intelligence"></span>
+            </div>
             </div>
           </div>
           <div class="col">
@@ -126,12 +135,12 @@
       <div class="setup-panel" id="setup-step-1">
         <div class="cols">
           <div class="col">
-            <h3>Party identity</h3>
-            <label class="fld"><span>Party name</span>
+            <h3 id="party-identity-h">Party identity</h3>
+            <label class="fld"><span id="party-name-label">Party name</span>
               <input type="text" id="in-party-name" maxlength="40" value="National Renewal Movement">
             </label>
             <div class="row2">
-              <label class="fld"><span>Abbreviation</span>
+              <label class="fld"><span id="party-abbr-label">Abbreviation</span>
                 <input type="text" id="in-party-abbr" maxlength="6" value="NRM">
               </label>
               <div class="fld"><span>Party colour</span>
@@ -147,6 +156,10 @@
              <label class="fld"><span>Slogan</span>
                <input type="text" id="in-party-slogan" maxlength="48" value="Bulgaria, forward!">
              </label>
+             <div id="pres-vp-picker" style="display:none">
+               <h3>Running mate <em class="hint">vice-presidential candidate</em></h3>
+               <div id="pres-vp-list" class="preset-list"></div>
+             </div>
            </div>
            <div class="col">
              <h3>Banner workshop</h3>
@@ -358,7 +371,7 @@
         </div>
       </div>
       <div class="window-body">
-      <h2 class="election-title">ELECTION NIGHT</h2>
+      <h2 class="election-title" id="election-title">ELECTION NIGHT</h2>
       <div class="election-livebar"><span id="election-clock">08:00</span><span class="live-status" id="election-live">● LIVE</span><span id="election-step">COUNTING BEGINS</span></div>
       <div id="election-headline" class="election-headline">The first boxes are open. Every vote counts.</div>
       <div class="election-counters" aria-live="polite">
