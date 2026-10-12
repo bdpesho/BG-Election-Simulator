@@ -63,9 +63,8 @@ function decodePNG(file){
   return {W,H,bpp,px(x,y){const i=y*stride+x*bpp;return bpp===4?[out[i],out[i+1],out[i+2],out[i+3]]:[out[i],out[i+1],out[i+2],255];}};
 }
 
-const img=decodePNG(path.join(__dirname,"..","pixelart1.png"));
-const img2=decodePNG(path.join(__dirname,"..","pixelart2.png"));
-const imgC=decodePNG(path.join(__dirname,"..","ChatGPT Image Aug 28, 2026, 08_57_03 PM.png"));
+const img=decodePNG(path.join(__dirname,"..","art","pixelart1.png"));
+const img2=decodePNG(path.join(__dirname,"..","art","pixelart2.png"));
 
 // ---- crop region, flood-fill white bg transparent, downsample by f ----
 function slice(SRC,name,x0,y0,x1,y1,f,dir){
@@ -166,7 +165,4 @@ slice(img2,"booth",191,177,530,543,2);         // voting booth w/ tricolor curta
 slice(img2,"house",760,43,1419,543,2);         // traditional two-storey house
 slice(img2,"car",88,543,681,1013,2);           // beige sedan
 slice(img2,"cow",760,543,1326,1020,2);         // horned cow with bell
-// cursor set (sheet from the user): arrow, pointing hand, pinching hand
-slice(imgC,"cursor-arrow",69,423,298,800,8,"");
-slice(imgC,"cursor-hand",469,447,800,817,8,"");
-slice(imgC,"cursor-pinch",916,514,1234,830,8,"");
+// cursors are no longer sliced from art: see tools/gen-cursors.js
