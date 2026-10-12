@@ -88,5 +88,10 @@ for(let i=0;i<40;i++){const k=run("drawEvent()");const ev=run("EVENT_POOL["+k+"]
 run("S.eventQueue=[]");
 const q=run("(function(){S.paused=false;const before=S.pres.newsUsed.length;for(let i=0;i<20;i++){S.eventQueue=[];maybeEvents();document.getElementById('modal-root').innerHTML='';S.paused=false;}return S.pres.newsUsed.length-before})()");
 check("weekly news draws use fresh headlines",q>=0);
+// ---------- migration axis: data matches the labels (low = Open Borders, high = Restrictive) ----------
+const mig=JSON.parse(run(`JSON.stringify({lo:ISSUE_BY_ID.migration.lo,hi:ISSUE_BY_ID.migration.hi,yambol:DIST_BY_ID.yambol.ideal.migration,sofia:DIST_BY_ID["sofia-city"].ideal.migration,vaz:PARL_PARTIES.find(p=>p.id==="vaz").pos.migration,ppdb:PARL_PARTIES.find(p=>p.id==="ppdb").pos.migration,kost:PRES_TICKET_BY_ID.kostadinov.pos.migration})`));
+check("migration labels run Open Borders -> Restrictive",mig.lo==="Open Borders"&&mig.hi==="Restrictive");
+check("nationalist districts want a more restrictive policy than Sofia",mig.yambol>mig.sofia);
+check("Vazrazhdane sits on the restrictive side",mig.vaz>.8&&mig.vaz>mig.ppdb&&mig.kost>.8);
 check("no uncaught page errors",!(w.__errs&&w.__errs.length));
 done();
