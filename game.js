@@ -1844,7 +1844,11 @@ function resumeFromState(){
     }
     showScreen("game");buildMap();updateAll();
   }
-  else if(S.phase==="election"){renderElectionScreen();showScreen("election");}
+  else if(S.phase==="election"){
+    renderElectionScreen();showScreen("election");
+    // the save was made mid-count: keep counting instead of freezing on a partial result
+    if(S.electionNight&&S.electionNight.progress<1){electionNightTimers.forEach(id=>clearTimeout(id));electionNightTimers=[setTimeout(advanceElectionNight,250)];}
+  }
   else if(S.phase==="coalition"){renderCoalition();showScreen("coalition");}
   else if(S.phase==="review"){
     if(!S.termReport&&S.termHistory.length)S.termReport=S.termHistory[S.termHistory.length-1].lines;
@@ -2625,8 +2629,12 @@ function musicStop(){
 function musicTick(){
   if(!music)return;
   const ctx=music.ctx,def=MUSIC_TRACKS[music.track];
-  if(!ctx||ctx.state!=="running"){music.nextTime=ctx.currentTime+0.06;return;}
+  if(!ctx)return;
+  if(ctx.state!=="running"){music.nextTime=ctx.currentTime+0.06;return;}
   const spb=60/def.bpm/4;
+  // background tabs throttle the timer to ~1s; skip the missed steps instead of
+  // firing them all at once as a burst of stacked notes
+  if(music.nextTime<ctx.currentTime-0.1)music.nextTime=ctx.currentTime+0.05;
   while(music.nextTime<ctx.currentTime+0.25){
     const s=music.step%def.steps,at=music.nextTime;
     for(const ch of[def.melody,def.bass,def.hat]){
@@ -3632,6 +3640,10 @@ function runElection(){
   }
   S.results={votes:votes,natShare:natShare,qualified:qualified,seats:seats,totalVotes:total,turnout:turnout,turnouts:turnouts,turnoutMode:turnoutMode,districts:dvAll.map(item=>({id:item.d.id,shares:item.shares,votes:item.dv,turnout:item.turnout,totalVotes:item.totalVotes}))};
   startElectionNight();
+  // Save the result now. The last save was made mid-way through the final End Week (week 21,
+  // still "campaign"), so closing the tab during election night used to bring the player back
+  // to a week-21 campaign that re-ran the last turn and re-rolled the election.
+  saveGame();
 }
 
 const ELECTION_NIGHT_TIMES=["08:00","10:00","12:00","14:00","16:00","20:00"];
@@ -3734,7 +3746,7 @@ function renderElectionMap(initial){
   // The geometry is visible from the opening frame. Only the colors wait for
   // the first count, so the map never appears to be drawing itself in.
   DISTRICTS.forEach(d=>{const node=svg.querySelector('.election-region[data-id="'+d.id+'"]');if(!node)return;const shown=progress>0,item=results[d.id];
-    if(shown){const p=partyOf(electionNightLeader(item,progress,byId[d.id].order)),old=node.dataset.party||"";node.classList.add("revealed");node.classList.remove("unrevealed");node.style.fill=p?p.color:"#c5cbd1";if(old!==p.id){node.classList.remove("leader-change");void node.offsetWidth;node.classList.add("leader-change");}node.dataset.party=p?p.id:"";node.querySelector("title").textContent=d.name+(p?" — "+p.abbr:" — counting");}
+    if(shown){const p=partyOf(electionNightLeader(item,progress,byId[d.id].order)),old=node.dataset.party||"";node.classList.add("revealed");node.classList.remove("unrevealed");node.style.fill=p?p.color:"#c5cbd1";if(p&&old!==p.id){node.classList.remove("leader-change");void node.offsetWidth;node.classList.add("leader-change");}node.dataset.party=p?p.id:"";node.querySelector("title").textContent=d.name+(p?" — "+p.abbr:" — counting");}
   });
 }
 function ensureElectionChart(){
@@ -3773,6 +3785,9 @@ function advanceElectionNight(){
 }
 function startElectionNight(){
   electionNightTimers.forEach(id=>clearTimeout(id));electionNightTimers=[];
+  // a later term runs a new election in the same page: rebuild the results chart and the
+  // district map (and their tooltips) instead of reusing the previous election's DOM
+  if(typeof document!=="undefined"){["election-results","election-map"].forEach(id=>{const el=$(id);if(el)delete el.dataset.ready;});}
   S.electionNight={progress:0,elapsed:0,step:0,tick:0,revealed:[]};renderElectionScreen();showScreen("election");
   if(typeof window==="undefined")finishElectionNight();else electionNightTimers.push(setTimeout(advanceElectionNight,250));
 }
