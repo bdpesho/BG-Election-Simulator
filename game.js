@@ -22,35 +22,35 @@ ISSUE_POOL.forEach(i=>ISSUE_BY_ID[i.id]=i);
 const MINISTRIES=["Finance","Interior","Foreign Affairs","Justice","Energy","Health","Education","Defence","Agriculture","Transport","Economy","Culture","Environment","Labour & Social Policy","Tourism","Digital Governance"];
 
 const DISTRICTS=[
-  {id:"sofia-city",name:"Sofia City",short:"Sofia City",bg:"София (град)",seats:40,x:176,y:314,w:{"euro":0.28,"corruption":0.28,"energy":0.1,"judiciary":0.22,"pensions":0.07,"healthcare":0.12,"defense":0.04,"rural":0.03,"migration":0.1},ideal:{"euro":0.9,"corruption":0.85,"energy":0.45,"judiciary":0.85,"pensions":0.45,"healthcare":0.75,"defense":0.45,"rural":0.15,"migration":0.7},ent:1.08,lean:{"ppdb":0.16,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.95,"turkish":0.005,"roma":0.015},geo:{"proEU":0.92,"proRussia":0.15,"proNATO":0.9,"proUS":0.8,"nationalism":0.3,"urbanization":0.97},tb:0.524},
-  {id:"sofia-obl",name:"Sofia Oblast",short:"Sofia Prov.",bg:"Софийска област",seats:9,x:245,y:296,w:{"euro":0.18,"corruption":0.18,"energy":0.22,"judiciary":0.14,"pensions":0.14,"healthcare":0.14,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.68,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.6,"healthcare":0.7,"defense":0.58,"rural":0.7,"migration":0.55},ent:0.92,lean:{"ppdb":0.08,"gerb":0.12,"pb":0.1},eth:{"bulgarian":0.9,"turkish":0.015,"roma":0.05},geo:{"proEU":0.68,"proRussia":0.35,"proNATO":0.65,"proUS":0.6,"nationalism":0.48,"urbanization":0.55},tb:0.56},
-  {id:"plovdiv-city",name:"Plovdiv-Grad",short:"Plovdiv",bg:"Пловдив (град)",seats:17,x:397,y:390,w:{"euro":0.27,"corruption":0.26,"energy":0.14,"judiciary":0.2,"pensions":0.08,"healthcare":0.13,"defense":0.04,"rural":0.04,"migration":0.1},ideal:{"euro":0.8,"corruption":0.75,"energy":0.5,"judiciary":0.7,"pensions":0.5,"healthcare":0.75,"defense":0.48,"rural":0.2,"migration":0.62},ent:1.05,lean:{"ppdb":0.12,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.035},geo:{"proEU":0.85,"proRussia":0.25,"proNATO":0.82,"proUS":0.75,"nationalism":0.35,"urbanization":0.85},tb:0.522},
+  {id:"sofia-city",name:"Sofia City",short:"Sofia City",bg:"София (град)",seats:40,x:176,y:314,w:{"euro":0.28,"corruption":0.28,"energy":0.1,"judiciary":0.22,"pensions":0.07,"healthcare":0.12,"defense":0.04,"rural":0.03,"migration":0.1},ideal:{"euro":0.9,"corruption":0.85,"energy":0.45,"judiciary":0.85,"pensions":0.45,"healthcare":0.75,"defense":0.45,"rural":0.15,"migration":0.3},ent:1.08,lean:{"ppdb":0.16,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.95,"turkish":0.005,"roma":0.015},geo:{"proEU":0.92,"proRussia":0.15,"proNATO":0.9,"proUS":0.8,"nationalism":0.3,"urbanization":0.97},tb:0.524},
+  {id:"sofia-obl",name:"Sofia Oblast",short:"Sofia Prov.",bg:"Софийска област",seats:9,x:245,y:296,w:{"euro":0.18,"corruption":0.18,"energy":0.22,"judiciary":0.14,"pensions":0.14,"healthcare":0.14,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.68,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.6,"healthcare":0.7,"defense":0.58,"rural":0.7,"migration":0.45},ent:0.92,lean:{"ppdb":0.08,"gerb":0.12,"pb":0.1},eth:{"bulgarian":0.9,"turkish":0.015,"roma":0.05},geo:{"proEU":0.68,"proRussia":0.35,"proNATO":0.65,"proUS":0.6,"nationalism":0.48,"urbanization":0.55},tb:0.56},
+  {id:"plovdiv-city",name:"Plovdiv-Grad",short:"Plovdiv",bg:"Пловдив (град)",seats:17,x:397,y:390,w:{"euro":0.27,"corruption":0.26,"energy":0.14,"judiciary":0.2,"pensions":0.08,"healthcare":0.13,"defense":0.04,"rural":0.04,"migration":0.1},ideal:{"euro":0.8,"corruption":0.75,"energy":0.5,"judiciary":0.7,"pensions":0.5,"healthcare":0.75,"defense":0.48,"rural":0.2,"migration":0.38},ent:1.05,lean:{"ppdb":0.12,"pb":0.12,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.035},geo:{"proEU":0.85,"proRussia":0.25,"proNATO":0.82,"proUS":0.75,"nationalism":0.35,"urbanization":0.85},tb:0.522},
   {id:"plovdiv-obl",name:"Plovdiv Oblast",short:"Plovdiv Prov.",bg:"Пловдивска област",seats:10,x:398,y:351,w:{"euro":0.18,"corruption":0.16,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.13,"defense":0.08,"rural":0.24,"migration":0.1},ideal:{"euro":0.62,"corruption":0.52,"energy":0.7,"judiciary":0.47,"pensions":0.65,"healthcare":0.72,"defense":0.62,"rural":0.75,"migration":0.5},ent:0.88,lean:{"gerb":0.1,"pb":0.08,"dps":0.06},eth:{"bulgarian":0.82,"turkish":0.1,"roma":0.04},geo:{"proEU":0.62,"proRussia":0.42,"proNATO":0.6,"proUS":0.55,"nationalism":0.55,"urbanization":0.5},tb:0.481},
-  {id:"varna",name:"Varna",short:"Varna",bg:"Варна",seats:13,x:866,y:238,w:{"euro":0.3,"corruption":0.26,"energy":0.12,"judiciary":0.18,"pensions":0.07,"healthcare":0.14,"defense":0.05,"rural":0.04,"migration":0.1},ideal:{"euro":0.85,"corruption":0.78,"energy":0.55,"judiciary":0.68,"pensions":0.48,"healthcare":0.75,"defense":0.5,"rural":0.25,"migration":0.65},ent:1.04,lean:{"ppdb":0.12,"pb":0.1,"gerb":0.06},eth:{"bulgarian":0.86,"turkish":0.07,"roma":0.03},geo:{"proEU":0.88,"proRussia":0.25,"proNATO":0.85,"proUS":0.78,"nationalism":0.4,"urbanization":0.88},tb:0.509},
-  {id:"burgas",name:"Burgas",short:"Burgas",bg:"Бургас",seats:11,x:799,y:343,w:{"euro":0.22,"corruption":0.2,"energy":0.2,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.13,"rural":0.1,"migration":0.12},ideal:{"euro":0.75,"corruption":0.65,"energy":0.62,"judiciary":0.55,"pensions":0.58,"healthcare":0.7,"defense":0.7,"rural":0.35,"migration":0.55},ent:0.98,lean:{"pb":0.1,"gerb":0.08,"dps":0.08},eth:{"bulgarian":0.74,"turkish":0.13,"roma":0.04},geo:{"proEU":0.8,"proRussia":0.35,"proNATO":0.78,"proUS":0.7,"nationalism":0.5,"urbanization":0.8},tb:0.5},
-  {id:"blagoevgrad",name:"Blagoevgrad",short:"Blagoevgrad",bg:"Благоевград",seats:8,x:143,y:416,w:{"euro":0.18,"corruption":0.16,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.12,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.72,"judiciary":0.48,"pensions":0.62,"healthcare":0.68,"defense":0.7,"rural":0.72,"migration":0.48},ent:0.9,lean:{"gerb":0.08,"pb":0.08,"dps":0.05},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.03},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.58,"proUS":0.52,"nationalism":0.55,"urbanization":0.68},tb:0.488},
-  {id:"stara-zagora",name:"Stara Zagora",short:"Stara Zagora",bg:"Стара Загора",seats:9,x:523,y:353,w:{"euro":0.15,"corruption":0.16,"energy":0.34,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.07,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.85,"judiciary":0.48,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.62,"migration":0.45},ent:0.92,lean:{"bsp":0.16,"pb":0.08,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.03,"roma":0.06},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.75},tb:0.511},
-  {id:"pleven",name:"Pleven",short:"Pleven",bg:"Плевен",seats:9,x:371,y:207,w:{"euro":0.18,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.16,"healthcare":0.13,"defense":0.07,"rural":0.2,"migration":0.1},ideal:{"euro":0.62,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.72,"migration":0.45},ent:0.88,lean:{"bsp":0.12,"gerb":0.08,"pb":0.05},eth:{"bulgarian":0.88,"turkish":0.06,"roma":0.04},geo:{"proEU":0.62,"proRussia":0.42,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.7},tb:0.474},
-  {id:"ruse",name:"Ruse",short:"Ruse",bg:"Русе",seats:9,x:572,y:140,w:{"euro":0.22,"corruption":0.2,"energy":0.18,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.17,"rural":0.1,"migration":0.12},ideal:{"euro":0.78,"corruption":0.65,"energy":0.55,"judiciary":0.58,"pensions":0.62,"healthcare":0.7,"defense":0.75,"rural":0.52,"migration":0.58},ent:0.95,lean:{"gerb":0.1,"pb":0.08,"dps":0.06},eth:{"bulgarian":0.83,"turkish":0.07,"roma":0.05},geo:{"proEU":0.82,"proRussia":0.4,"proNATO":0.75,"proUS":0.68,"nationalism":0.55,"urbanization":0.78},tb:0.459},
+  {id:"varna",name:"Varna",short:"Varna",bg:"Варна",seats:13,x:866,y:238,w:{"euro":0.3,"corruption":0.26,"energy":0.12,"judiciary":0.18,"pensions":0.07,"healthcare":0.14,"defense":0.05,"rural":0.04,"migration":0.1},ideal:{"euro":0.85,"corruption":0.78,"energy":0.55,"judiciary":0.68,"pensions":0.48,"healthcare":0.75,"defense":0.5,"rural":0.25,"migration":0.35},ent:1.04,lean:{"ppdb":0.12,"pb":0.1,"gerb":0.06},eth:{"bulgarian":0.86,"turkish":0.07,"roma":0.03},geo:{"proEU":0.88,"proRussia":0.25,"proNATO":0.85,"proUS":0.78,"nationalism":0.4,"urbanization":0.88},tb:0.509},
+  {id:"burgas",name:"Burgas",short:"Burgas",bg:"Бургас",seats:11,x:799,y:343,w:{"euro":0.22,"corruption":0.2,"energy":0.2,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.13,"rural":0.1,"migration":0.12},ideal:{"euro":0.75,"corruption":0.65,"energy":0.62,"judiciary":0.55,"pensions":0.58,"healthcare":0.7,"defense":0.7,"rural":0.35,"migration":0.45},ent:0.98,lean:{"pb":0.1,"gerb":0.08,"dps":0.08},eth:{"bulgarian":0.74,"turkish":0.13,"roma":0.04},geo:{"proEU":0.8,"proRussia":0.35,"proNATO":0.78,"proUS":0.7,"nationalism":0.5,"urbanization":0.8},tb:0.5},
+  {id:"blagoevgrad",name:"Blagoevgrad",short:"Blagoevgrad",bg:"Благоевград",seats:8,x:143,y:416,w:{"euro":0.18,"corruption":0.16,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.12,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.72,"judiciary":0.48,"pensions":0.62,"healthcare":0.68,"defense":0.7,"rural":0.72,"migration":0.52},ent:0.9,lean:{"gerb":0.08,"pb":0.08,"dps":0.05},eth:{"bulgarian":0.88,"turkish":0.05,"roma":0.03},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.58,"proUS":0.52,"nationalism":0.55,"urbanization":0.68},tb:0.488},
+  {id:"stara-zagora",name:"Stara Zagora",short:"Stara Zagora",bg:"Стара Загора",seats:9,x:523,y:353,w:{"euro":0.15,"corruption":0.16,"energy":0.34,"judiciary":0.14,"pensions":0.13,"healthcare":0.13,"defense":0.07,"rural":0.16,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.85,"judiciary":0.48,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.62,"migration":0.55},ent:0.92,lean:{"bsp":0.16,"pb":0.08,"gerb":0.06},eth:{"bulgarian":0.88,"turkish":0.03,"roma":0.06},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.75},tb:0.511},
+  {id:"pleven",name:"Pleven",short:"Pleven",bg:"Плевен",seats:9,x:371,y:207,w:{"euro":0.18,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.16,"healthcare":0.13,"defense":0.07,"rural":0.2,"migration":0.1},ideal:{"euro":0.62,"corruption":0.58,"energy":0.62,"judiciary":0.52,"pensions":0.72,"healthcare":0.72,"defense":0.58,"rural":0.72,"migration":0.55},ent:0.88,lean:{"bsp":0.12,"gerb":0.08,"pb":0.05},eth:{"bulgarian":0.88,"turkish":0.06,"roma":0.04},geo:{"proEU":0.62,"proRussia":0.42,"proNATO":0.55,"proUS":0.5,"nationalism":0.55,"urbanization":0.7},tb:0.474},
+  {id:"ruse",name:"Ruse",short:"Ruse",bg:"Русе",seats:9,x:572,y:140,w:{"euro":0.22,"corruption":0.2,"energy":0.18,"judiciary":0.14,"pensions":0.12,"healthcare":0.13,"defense":0.17,"rural":0.1,"migration":0.12},ideal:{"euro":0.78,"corruption":0.65,"energy":0.55,"judiciary":0.58,"pensions":0.62,"healthcare":0.7,"defense":0.75,"rural":0.52,"migration":0.42},ent:0.95,lean:{"gerb":0.1,"pb":0.08,"dps":0.06},eth:{"bulgarian":0.83,"turkish":0.07,"roma":0.05},geo:{"proEU":0.82,"proRussia":0.4,"proNATO":0.75,"proUS":0.68,"nationalism":0.55,"urbanization":0.78},tb:0.459},
   {id:"velikotarnovo",name:"Veliko Tarnovo",short:"V. Tarnovo",bg:"Велико Търново",seats:8,x:523,y:257,w:{"euro":0.18,"corruption":0.18,"energy":0.2,"judiciary":0.16,"pensions":0.14,"healthcare":0.13,"defense":0.09,"rural":0.16,"migration":0.1},ideal:{"euro":0.68,"corruption":0.62,"energy":0.58,"judiciary":0.6,"pensions":0.7,"healthcare":0.7,"defense":0.58,"rural":0.68,"migration":0.5},ent:0.9,lean:{"gerb":0.08,"bsp":0.08,"pb":0.06},eth:{"bulgarian":0.86,"turkish":0.04,"roma":0.04},geo:{"proEU":0.7,"proRussia":0.4,"proNATO":0.65,"proUS":0.6,"nationalism":0.52,"urbanization":0.72},tb:0.498},
-  {id:"pazardzhik",name:"Pazardzhik",short:"Pazardzhik",bg:"Пазарджик",seats:8,x:328,y:388,w:{"euro":0.15,"corruption":0.16,"energy":0.3,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.18,"migration":0.14},ideal:{"euro":0.58,"corruption":0.52,"energy":0.75,"judiciary":0.48,"pensions":0.68,"healthcare":0.7,"defense":0.62,"rural":0.72,"migration":0.45},ent:0.86,lean:{"dps":0.1,"bsp":0.08,"pb":0.06},eth:{"bulgarian":0.8,"turkish":0.08,"roma":0.07},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.52,"proUS":0.48,"nationalism":0.55,"urbanization":0.62},tb:0.46},
-  {id:"haskovo",name:"Haskovo",short:"Haskovo",bg:"Хасково",seats:7,x:512,y:428,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.12,"healthcare":0.12,"defense":0.1,"rural":0.16,"migration":0.15},ideal:{"euro":0.6,"corruption":0.55,"energy":0.72,"judiciary":0.5,"pensions":0.68,"healthcare":0.7,"defense":0.65,"rural":0.72,"migration":0.45},ent:0.88,lean:{"dps":0.1,"bsp":0.08,"gerb":0.06},eth:{"bulgarian":0.74,"turkish":0.19,"roma":0.03},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.5,"proUS":0.45,"nationalism":0.55,"urbanization":0.6},tb:0.493},
-  {id:"shumen",name:"Shumen",short:"Shumen",bg:"Шумен",seats:7,x:718,y:228,w:{"euro":0.14,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.09,"rural":0.22,"migration":0.14},ideal:{"euro":0.55,"corruption":0.48,"energy":0.75,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.48},ent:0.84,lean:{"dps":0.12,"aps":0.07,"vaz":0.08},eth:{"bulgarian":0.61,"turkish":0.29,"roma":0.04},geo:{"proEU":0.55,"proRussia":0.5,"proNATO":0.48,"proUS":0.44,"nationalism":0.62,"urbanization":0.62},tb:0.385},
-  {id:"sliven",name:"Sliven",short:"Sliven",bg:"Сливен",seats:7,x:627,y:316,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.48,"corruption":0.48,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.35},ent:0.84,lean:{"vaz":0.16,"velichie":0.07,"bsp":0.08},eth:{"bulgarian":0.74,"turkish":0.07,"roma":0.13},geo:{"proEU":0.48,"proRussia":0.58,"proNATO":0.42,"proUS":0.38,"nationalism":0.72,"urbanization":0.65},tb:0.398},
-  {id:"dobrich",name:"Dobrich",short:"Dobrich",bg:"Добрич",seats:7,x:853,y:183,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.12},ideal:{"euro":0.55,"corruption":0.52,"energy":0.72,"judiciary":0.48,"pensions":0.72,"healthcare":0.68,"defense":0.62,"rural":0.85,"migration":0.45},ent:0.84,lean:{"bsp":0.1,"gerb":0.08,"dps":0.06},eth:{"bulgarian":0.76,"turkish":0.11,"roma":0.06},geo:{"proEU":0.62,"proRussia":0.48,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.68},tb:0.404},
-  {id:"vratsa",name:"Vratsa",short:"Vratsa",bg:"Враца",seats:6,x:212,y:237,w:{"euro":0.14,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.1},ideal:{"euro":0.5,"corruption":0.55,"energy":0.68,"judiciary":0.48,"pensions":0.78,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.4},ent:0.8,lean:{"bsp":0.14,"gerb":0.06,"vaz":0.05},eth:{"bulgarian":0.83,"turkish":0.01,"roma":0.1},geo:{"proEU":0.52,"proRussia":0.52,"proNATO":0.48,"proUS":0.44,"nationalism":0.6,"urbanization":0.58},tb:0.53},
-  {id:"montana",name:"Montana",short:"Montana",bg:"Монтана",seats:6,x:162,y:206,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.24,"migration":0.1},ideal:{"euro":0.48,"corruption":0.52,"energy":0.75,"judiciary":0.42,"pensions":0.8,"healthcare":0.72,"defense":0.58,"rural":0.88,"migration":0.4},ent:0.78,lean:{"bsp":0.16,"vaz":0.06},eth:{"bulgarian":0.8,"turkish":0.02,"roma":0.11},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.58},tb:0.521},
-  {id:"kyustendil",name:"Kyustendil",short:"Kyustendil",bg:"Кюстендил",seats:5,x:81,y:376,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.11,"rural":0.18,"migration":0.1},ideal:{"euro":0.55,"corruption":0.52,"energy":0.8,"judiciary":0.48,"pensions":0.75,"healthcare":0.7,"defense":0.65,"rural":0.78,"migration":0.45},ent:0.82,lean:{"gerb":0.08,"bsp":0.08,"vaz":0.06},eth:{"bulgarian":0.88,"turkish":0.005,"roma":0.08},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.65},tb:0.442},
-  {id:"pernik",name:"Pernik",short:"Pernik",bg:"Перник",seats:5,x:133,y:328,w:{"euro":0.14,"corruption":0.18,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.55,"corruption":0.55,"energy":0.78,"judiciary":0.48,"pensions":0.75,"healthcare":0.68,"defense":0.6,"rural":0.75,"migration":0.45},ent:0.84,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.9,"turkish":0.01,"roma":0.04},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.52,"proUS":0.48,"nationalism":0.58,"urbanization":0.7},tb:0.544},
-  {id:"lovech",name:"Lovech",short:"Lovech",bg:"Ловеч",seats:5,x:386,y:248,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.17,"healthcare":0.13,"defense":0.08,"rural":0.22,"migration":0.1},ideal:{"euro":0.58,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.75,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.4},ent:0.84,lean:{"bsp":0.1,"gerb":0.08},eth:{"bulgarian":0.84,"turkish":0.03,"roma":0.1},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.58,"proUS":0.52,"nationalism":0.52,"urbanization":0.58},tb:0.491},
+  {id:"pazardzhik",name:"Pazardzhik",short:"Pazardzhik",bg:"Пазарджик",seats:8,x:328,y:388,w:{"euro":0.15,"corruption":0.16,"energy":0.3,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.18,"migration":0.14},ideal:{"euro":0.58,"corruption":0.52,"energy":0.75,"judiciary":0.48,"pensions":0.68,"healthcare":0.7,"defense":0.62,"rural":0.72,"migration":0.55},ent:0.86,lean:{"dps":0.1,"bsp":0.08,"pb":0.06},eth:{"bulgarian":0.8,"turkish":0.08,"roma":0.07},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.52,"proUS":0.48,"nationalism":0.55,"urbanization":0.62},tb:0.46},
+  {id:"haskovo",name:"Haskovo",short:"Haskovo",bg:"Хасково",seats:7,x:512,y:428,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.12,"healthcare":0.12,"defense":0.1,"rural":0.16,"migration":0.15},ideal:{"euro":0.6,"corruption":0.55,"energy":0.72,"judiciary":0.5,"pensions":0.68,"healthcare":0.7,"defense":0.65,"rural":0.72,"migration":0.55},ent:0.88,lean:{"dps":0.1,"bsp":0.08,"gerb":0.06},eth:{"bulgarian":0.74,"turkish":0.19,"roma":0.03},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.5,"proUS":0.45,"nationalism":0.55,"urbanization":0.6},tb:0.493},
+  {id:"shumen",name:"Shumen",short:"Shumen",bg:"Шумен",seats:7,x:718,y:228,w:{"euro":0.14,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.09,"rural":0.22,"migration":0.14},ideal:{"euro":0.55,"corruption":0.48,"energy":0.75,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.52},ent:0.84,lean:{"dps":0.12,"aps":0.07,"vaz":0.08},eth:{"bulgarian":0.61,"turkish":0.29,"roma":0.04},geo:{"proEU":0.55,"proRussia":0.5,"proNATO":0.48,"proUS":0.44,"nationalism":0.62,"urbanization":0.62},tb:0.385},
+  {id:"sliven",name:"Sliven",short:"Sliven",bg:"Сливен",seats:7,x:627,y:316,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.48,"corruption":0.48,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.72,"migration":0.65},ent:0.84,lean:{"vaz":0.16,"velichie":0.07,"bsp":0.08},eth:{"bulgarian":0.74,"turkish":0.07,"roma":0.13},geo:{"proEU":0.48,"proRussia":0.58,"proNATO":0.42,"proUS":0.38,"nationalism":0.72,"urbanization":0.65},tb:0.398},
+  {id:"dobrich",name:"Dobrich",short:"Dobrich",bg:"Добрич",seats:7,x:853,y:183,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.12},ideal:{"euro":0.55,"corruption":0.52,"energy":0.72,"judiciary":0.48,"pensions":0.72,"healthcare":0.68,"defense":0.62,"rural":0.85,"migration":0.55},ent:0.84,lean:{"bsp":0.1,"gerb":0.08,"dps":0.06},eth:{"bulgarian":0.76,"turkish":0.11,"roma":0.06},geo:{"proEU":0.62,"proRussia":0.48,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.68},tb:0.404},
+  {id:"vratsa",name:"Vratsa",short:"Vratsa",bg:"Враца",seats:6,x:212,y:237,w:{"euro":0.14,"corruption":0.18,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.22,"migration":0.1},ideal:{"euro":0.5,"corruption":0.55,"energy":0.68,"judiciary":0.48,"pensions":0.78,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.6},ent:0.8,lean:{"bsp":0.14,"gerb":0.06,"vaz":0.05},eth:{"bulgarian":0.83,"turkish":0.01,"roma":0.1},geo:{"proEU":0.52,"proRussia":0.52,"proNATO":0.48,"proUS":0.44,"nationalism":0.6,"urbanization":0.58},tb:0.53},
+  {id:"montana",name:"Montana",short:"Montana",bg:"Монтана",seats:6,x:162,y:206,w:{"euro":0.14,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.07,"rural":0.24,"migration":0.1},ideal:{"euro":0.48,"corruption":0.52,"energy":0.75,"judiciary":0.42,"pensions":0.8,"healthcare":0.72,"defense":0.58,"rural":0.88,"migration":0.6},ent:0.78,lean:{"bsp":0.16,"vaz":0.06},eth:{"bulgarian":0.8,"turkish":0.02,"roma":0.11},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.58},tb:0.521},
+  {id:"kyustendil",name:"Kyustendil",short:"Kyustendil",bg:"Кюстендил",seats:5,x:81,y:376,w:{"euro":0.17,"corruption":0.16,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.11,"rural":0.18,"migration":0.1},ideal:{"euro":0.55,"corruption":0.52,"energy":0.8,"judiciary":0.48,"pensions":0.75,"healthcare":0.7,"defense":0.65,"rural":0.78,"migration":0.55},ent:0.82,lean:{"gerb":0.08,"bsp":0.08,"vaz":0.06},eth:{"bulgarian":0.88,"turkish":0.005,"roma":0.08},geo:{"proEU":0.6,"proRussia":0.45,"proNATO":0.55,"proUS":0.5,"nationalism":0.58,"urbanization":0.65},tb:0.442},
+  {id:"pernik",name:"Pernik",short:"Pernik",bg:"Перник",seats:5,x:133,y:328,w:{"euro":0.14,"corruption":0.18,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.1},ideal:{"euro":0.55,"corruption":0.55,"energy":0.78,"judiciary":0.48,"pensions":0.75,"healthcare":0.68,"defense":0.6,"rural":0.75,"migration":0.55},ent:0.84,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.9,"turkish":0.01,"roma":0.04},geo:{"proEU":0.58,"proRussia":0.45,"proNATO":0.52,"proUS":0.48,"nationalism":0.58,"urbanization":0.7},tb:0.544},
+  {id:"lovech",name:"Lovech",short:"Lovech",bg:"Ловеч",seats:5,x:386,y:248,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.17,"healthcare":0.13,"defense":0.08,"rural":0.22,"migration":0.1},ideal:{"euro":0.58,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.75,"healthcare":0.72,"defense":0.58,"rural":0.82,"migration":0.6},ent:0.84,lean:{"bsp":0.1,"gerb":0.08},eth:{"bulgarian":0.84,"turkish":0.03,"roma":0.1},geo:{"proEU":0.6,"proRussia":0.42,"proNATO":0.58,"proUS":0.52,"nationalism":0.52,"urbanization":0.58},tb:0.491},
   {id:"gabrovo",name:"Gabrovo",short:"Gabrovo",bg:"Габрово",seats:5,x:478,y:287,w:{"euro":0.19,"corruption":0.19,"energy":0.18,"judiciary":0.17,"pensions":0.13,"healthcare":0.13,"defense":0.08,"rural":0.18,"migration":0.1},ideal:{"euro":0.7,"corruption":0.62,"energy":0.58,"judiciary":0.58,"pensions":0.68,"healthcare":0.7,"defense":0.6,"rural":0.68,"migration":0.5},ent:0.88,lean:{"gerb":0.08,"ppdb":0.06},eth:{"bulgarian":0.91,"turkish":0.03,"roma":0.04},geo:{"proEU":0.75,"proRussia":0.38,"proNATO":0.7,"proUS":0.65,"nationalism":0.55,"urbanization":0.7},tb:0.487},
-  {id:"kardzhali",name:"Kardzhali",short:"Kardzhali",bg:"Кърджали",seats:5,x:484,y:473,w:{"euro":0.12,"corruption":0.12,"energy":0.36,"judiciary":0.14,"pensions":0.08,"healthcare":0.12,"defense":0.06,"rural":0.2,"migration":0.22},ideal:{"euro":0.6,"corruption":0.45,"energy":0.85,"judiciary":0.42,"pensions":0.62,"healthcare":0.7,"defense":0.48,"rural":0.82,"migration":0.55},ent:0.9,lean:{"dps":0.34,"aps":0.2},eth:{"bulgarian":0.26,"turkish":0.66,"roma":0.02},geo:{"proEU":0.62,"proRussia":0.4,"proNATO":0.48,"proUS":0.45,"nationalism":0.45,"urbanization":0.55},tb:0.298},
-  {id:"yambol",name:"Yambol",short:"Yambol",bg:"Ямбол",seats:4,x:652,y:346,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.45,"corruption":0.45,"energy":0.78,"judiciary":0.4,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.75,"migration":0.35},ent:0.8,lean:{"vaz":0.14,"velichie":0.06,"bsp":0.08},eth:{"bulgarian":0.85,"turkish":0.05,"roma":0.07},geo:{"proEU":0.45,"proRussia":0.6,"proNATO":0.42,"proUS":0.38,"nationalism":0.74,"urbanization":0.62},tb:0.483},
+  {id:"kardzhali",name:"Kardzhali",short:"Kardzhali",bg:"Кърджали",seats:5,x:484,y:473,w:{"euro":0.12,"corruption":0.12,"energy":0.36,"judiciary":0.14,"pensions":0.08,"healthcare":0.12,"defense":0.06,"rural":0.2,"migration":0.22},ideal:{"euro":0.6,"corruption":0.45,"energy":0.85,"judiciary":0.42,"pensions":0.62,"healthcare":0.7,"defense":0.48,"rural":0.82,"migration":0.45},ent:0.9,lean:{"dps":0.34,"aps":0.2},eth:{"bulgarian":0.26,"turkish":0.66,"roma":0.02},geo:{"proEU":0.62,"proRussia":0.4,"proNATO":0.48,"proUS":0.45,"nationalism":0.45,"urbanization":0.55},tb:0.298},
+  {id:"yambol",name:"Yambol",short:"Yambol",bg:"Ямбол",seats:4,x:652,y:346,w:{"euro":0.14,"corruption":0.15,"energy":0.28,"judiciary":0.14,"pensions":0.14,"healthcare":0.12,"defense":0.08,"rural":0.2,"migration":0.12},ideal:{"euro":0.45,"corruption":0.45,"energy":0.78,"judiciary":0.4,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.75,"migration":0.65},ent:0.8,lean:{"vaz":0.14,"velichie":0.06,"bsp":0.08},eth:{"bulgarian":0.85,"turkish":0.05,"roma":0.07},geo:{"proEU":0.45,"proRussia":0.6,"proNATO":0.42,"proUS":0.38,"nationalism":0.74,"urbanization":0.62},tb:0.483},
   {id:"targovishte",name:"Targovishte",short:"Targovishte",bg:"Търговище",seats:4,x:627,y:231,w:{"euro":0.13,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.22,"migration":0.18},ideal:{"euro":0.52,"corruption":0.45,"energy":0.75,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.6,"rural":0.8,"migration":0.5},ent:0.8,lean:{"dps":0.16,"aps":0.1},eth:{"bulgarian":0.53,"turkish":0.36,"roma":0.04},geo:{"proEU":0.55,"proRussia":0.5,"proNATO":0.48,"proUS":0.44,"nationalism":0.6,"urbanization":0.55},tb:0.414},
-  {id:"razgrad",name:"Razgrad",short:"Razgrad",bg:"Разград",seats:4,x:657,y:188,w:{"euro":0.13,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.22,"migration":0.18},ideal:{"euro":0.5,"corruption":0.45,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.8,"migration":0.52},ent:0.8,lean:{"dps":0.18,"aps":0.12},eth:{"bulgarian":0.41,"turkish":0.5,"roma":0.04},geo:{"proEU":0.52,"proRussia":0.55,"proNATO":0.45,"proUS":0.42,"nationalism":0.65,"urbanization":0.55},tb:0.369},
+  {id:"razgrad",name:"Razgrad",short:"Razgrad",bg:"Разград",seats:4,x:657,y:188,w:{"euro":0.13,"corruption":0.14,"energy":0.28,"judiciary":0.14,"pensions":0.13,"healthcare":0.12,"defense":0.08,"rural":0.22,"migration":0.18},ideal:{"euro":0.5,"corruption":0.45,"energy":0.78,"judiciary":0.42,"pensions":0.68,"healthcare":0.65,"defense":0.62,"rural":0.8,"migration":0.48},ent:0.8,lean:{"dps":0.18,"aps":0.12},eth:{"bulgarian":0.41,"turkish":0.5,"roma":0.04},geo:{"proEU":0.52,"proRussia":0.55,"proNATO":0.45,"proUS":0.42,"nationalism":0.65,"urbanization":0.55},tb:0.369},
   {id:"silistra",name:"Silistra",short:"Silistra",bg:"Силистра",seats:4,x:768,y:101,w:{"euro":0.13,"corruption":0.15,"energy":0.26,"judiciary":0.14,"pensions":0.17,"healthcare":0.12,"defense":0.11,"rural":0.22,"migration":0.14},ideal:{"euro":0.5,"corruption":0.5,"energy":0.75,"judiciary":0.45,"pensions":0.75,"healthcare":0.68,"defense":0.65,"rural":0.88,"migration":0.5},ent:0.78,lean:{"dps":0.1,"bsp":0.08,"vaz":0.06},eth:{"bulgarian":0.67,"turkish":0.21,"roma":0.05},geo:{"proEU":0.55,"proRussia":0.52,"proNATO":0.5,"proUS":0.45,"nationalism":0.6,"urbanization":0.55},tb:0.439},
-  {id:"smolyan",name:"Smolyan",short:"Smolyan",bg:"Смолян",seats:4,x:382,y:482,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.15,"healthcare":0.13,"defense":0.13,"rural":0.24,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.68,"healthcare":0.7,"defense":0.7,"rural":0.85,"migration":0.48},ent:0.82,lean:{"bsp":0.08,"gerb":0.06,"dps":0.06},eth:{"bulgarian":0.93,"turkish":0.05,"roma":0.015},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.6,"proUS":0.55,"nationalism":0.55,"urbanization":0.65},tb:0.555},
-  {id:"vidin",name:"Vidin",short:"Vidin",bg:"Видин",seats:4,x:109,y:120,w:{"euro":0.13,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.09,"rural":0.24,"migration":0.1},ideal:{"euro":0.45,"corruption":0.52,"energy":0.68,"judiciary":0.48,"pensions":0.82,"healthcare":0.72,"defense":0.62,"rural":0.9,"migration":0.4},ent:0.76,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.89,"turkish":0.01,"roma":0.07},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.6},tb:0.461}
+  {id:"smolyan",name:"Smolyan",short:"Smolyan",bg:"Смолян",seats:4,x:382,y:482,w:{"euro":0.17,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.15,"healthcare":0.13,"defense":0.13,"rural":0.24,"migration":0.1},ideal:{"euro":0.62,"corruption":0.55,"energy":0.62,"judiciary":0.52,"pensions":0.68,"healthcare":0.7,"defense":0.7,"rural":0.85,"migration":0.52},ent:0.82,lean:{"bsp":0.08,"gerb":0.06,"dps":0.06},eth:{"bulgarian":0.93,"turkish":0.05,"roma":0.015},geo:{"proEU":0.65,"proRussia":0.4,"proNATO":0.6,"proUS":0.55,"nationalism":0.55,"urbanization":0.65},tb:0.555},
+  {id:"vidin",name:"Vidin",short:"Vidin",bg:"Видин",seats:4,x:109,y:120,w:{"euro":0.13,"corruption":0.16,"energy":0.24,"judiciary":0.14,"pensions":0.18,"healthcare":0.12,"defense":0.09,"rural":0.24,"migration":0.1},ideal:{"euro":0.45,"corruption":0.52,"energy":0.68,"judiciary":0.48,"pensions":0.82,"healthcare":0.72,"defense":0.62,"rural":0.9,"migration":0.6},ent:0.76,lean:{"bsp":0.14,"vaz":0.06},eth:{"bulgarian":0.89,"turkish":0.01,"roma":0.07},geo:{"proEU":0.5,"proRussia":0.55,"proNATO":0.45,"proUS":0.4,"nationalism":0.62,"urbanization":0.6},tb:0.461}
 ];
 
 /* T15: geopolitical axes + demographics — derived so eth (census) stays the single source of truth.
@@ -68,16 +68,16 @@ const DIST_BY_ID={};
 DISTRICTS.forEach(d=>DIST_BY_ID[d.id]=d);
 
 const AI_PARTIES=[
-  {id:"gerb",name:"GERB",abbr:"GERB",color:"#0066b3",leader:"Boyko Borisov",ideo:"Center-right incumbent (GERB–SDS)",pos:{euro:.80,corruption:.45,energy:.50,judiciary:.40,pensions:.45,healthcare:.40,defense:.70,rural:.40,migration:.55},appeal:.86,favMinistry:"Finance",topIssue:"euro"},
-  {id:"pb",name:"Progresivna Balgariya",abbr:"PB",color:"#e67e22",leader:"Rumen Radev",ideo:"Centre-left populist, anti-oligarch",pos:{euro:.55,corruption:.85,energy:.75,judiciary:.70,pensions:.75,healthcare:.80,defense:.45,rural:.60,migration:.45},appeal:.92,mainRival:true,favMinistry:"Justice",topIssue:"corruption"},
-  {id:"ppdb",name:"Produlzhavame promyanata – Demokratichna Balgariya",abbr:"PP-DB",color:"#2fa84f",leader:"Assen Vassilev",ideo:"Reformist anti-corruption",pos:{euro:.90,corruption:.90,energy:.35,judiciary:.90,pensions:.50,healthcare:.65,defense:.55,rural:.45,migration:.50},appeal:.80,favMinistry:"Justice",topIssue:"corruption",focus:["sofia-city","sofia-obl","burgas","varna","plovdiv-city","plovdiv-obl"]},
-  {id:"dps",name:"Dvizhenie za prava i svobodi",abbr:"DPS",color:"#8e44ad",leader:"Delyan Peevski",ideo:"Minority interests",pos:{euro:.60,corruption:.35,energy:.75,judiciary:.40,pensions:.70,healthcare:.70,defense:.30,rural:.75,migration:.65},appeal:.60,favMinistry:"Agriculture",topIssue:"energy"},
-  {id:"vaz",name:"Vazrazhdane",abbr:"VRZ",color:"#e0a71e",leader:"Kostadin Kostadinov",ideo:"Nationalist, anti-EU",pos:{euro:.10,corruption:.60,energy:.60,judiciary:.30,pensions:.60,healthcare:.40,defense:.90,rural:.65,migration:.05},appeal:.56,favMinistry:"Interior",topIssue:"euro"},
-  {id:"bsp",name:"Bulgarska sotsialisticheska partiya – Obedinena levitsa",abbr:"BSP",color:"#e41e20",leader:"Krum Zarkov",ideo:"Socialist, centre-left",pos:{euro:.50,corruption:.55,energy:.85,judiciary:.50,pensions:.90,healthcare:.90,defense:.35,rural:.70,migration:.40},appeal:.218,favMinistry:"Labour & Social Policy",topIssue:"energy"},
-  {id:"itn",name:"Ima takav narod",abbr:"ITN",color:"#17a2b8",leader:"Slavi Trifonov",ideo:"National-conservative populist",pos:{euro:.45,corruption:.80,energy:.65,judiciary:.45,pensions:.65,healthcare:.70,defense:.60,rural:.55,migration:.30},appeal:.227,favMinistry:"Health",topIssue:"corruption"},
-  {id:"mech",name:"Morale, edinstvo, chest",abbr:"MECh",color:"#6d4c41",leader:"Radostin Vassilev",ideo:"Right-wing populist, anti-corruption",pos:{euro:.30,corruption:.75,energy:.60,judiciary:.45,pensions:.55,healthcare:.45,defense:.75,rural:.50,migration:.20},appeal:.19,favMinistry:"Interior",topIssue:"corruption"},
-  {id:"aps",name:"Alians za prava i svobodi",abbr:"APS",color:"#7f8c8d",leader:"Collective leadership",ideo:"Minority interests (DPS split)",pos:{euro:.60,corruption:.40,energy:.75,judiciary:.40,pensions:.70,healthcare:.75,defense:.35,rural:.80,migration:.60},appeal:.17,favMinistry:"Agriculture",topIssue:"energy"},
-  {id:"velichie",name:"Velichie",abbr:"VEL",color:"#34495e",leader:"Albena Pekova",ideo:"Far-right nationalist",pos:{euro:.15,corruption:.60,energy:.65,judiciary:.35,pensions:.60,healthcare:.35,defense:.85,rural:.70,migration:.05},appeal:.12,favMinistry:"Energy",topIssue:"energy"}
+  {id:"gerb",name:"GERB",abbr:"GERB",color:"#0066b3",leader:"Boyko Borisov",ideo:"Center-right incumbent (GERB–SDS)",pos:{euro:.80,corruption:.45,energy:.50,judiciary:.40,pensions:.45,healthcare:.40,defense:.70,rural:.40,migration:0.45},appeal:.86,favMinistry:"Finance",topIssue:"euro"},
+  {id:"pb",name:"Progresivna Balgariya",abbr:"PB",color:"#e67e22",leader:"Rumen Radev",ideo:"Centre-left populist, anti-oligarch",pos:{euro:.55,corruption:.85,energy:.75,judiciary:.70,pensions:.75,healthcare:.80,defense:.45,rural:.60,migration:0.55},appeal:.92,mainRival:true,favMinistry:"Justice",topIssue:"corruption"},
+  {id:"ppdb",name:"Produlzhavame promyanata – Demokratichna Balgariya",abbr:"PP-DB",color:"#2fa84f",leader:"Assen Vassilev",ideo:"Reformist anti-corruption",pos:{euro:.90,corruption:.90,energy:.35,judiciary:.90,pensions:.50,healthcare:.65,defense:.55,rural:.45,migration:0.5},appeal:.80,favMinistry:"Justice",topIssue:"corruption",focus:["sofia-city","sofia-obl","burgas","varna","plovdiv-city","plovdiv-obl"]},
+  {id:"dps",name:"Dvizhenie za prava i svobodi",abbr:"DPS",color:"#8e44ad",leader:"Delyan Peevski",ideo:"Minority interests",pos:{euro:.60,corruption:.35,energy:.75,judiciary:.40,pensions:.70,healthcare:.70,defense:.30,rural:.75,migration:0.35},appeal:.60,favMinistry:"Agriculture",topIssue:"energy"},
+  {id:"vaz",name:"Vazrazhdane",abbr:"VRZ",color:"#e0a71e",leader:"Kostadin Kostadinov",ideo:"Nationalist, anti-EU",pos:{euro:.10,corruption:.60,energy:.60,judiciary:.30,pensions:.60,healthcare:.40,defense:.90,rural:.65,migration:0.95},appeal:.56,favMinistry:"Interior",topIssue:"euro"},
+  {id:"bsp",name:"Bulgarska sotsialisticheska partiya – Obedinena levitsa",abbr:"BSP",color:"#e41e20",leader:"Krum Zarkov",ideo:"Socialist, centre-left",pos:{euro:.50,corruption:.55,energy:.85,judiciary:.50,pensions:.90,healthcare:.90,defense:.35,rural:.70,migration:0.6},appeal:.218,favMinistry:"Labour & Social Policy",topIssue:"energy"},
+  {id:"itn",name:"Ima takav narod",abbr:"ITN",color:"#17a2b8",leader:"Slavi Trifonov",ideo:"National-conservative populist",pos:{euro:.45,corruption:.80,energy:.65,judiciary:.45,pensions:.65,healthcare:.70,defense:.60,rural:.55,migration:0.7},appeal:.227,favMinistry:"Health",topIssue:"corruption"},
+  {id:"mech",name:"Morale, edinstvo, chest",abbr:"MECh",color:"#6d4c41",leader:"Radostin Vassilev",ideo:"Right-wing populist, anti-corruption",pos:{euro:.30,corruption:.75,energy:.60,judiciary:.45,pensions:.55,healthcare:.45,defense:.75,rural:.50,migration:0.8},appeal:.19,favMinistry:"Interior",topIssue:"corruption"},
+  {id:"aps",name:"Alians za prava i svobodi",abbr:"APS",color:"#7f8c8d",leader:"Collective leadership",ideo:"Minority interests (DPS split)",pos:{euro:.60,corruption:.40,energy:.75,judiciary:.40,pensions:.70,healthcare:.75,defense:.35,rural:.80,migration:0.4},appeal:.17,favMinistry:"Agriculture",topIssue:"energy"},
+  {id:"velichie",name:"Velichie",abbr:"VEL",color:"#34495e",leader:"Albena Pekova",ideo:"Far-right nationalist",pos:{euro:.15,corruption:.60,energy:.65,judiciary:.35,pensions:.60,healthcare:.35,defense:.85,rural:.70,migration:0.95},appeal:.12,favMinistry:"Energy",topIssue:"energy"}
 ];
 
 // parliamentary roster; presidential mode swaps AI_PARTIES' contents for the tickets
@@ -1576,10 +1576,22 @@ function applyFx(fx,prefix){
 }
 
 function drawEvent(){
-  if(S.eventCursor>=S.eventBag.length){S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
-  return S.eventBag[S.eventCursor++];
+  for(let tries=0;tries<EVENT_POOL.length+2;tries++){
+    if(S.eventCursor>=S.eventBag.length){S.eventBag=shuffle([...Array(EVENT_POOL.length).keys()]);S.eventCursor=0;}
+    const i=S.eventBag[S.eventCursor++],ev=EVENT_POOL[i];
+    // each real headline happens once per race
+    if(ev&&ev.news&&isPres()){const used=S.pres.newsUsed=S.pres.newsUsed||[];if(used.indexOf(ev.title)>=0)continue;used.push(ev.title);}
+    return i;
+  }
+  return S.eventBag[0];
 }
 function maybeEvents(){
+  // presidential race: most weeks bring one headline from the real autumn news cycle
+  if(isPres()&&rng()<.75){
+    const used=S.pres.newsUsed=S.pres.newsUsed||[];
+    const fresh=EVENT_POOL.map((e,i)=>({e,i})).filter(x=>x.e.news&&used.indexOf(x.e.title)<0);
+    if(fresh.length){const x=pick(fresh);used.push(x.e.title);S.eventQueue.push(x.i);}
+  }
   const r=rng();
   const n=r<0.08?2:(r<0.80?1:0);
   for(let i=0;i<n;i++)S.eventQueue.push(drawEvent());
@@ -1673,11 +1685,11 @@ function debateHeadless(){
 function renderEventModal(ev){
   const root=$("modal-root");
   const headCls=ev.kind==="good"?"good":ev.kind==="bad"?"bad":"choice";
-  const headTxt=ev.kind==="good"?"GOOD NEWS":ev.kind==="bad"?"BAD NEWS":"DECISION REQUIRED";
+  const headTxt=ev.news?"IN THE NEWS · "+ev.news.toUpperCase():ev.kind==="good"?"GOOD NEWS":ev.kind==="bad"?"BAD NEWS":"DECISION REQUIRED";
   const optsHtml=ev.opts.map((o,i)=>'<button class="btn" data-i="'+i+'">'+esc(o.label)+(o.sub?'<small>'+esc(o.sub)+'</small>':"")+'</button>').join("");
   root.innerHTML='<div class="modal-back"><div class="modal">'
     +'<div class="ev-head '+headCls+'"><span>'+headTxt+'</span><span class="paused-badge">GAME PAUSED</span></div>'
-    +'<div class="ev-body"><h3>'+esc(ev.title)+'</h3><p>'+esc(ev.text)+'</p><div class="ev-opts">'+optsHtml+'</div></div>'
+    +'<div class="ev-body"><h3>'+esc(ev.title)+'</h3><p>'+esc(ev.text)+'</p>'+(ev.src?'<p class="hint">Based on reporting by '+esc(ev.src)+', 2026.</p>':"")+'<div class="ev-opts">'+optsHtml+'</div></div>'
     +'</div></div>';
   root.querySelectorAll(".ev-opts .btn").forEach(b=>{
     b.onclick=()=>{
@@ -1738,6 +1750,7 @@ function helpModal(){
   if(isPres()){
     openModal('<h3>How to play — Presidential race</h3>'
       +'<p>You have <b>'+PRES_WEEKS+' weeks</b> until round one on <b>'+PRES_ROUND1_DATE+'</b>. Travel, rally, run ads and build HQs exactly as in the parliamentary campaign — but there is one national vote and no seats.</p>'
+      +'<p>Instead of issue rallies you make <b>campaign stops</b>: each one is a town hall question, a local-news situation, a meeting or a heckler. Answers that match the district\'s stance win support that also spreads nationally; answers that miss it cost you, and every answer nudges your platform. Most weeks bring a real headline from September–October 2026 to respond to. Right-click any district to travel or act.</p>'
       +'<ul><li>Win outright only with <b>more than 50%</b> of valid votes <b>and turnout above 50%</b>. That has never happened in Bulgaria.</li>'
       +'<li>Otherwise the <b>top two</b> go to a runoff on <b>'+PRES_RUNOFF_DATE+'</b>. Voters of the eliminated tickets drift toward the closer finalist (or split), you pick one outreach move, then get one runoff week and a head-to-head debate.</li>'
       +'<li>Knocked out in round one? Endorse a finalist and watch the runoff.</li>'
@@ -1909,6 +1922,12 @@ function buildMap(){
     const body=svgEl("path",{class:"body region",d:(cellData.cells[d.id])||"",fill:"#44506b"});
     node.appendChild(title);node.appendChild(body);
     node.addEventListener("click",()=>selectDistrict(d.id));
+    node.addEventListener("contextmenu",e=>{
+      e.preventDefault();
+      if(!S||S.phase!=="campaign")return;
+      selectDistrict(d.id);
+      openMapMenu(d,e.clientX,e.clientY);
+    });
     g.appendChild(node);
   }
   svg.appendChild(svgEl("path",{class:"map-borders",d:cellData.borders||"",fill:"none",stroke:"#0b1220","stroke-width":"2","pointer-events":"none"}));
@@ -2063,6 +2082,7 @@ function renderDistrictCard(){
       const d=DIST_BY_ID[S.selDistrict];
       if(act==="travel")travelTo(d.id);
       else if(act==="rally")doRally(b.dataset.issue);
+      else if(act==="stop")presCampaignStop();
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
     };
@@ -2135,7 +2155,8 @@ function renderMobileActions(){
   }else{
     const here=S.location===d.id,ral=activeIssueList();
     if(here){
-      html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
+      if(isPres())html+='<button class="btn wide" data-act="stop" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+'>Campaign stop <span class="cost">'+COSTS.rallySP+' SP</span></button>';
+      else html+='<button class="btn wide" id="btn-mb-rally" '+(S.paused?"disabled":"")+'>Rally <span class="cost">'+COSTS.rallySP+' SP</span> ▾</button>';
       html+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
       if(S.hq[d.id])html+='<button class="btn wide" disabled>Campaign HQ operational</button>';
       else html+='<button class="btn wide" data-act="hq" '+((S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax||S.paused)?"disabled":"")+'>Build Campaign HQ <span class="cost">'+fmtMoney(COSTS.hq)+'</span></button>';
@@ -2158,6 +2179,7 @@ function renderMobileActions(){
         doRally(b.dataset.issue);
         setMobileRallyOpen(false);
       }
+      else if(act==="stop")presCampaignStop();
       else if(act==="ad")buyAd();
       else if(act==="hq")buildHQ();
     };
@@ -2404,7 +2426,8 @@ function actionButtonsHtml(d,here){
     const c=travelCost(S.location,d.id);
     actions+='<button class="btn wide" data-act="travel" '+((S.stamina<c||S.paused)?"disabled":"")+'>Travel here <span class="cost">'+c+' SP</span></button>';
   }else{
-    for(const i of activeIssueList()){
+    if(isPres())actions+='<button class="btn wide" data-act="stop" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Meet voters: answer a local question or situation">Campaign stop <span class="cost">'+COSTS.rallySP+' SP</span></button>';
+    else for(const i of activeIssueList()){
       actions+='<button class="btn wide" data-act="rally" data-issue="'+i.id+'" '+((S.stamina<COSTS.rallySP||S.paused)?"disabled":"")+' title="Hold a rally focused on '+i.name+'">Rally: '+i.name+' <span class="cost">'+COSTS.rallySP+' SP</span></button>';
     }
     actions+='<button class="btn wide" data-act="ad" '+((S.cash<COSTS.ad||S.paused)?"disabled":"")+'>Local media ads <span class="cost">'+fmtMoney(COSTS.ad)+'</span></button>';
@@ -2459,7 +2482,7 @@ function renderDistrictDetail(){
     +polls
     +ethLine
     +'<div class="dc-actions">'+actions+'</div>'
-    +'<div class="dc-note">'+(here?"You are campaigning here now.":"Your candidate is in <b>"+DIST_BY_ID[S.location].name+"</b>.")+' Rallies are strongest on high-weight issues close to the district stance. HQs pay '+fmtMoney(COSTS.hqIncome)+'/week.</div>';
+    +'<div class="dc-note">'+(here?"You are campaigning here now.":"Your candidate is in <b>"+DIST_BY_ID[S.location].name+"</b>.")+(isPres()?' Campaign stops reward answers close to the district stance (the markers above). Right-click any district for quick actions.':' Rallies are strongest on high-weight issues close to the district stance. Right-click any district for quick actions.')+' HQs pay '+fmtMoney(COSTS.hqIncome)+'/week.</div>';
 }
 
 function projectNationalSeats(est){
@@ -2554,6 +2577,7 @@ function log(html,cls){
 }
 
 function updateAll(){
+  closeMapMenu();
   if(!S||S.phase!=="campaign")return;
   renderTopbar();
   redrawMap();
@@ -3310,6 +3334,7 @@ function previewForButton(b){
   const act=b.dataset.act;
   if(act==="travel")return previewLine(previewTravel(DIST_BY_ID[S.selDistrict].id));
   if(act==="rally")return previewLine(previewRally(b.dataset.issue));
+  if(act==="stop")return '<div class="preview-title">Campaign stop</div><div class="preview-note">Voters here put a question or a situation to you. Answers that match the district\'s stance win support (and spill nationally); answers that miss can cost you. Each answer nudges your platform.</div>';
   if(act==="ad")return previewLine(previewAd());
   if(act==="hq")return previewLine(previewHQ());
   return "";
@@ -4896,13 +4921,29 @@ const PRES_SAVE_KEY="121towin-pres-save-v1";
 const PRES_OTHER_TICKETS=21;
 // poll = Market Links / bTV, 26–29 Sep 2026 (share of all respondents); appeal is calibrated
 // so the opening national estimate lands near those numbers among decided voters
+// Stances (0..1, low = the issue's left label, high = its right label) follow what each
+// ticket said in the campaign, Sept-Oct 2026: BTA candidate profiles, Brussels Signal
+// (11 Sep), EUalive (23 Sep), BTA interview with Iotova (20 Feb), Blick (Mihaylov on the euro).
+// Where a candidate has published nothing on an issue, the backing party's line is used.
 const PRES_TICKETS=[
-  {id:"iotova",leader:"Iliana Iotova",vp:"Kiril Valchev",short:"Iotova",color:"#e67e22",gender:"female",backers:"Independent · backed by Progressive Bulgaria and BSP–United Left",note:"Incumbent president",leanFrom:["pb","bsp"],posFrom:["pb","bsp"],appeal:2.237,poll:.414,mainRival:true},
-  {id:"gyurov",leader:"Andrey Gyurov",vp:"Georgi Kandev",short:"Gyurov",color:"#2fa84f",gender:"male",backers:"Initiative committee · backed by PP and DB",note:"Former caretaker prime minister",leanFrom:["ppdb"],posFrom:["ppdb"],appeal:1.281,poll:.219},
-  {id:"kostadinov",leader:"Kostadin Kostadinov",vp:"Petar Volgin",short:"Kostadinov",color:"#e0a71e",gender:"male",backers:"Nominated by Vazrazhdane",note:"Vazrazhdane leader",leanFrom:["vaz"],posFrom:["vaz"],appeal:0.4,poll:.064},
-  {id:"mihaylov",leader:"Ivelin Mihaylov",vp:"Yuliana Mateeva",short:"Mihaylov",color:"#34495e",gender:"male",backers:"Nominated by Velichie",note:"Velichie nominee",leanFrom:["velichie"],posFrom:["velichie"],appeal:0.248,poll:.039},
-  {id:"vasilev",leader:"Radostin Vasilev",vp:null,short:"Vasilev",color:"#6d4c41",gender:"male",backers:"running mate not listed in polls",note:"MECh leader",leanFrom:["mech"],posFrom:["mech"],appeal:0.101,poll:.016},
-  {id:"hristanov",leader:"Ivan Hristanov",vp:null,short:"Hristanov",color:"#17a2b8",gender:"male",backers:"running mate not listed in polls",note:"Edinenie leader",leanFrom:[],posFrom:null,appeal:0.056,poll:.009}
+  {id:"iotova",leader:"Iliana Iotova",vp:"Kiril Valchev",short:"Iotova",color:"#e67e22",gender:"female",backers:"Independent · backed by Progressive Bulgaria and BSP–United Left",note:"Incumbent president",leanFrom:["pb","bsp"],
+    stance:"Peace coalition, no arms to Ukraine · says the euro switch was rushed · income and price protection",
+    pos:{euro:.40,corruption:.65,energy:.75,judiciary:.60,pensions:.80,healthcare:.80,defense:.30,rural:.65,migration:.58},appeal:2.27,poll:.414,mainRival:true},
+  {id:"gyurov",leader:"Andrey Gyurov",vp:"Georgi Kandev",short:"Gyurov",color:"#2fa84f",gender:"male",backers:"Initiative committee · backed by PP and DB",note:"Former caretaker PM, ex-BNB deputy governor",leanFrom:["ppdb"],
+    stance:"Guarantor of the European path · Russia is the aggressor, keep aiding Ukraine · oversight of government",
+    pos:{euro:.95,corruption:.90,energy:.35,judiciary:.90,pensions:.45,healthcare:.60,defense:.80,rural:.40,migration:.50},appeal:1.23,poll:.219},
+  {id:"kostadinov",leader:"Kostadin Kostadinov",vp:"Petar Volgin",short:"Kostadinov",color:"#e0a71e",gender:"male",backers:"Nominated by Vazrazhdane",note:"Vazrazhdane leader",leanFrom:["vaz"],
+    stance:"Against the euro and 'Brussels loyalists' · stop military aid, Russia 'not an aggressor' · anti-migration (party line)",
+    pos:{euro:.05,corruption:.60,energy:.70,judiciary:.30,pensions:.65,healthcare:.50,defense:.30,rural:.70,migration:.95},appeal:0.447,poll:.064},
+  {id:"mihaylov",leader:"Ivelin Mihaylov",vp:"Yuliana Mateeva",short:"Mihaylov",color:"#34495e",gender:"male",backers:"Nominated by Velichie",note:"Velichie founder",leanFrom:["velichie"],
+    stance:"Opposed euro adoption · against war spending, 'neither pro-US nor pro-Russia' · anti-corruption, rule of law",
+    pos:{euro:.10,corruption:.85,energy:.55,judiciary:.65,pensions:.60,healthcare:.45,defense:.30,rural:.70,migration:.90},appeal:0.274,poll:.039},
+  {id:"vasilev",leader:"Radostin Vasilev",vp:"Krasimir Manov",short:"Vasilev",color:"#6d4c41",gender:"male",backers:"Nominated by MECh",note:"MECh leader",leanFrom:["mech"],
+    stance:"Anti-corruption, 'Bulgaria first' · Eurosceptic · socially conservative",
+    pos:{euro:.20,corruption:.90,energy:.60,judiciary:.55,pensions:.55,healthcare:.45,defense:.50,rural:.55,migration:.80},appeal:0.106,poll:.016},
+  {id:"hristanov",leader:"Ivan Hristanov",vp:"Stoyanka Cherkezova",short:"Hristanov",color:"#17a2b8",gender:"male",backers:"Nomination committee",note:"Ex-PP MP and deputy agriculture minister",leanFrom:["ppdb"],
+    stance:"No published platform found · placed near his former PP line, with a farm-policy background",
+    pos:{euro:.80,corruption:.80,energy:.40,judiciary:.75,pensions:.50,healthcare:.55,defense:.55,rural:.70,migration:.50},appeal:0.049,poll:.009}
 ];
 const PRES_TICKET_BY_ID={};PRES_TICKETS.forEach(t=>PRES_TICKET_BY_ID[t.id]=t);
 // fictional running mates for a player-made ticket
@@ -4931,7 +4972,7 @@ function presAvgPos(ids){
 }
 function presTicketParty(t){
   return {id:t.id,name:t.leader+(t.vp?" – "+t.vp:""),abbr:t.short,color:t.color,leader:t.leader,ideo:t.backers,
-    pos:presAvgPos(t.posFrom),appeal:t.appeal,mainRival:!!t.mainRival,leanFrom:t.leanFrom,isTicket:true};
+    pos:Object.assign({},t.pos||presAvgPos(t.posFrom)),appeal:t.appeal,mainRival:!!t.mainRival,leanFrom:t.leanFrom,isTicket:true};
 }
 function presActiveTickets(){
   const mine=S&&S.pres?S.pres.ticket:null;
@@ -5002,7 +5043,7 @@ function presRenderTicketPicker(){
     +'<span class="pres-swatch" style="background:'+color+'"></span><div><b>'+esc(title)+'</b><span>'+esc(sub)+'</span></div>'
     +(pollTxt?'<em class="pres-poll">'+pollTxt+'</em>':'')+'</div>';
   el.innerHTML=card("own","Your own ticket","Create a candidate, pick a running mate, start as an outsider","#888","")
-    +PRES_TICKETS.map(t=>card(t.id,t.leader+(t.vp?" – "+t.vp:""),t.note+" · "+t.backers,t.color,pct(t.poll,1))).join("");
+    +PRES_TICKETS.map(t=>card(t.id,t.leader+(t.vp?" – "+t.vp:""),t.note+" · "+t.backers+(t.stance?" — "+t.stance:""),t.color,pct(t.poll,1))).join("");
   el.querySelectorAll("[data-ticket]").forEach(c=>{c.onclick=()=>presPickTicket(c.dataset.ticket);});
   const note=$("pres-ticket-note");
   if(note)note.textContent=sel==="own"
@@ -5025,7 +5066,7 @@ function presPickTicket(id){
     S.player.attrs={stamina:5,charisma:5,intelligence:5};
     S.party.name=t.leader+(t.vp?" – "+t.vp:"");S.party.abbr=t.short;S.party.color=t.color;S.party.logo=null;
     S.party.slogan="";
-    S.party.pos=presAvgPos(t.posFrom);
+    S.party.pos=Object.assign({},t.pos||presAvgPos(t.posFrom));
   }
   $("in-cand-name").value=S.player.name;
   updateAttrUI();renderAppearanceUI();renderPortraitPreview();renderFaceGrid();
@@ -5388,6 +5429,7 @@ const PRES_EXCLUDED_EVENTS=["Rival gaffe","Debate night win","Leaked rival memo"
   "Attack ad package","Investigative interview offer","Anonymous dossier","Pre-electoral signal"];
 function presEventPool(P){
   for(let i=P.length-1;i>=0;i--)if(PRES_EXCLUDED_EVENTS.indexOf(P[i].title)>=0)P.splice(i,1);
+  for(const ev of presNewsEvents())P.push(ev);
   P.push({kind:"good",title:"Mayors' association endorsement",text:"A cross-party group of small-town mayors backs your ticket as 'a president for the regions'.",opts:[{label:"Tour their towns",fx:{nationBoost:.012,enthusiasmAll:.02}}]});
   P.push({kind:"good",title:"Diaspora turnout drive",text:"Volunteers abroad organise transport to polling stations in Germany, Spain and the UK.",opts:[{label:"Thank them on air",fx:{nationBoost:.01,cash:8000}}]});
   P.push({kind:"choice",title:"Presidential powers debate",text:"A TV panel presses every ticket: would you veto laws you disagree with, or act as a unifying figure?",opts:[
@@ -5411,6 +5453,265 @@ function presEventPool(P){
     P.push({kind:"good",flavor:true,title:"Running mate's big interview",text:"Your running mate holds a confident hour-long interview on morning TV.",opts:[{label:"Share the clips",fx:{nationBoost:.01}}]});
     P.push({kind:"bad",title:"Running mate stumbles",text:"Your running mate fumbles a question about the constitution on live radio.",opts:[{label:"Laugh it off",fx:{nationBoost:-.008}},{label:"Send them to a quiet tour",fx:{stamina:-1}}]});
   }
+}
+
+
+/* ---- presidential gameplay: campaign stops instead of issue rallies ----
+   A campaign stop is a small decision, not a button press: the district puts a
+   question or a situation to you and the answer you give is judged against what
+   that district wants. Good reads of the district pay off; answers also nudge
+   your platform, so promising everything everywhere catches up with you. */
+const PRES_STOP_QUESTIONS={
+  euro:"Since the euro arrived, prices at the market feel higher. What would you do about it?",
+  corruption:"People here say nobody ever goes to jail for stealing public money. Will you change that?",
+  energy:"Heating and electricity bills are the first worry this autumn. Who should carry the cost?",
+  judiciary:"Should a president lean on the prosecutors, or keep well away from them?",
+  pensions:"Pensioners in the front row ask if their pensions will keep up with prices.",
+  healthcare:"The local hospital is short of doctors. Public money or private clinics?",
+  defense:"After the drone strikes in the Black Sea, should Bulgaria spend more on defence?",
+  rural:"The villages around here are emptying. Is that the state's problem?",
+  migration:"How strict should the southern border be?"
+};
+const PRES_STOP_ANSWERS={
+  euro:["The changeover failed; reopen the euro question","Keep the euro, add fair-price checks","Finish the job: deeper EU integration pays off"],
+  corruption:["It's exaggerated; stability matters more","Strengthen what exists, carefully","Back a fully independent anti-corruption body"],
+  energy:["Let prices reflect costs, help only the poorest","Targeted help for households","Cap bills and subsidise heating for everyone"],
+  judiciary:["A strong hand over the prosecution","Reform it slowly from the inside","Full independence, whatever it costs"],
+  pensions:["Hold the line on spending first","Index pensions to inflation","A big pension rise now"],
+  healthcare:["Open the system to private providers","Mixed model with clear rules","Public money into public hospitals"],
+  defense:["Defence spending can wait","Meet NATO commitments, no more","Rearm and protect the coast"],
+  rural:["Cities first; that's where growth is","Some help, tied to results","Roads, clinics and internet for every village"],
+  migration:["Humane, open to workers we need","Firm but fair","Seal the border"]
+};
+const PRES_STOP_VALUES=[.15,.5,.85];
+// places in the news this autumn get their own stop (paraphrased from BTA / Sofia Globe reporting)
+const PRES_NEWS_STOPS={
+  varna:{title:"Port of Varna after the drone strikes",text:"Two merchant ships were hit by drones in Bulgaria's Black Sea zone on 6 October and one sank. Dock workers and fishermen want to know what you would do.",
+    opts:[{label:"Call for joint EU/NATO patrols",issue:"defense",v:.9},{label:"Keep Bulgaria out of other people's war",issue:"defense",v:.15},{label:"Promise compensation for fishermen",issue:"rural",v:.75,cash:-8000}]},
+  pernik:{title:"Smog over Pernik",text:"Inspectors found sulphur and dust above the limits from the town's power plant and capped one of its boilers. Workers fear for their jobs; parents fear for their kids.",
+    opts:[{label:"Clean air first, enforce the limits",issue:"energy",v:.3},{label:"Protect the plant and its jobs",issue:"energy",v:.85},{label:"Fund new filters from the state",issue:"energy",v:.65,cash:-10000}]},
+  burgas:{title:"Burgas gets ready for Eurovision 2027",text:"Tourism revenue is up and the city is preparing a port Eurovillage for next year's contest. Local business wants the state to help with roads and the airport.",
+    opts:[{label:"Back state money for transport links",issue:"rural",v:.35},{label:"Let the city and investors pay",issue:"rural",v:.2},{label:"Promise the same for small coastal towns",issue:"rural",v:.8}]},
+  haskovo:{title:"After the summer fires",text:"A nearly 1,000-hectare wildfire burned near Dinevo in August, the driest August since 1988. Farmers lost crops and the winter sowing is behind.",
+    opts:[{label:"Drought aid for farmers now",issue:"rural",v:.85,cash:-6000},{label:"Better fire services, not handouts",issue:"rural",v:.45},{label:"Say the market will adjust",issue:"rural",v:.15}]},
+  shumen:{title:"Union rally in Shumen",text:"Public-sector unions are touring Varna, Shumen and Ruse demanding at least a 10% pay rise in the 2027 budget.",
+    opts:[{label:"Stand with the workers",issue:"pensions",v:.85},{label:"Rises only with reforms",issue:"pensions",v:.45},{label:"The budget can't afford it",issue:"pensions",v:.15}]},
+  ruse:{title:"Union rally in Ruse",text:"Public-sector unions end their regional tour in Ruse, asking for a 10% pay rise and no job cuts from merging agencies.",
+    opts:[{label:"Stand with the workers",issue:"pensions",v:.85},{label:"Rises only with reforms",issue:"pensions",v:.45},{label:"The budget can't afford it",issue:"pensions",v:.15}]},
+  "sofia-city":{title:"Sofia: prices, metro and bike lanes",text:"The consumer watchdog found butter and cheese markups above 130% in big chains, and the city is arguing over Ring Road bike lanes and a new metro station.",
+    opts:[{label:"Back a fair-price law for big chains",issue:"euro",v:.55},{label:"Promise a faster metro and cycle network",issue:"rural",v:.15},{label:"Say prices are the euro's fault",issue:"euro",v:.1}]}
+};
+function presTopIssues(d){
+  return activeIssueList().map(i=>({i,w:d.w[i.id]||0})).sort((a,b)=>b.w-a.w).slice(0,3).map(x=>x.i);
+}
+let presCurrentStop=null;
+function presCampaignStop(){
+  if(!isPres()||S.paused||S.phase!=="campaign"||S.stamina<COSTS.rallySP)return;
+  const d=DIST_BY_ID[S.location];
+  S.paused=true;
+  const news=PRES_NEWS_STOPS[d.id]&&!(S.pres.newsStopsDone||[]).includes(d.id)?PRES_NEWS_STOPS[d.id]:null;
+  let scen;
+  if(news){
+    scen={kind:"news",title:news.title,text:news.text,opts:news.opts};
+  }else{
+    const r=rng(),top=presTopIssues(d);
+    if(r<.62||!top.length){
+      const iss=pick(top.slice(0,2).length?top.slice(0,2):activeIssueList());
+      scen={kind:"townhall",title:"Town hall in "+d.name,text:PRES_STOP_QUESTIONS[iss.id]||("What is your position on "+iss.name+"?"),
+        opts:PRES_STOP_ANSWERS[iss.id].map((label,k)=>({label,issue:iss.id,v:PRES_STOP_VALUES[k]}))};
+    }else if(r<.82){
+      scen={kind:"leaders",title:"Local leaders in "+d.name,text:"The mayor's office, a union branch and the chamber of commerce all want an hour with you. You only have time for one.",
+        opts:[{label:"Walk the centre with the mayor",flat:1.1,ent:.03},{label:"Factory gate with the union",flat:.9,ent:.06},{label:"Breakfast with local business",flat:.7,cash:9000}]};
+    }else{
+      scen={kind:"heckler",title:"A heckler in "+d.name,text:"Halfway through your speech a man with a megaphone starts shouting that all politicians are the same.",
+        opts:[{label:"Invite him up to the stage",gamble:true},{label:"Stay calm and keep going",flat:.75},{label:"Fire back",gamble:true,risk:.55}]};
+    }
+  }
+  presCurrentStop=scen;
+  const root=$("modal-root");
+  const head=scen.kind==="news"?"IN THE NEWS · CAMPAIGN STOP":"CAMPAIGN STOP · "+COSTS.rallySP+" SP";
+  root.innerHTML='<div class="modal-back"><div class="modal">'
+    +'<div class="ev-head choice"><span>'+head+'</span><span class="paused-badge">'+esc(d.short.toUpperCase())+'</span></div>'
+    +'<div class="ev-body"><h3>'+esc(scen.title)+'</h3><p>'+esc(scen.text)+'</p>'
+    +(scen.kind==="townhall"?'<p class="hint">Answers are judged against this district\'s stance (see the markers in the District tab) and nudge your platform.</p>':"")
+    +'<div class="ev-opts">'+scen.opts.map((o,k)=>'<button class="btn" data-k="'+k+'">'+esc(o.label)+(o.cash?'<small>'+(o.cash>0?"+":"−")+fmtMoney(Math.abs(o.cash))+'</small>':"")+'</button>').join("")
+    +'<button class="btn ghost" data-k="-1">Cancel<small>No SP spent</small></button></div></div></div></div>';
+  root.querySelectorAll("[data-k]").forEach(b=>{b.onclick=()=>{
+    const k=+b.dataset.k;
+    root.innerHTML="";S.paused=false;
+    if(k>=0){presResolveStop(d,scen,scen.opts[k]);if(scen.kind==="news")(S.pres.newsStopsDone=S.pres.newsStopsDone||[]).push(d.id);}
+    updateAll();
+  };});
+}
+function presResolveStop(d,scen,o){
+  const before=(S.districtPoll&&S.districtPoll[d.id]&&S.districtPoll[d.id].player)||0;
+  const base=(0.055+getAttr("charisma")*0.0075)*(1+modSum("rallyMult"))/(1+S.ralliesThisTurn*0.5);
+  let gain,verdict;
+  if(o.issue){
+    const w=Math.max(.08,d.w[o.issue]||0),fit=1-Math.abs(o.v-(d.ideal[o.issue]===undefined?.5:d.ideal[o.issue]));
+    gain=base*(0.1+1.5*fit*fit)*(0.6+w*2);
+    if(fit<.45)gain=-base*0.4;
+    verdict=fit>=.8?"The room is with you.":fit>=.6?"Polite applause.":fit>=.45?"A lukewarm reception.":"That landed badly here.";
+    S.party.pos[o.issue]=clamp(S.party.pos[o.issue]+(o.v-S.party.pos[o.issue])*0.12,0,1);
+  }else if(o.gamble){
+    const win=rng()<(o.risk||.6);
+    gain=win?base*1.8:-base*0.6;
+    verdict=win?"The clip goes viral for the right reasons.":"It turns into a shouting match on camera.";
+  }else{
+    gain=base*o.flat;verdict="A solid, quiet win.";
+  }
+  if(o.cash)S.cash+=o.cash;
+  if(o.ent)S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+o.ent,.5,1.4);
+  addBoost(d.id,"player",gain);
+  if(gain>0)presSpill(d.id,gain);
+  S.enthusiasm[d.id]=clamp((S.enthusiasm[d.id]!==undefined?S.enthusiasm[d.id]:d.ent)+(gain>0?.03:-.01),.5,1.4);
+  S.stamina-=COSTS.rallySP;S.ralliesThisTurn++;S.stats.rallies++;S.touched.push(d.id);
+  recomputePolls();
+  const after=S.districtPoll[d.id].player||0;
+  log("Campaign stop in <b>"+d.name+"</b> — "+esc(o.label)+". "+verdict+" YOU "+(after-before>=0?"+":"")+pts(after-before)+" pts here.",gain>0?"good":"bad");
+  playSound(gain>0?"confirm":"click");
+}
+
+/* ---- presidential news events: September–October 2026 ----
+   Paraphrased from BTA, Sofia Globe and BNR reporting. Each one asks how YOU respond;
+   none of them puts words in the mouths of the real candidates. */
+function presGeoList(key,min){return DISTRICTS.filter(d=>((d.geo&&d.geo[key])||0)>=min).map(d=>d.id);}
+function presNewsEvents(){
+  const nato=presGeoList("proNATO",.7),ru=presGeoList("proRussia",.5),nat=presGeoList("nationalism",.6),urban=presGeoList("urbanization",.75);
+  const mb=(ids,v)=>ids.map(id=>({d:id,v}));
+  const rural=DISTRICTS.filter(d=>(d.w.rural||0)>=.18).map(d=>d.id);
+  return [
+    {news:"6 Oct",src:"BTA / Sofia Globe",kind:"choice",title:"Drone strikes in the Black Sea",text:"Two merchant ships were hit by drones in Bulgaria's exclusive economic zone off Varna; one sank. The government has asked the EU and NATO to help investigate. Reporters want your answer tonight.",opts:[
+      {label:"Demand allied patrols off our coast",sub:"Pro-NATO districts approve; platform moves to Rearm",fx:{multiBoost:mb(nato,.025),posShift:{issue:"defense",delta:.08}}},
+      {label:"Call for calm and neutrality",sub:"Plays well in Russia-friendly regions",fx:{multiBoost:mb(ru,.025),posShift:{issue:"defense",delta:-.08}}},
+      {label:"Go to Varna and meet the crews' families",sub:"−2 SP, enthusiasm up on the coast",fx:{stamina:-2,entDistrict:{d:"varna",v:.08},nationBoost:.006}}]},
+    {news:"15 Sep",src:"Sofia Globe / NSI",kind:"choice",title:"Inflation hits 5.1%",text:"Annual inflation rose to 5.1% in August, with transport up almost 14%. The finance minister says the euro is not to blame; shoppers are not convinced.",opts:[
+      {label:"Blame retailers, not the euro",sub:"Nationwide +1%",fx:{nationBoost:.01}},
+      {label:"Say the changeover was botched",sub:"Eurosceptic voters warm to you; platform moves Eurosceptic",fx:{multiBoost:mb(nat,.03),posShift:{issue:"euro",delta:-.08}}},
+      {label:"Talk fuel, Hormuz and global prices",sub:"Safe, small gain",fx:{nationBoost:.004}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Butter up 141%",text:"Consumer-protection inspectors found markups of 141% on butter and 133% on cheese at big chains and plan a 'fair value' benchmark with penalties.",opts:[
+      {label:"Back a fair-price law",sub:"Popular, +1.2% nationwide; donors grumble",fx:{nationBoost:.012,cash:-8000}},
+      {label:"Warn against price controls",sub:"Business donors grateful",fx:{cash:15000,nationBoost:-.004}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Unions march for a 10% raise",text:"Public-sector unions launched rallies in Varna, Shumen and Ruse for a 10% pay rise in the 2027 budget and against job cuts.",opts:[
+      {label:"Join the march in Varna",sub:"−2 SP, big local enthusiasm",fx:{stamina:-2,multiBoost:[{d:"varna",v:.04},{d:"shumen",v:.04},{d:"ruse",v:.04}],posShift:{issue:"pensions",delta:.06}}},
+      {label:"Call for pay tied to reforms",sub:"Moderates approve",fx:{nationBoost:.006}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Teachers' pay and polling-day schools",text:"An education union says teacher pay lags its promised target and is weighing strike readiness; it also wants the day after the vote off, since schools are polling stations.",opts:[
+      {label:"Pledge teacher pay at 125% of the average wage",sub:"Teachers and parents notice, −10 000 лв for the ad",fx:{nationBoost:.012,cash:-10000}},
+      {label:"Promise a school reform plan instead",sub:"+1 Intelligence for 2 weeks",fx:{attrTemp:{attr:"intelligence",v:1,turns:2}}}]},
+    {news:"25 Sep",src:"BTA / Sofia Globe",kind:"choice",title:"A windfall tax on banks",text:"The government wants a windfall tax from 2027 on banks, insurers, big retailers and telecoms. The central bank governor warns it could raise borrowing costs.",opts:[
+      {label:"Support it: profits should share the burden",sub:"Popular, but bank-friendly donors pull back",fx:{nationBoost:.01,cash:-12000}},
+      {label:"Oppose it: it will hit every borrower",sub:"Donations rise",fx:{cash:20000,nationBoost:-.005}}]},
+    {news:"12 Oct",src:"BTA",kind:"choice",title:"Rubbish fees double in the villages",text:"Mayors say the new 'polluter pays' waste-fee system cut business charges but raised household bills, two or three times in some villages.",opts:[
+      {label:"Promise to fix fees for rural households",sub:"Village districts +3%; platform moves toward villages",fx:{multiBoost:mb(rural,.03),posShift:{issue:"rural",delta:.06}}},
+      {label:"Leave it to the municipalities",sub:"Nothing gained, nothing lost",fx:{}}]},
+    {news:"12 Sep",src:"Reuters",kind:"choice",title:"Another arms-depot fire",text:"Explosions hit a weapons storage site near Tsareva Livada, weeks after a fire at another depot. Investigators have not ruled out sabotage.",opts:[
+      {label:"Demand a full security review",sub:"+0.8% nationwide; platform moves to Rearm",fx:{nationBoost:.008,posShift:{issue:"defense",delta:.05}}},
+      {label:"Warn against panic before the facts",sub:"Steady; small gain",fx:{nationBoost:.004}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"Bomb threats at schools",text:"Fake bomb threats hit schools and institutions across the country. The interior minister says they were coordinated from abroad.",opts:[
+      {label:"Visit a school and reassure parents",sub:"−1 SP, enthusiasm up nationwide",fx:{stamina:-1,enthusiasmAll:.03}},
+      {label:"Propose a cyber-threat agency",sub:"Urban voters approve",fx:{multiBoost:mb(urban,.025)}}]},
+    {news:"10 Oct",src:"BTA",kind:"choice",title:"Can you trust the machines?",text:"The election commission says voting machines are offline and voters can check a hash code on their receipt. Some voters still don't know how to use them.",opts:[
+      {label:"Fund voter-education videos",sub:"−15 000 лв, enthusiasm +4% nationwide",fx:{cash:-15000,enthusiasmAll:.04}},
+      {label:"Raise doubts about the machines",sub:"Your base fires up, moderates recoil",fx:{multiBoost:mb(nat,.03),nationBoost:-.008}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"Fuel could jump under EU carbon rules",text:"Fuel traders warn new EU emissions rules from 2028 could add up to €1.40 a litre; regional energy bodies want a two-year delay.",opts:[
+      {label:"Back the call for a delay",sub:"Drivers and rural voters approve; platform moves to subsidies",fx:{multiBoost:mb(rural,.02),posShift:{issue:"energy",delta:.06}}},
+      {label:"Stick with EU climate rules",sub:"Pro-EU cities approve",fx:{multiBoost:mb(urban,.025)}}]},
+    {news:"8 Oct",src:"BTA",kind:"choice",title:"The crash-barrier contracts",text:"A parliamentary hearing heard that four linked companies won every regional lot of a road crash-barrier tender, which grew by over 60% after amendments.",opts:[
+      {label:"Promise an audit of every road contract",sub:"+1.2% nationwide; platform moves to Zero Tolerance",fx:{nationBoost:.012,posShift:{issue:"corruption",delta:.06}}},
+      {label:"Stay out of parliament's business",sub:"No change",fx:{}}]},
+    {news:"Aug–Sep",src:"Sofia Globe",kind:"choice",title:"The driest August since 1988",text:"Drought, a near-1,000-hectare wildfire near Haskovo and flash floods in Strumyani, Peshtera and Batak have hit farmers hard; winter sowing is behind.",opts:[
+      {label:"Promise drought aid for farmers",sub:"Farm districts +3%",fx:{multiBoost:mb(rural,.03)}},
+      {label:"Promise a modern fire and flood service",sub:"+0.8% nationwide",fx:{nationBoost:.008}}]},
+    {news:"12 Oct",src:"BTA",kind:"good",title:"Tourism's record summer",text:"Revenue from overnight stays rose 13% in August, and Burgas is preparing to host Eurovision 2027.",opts:[{label:"Campaign on the coast",fx:{multiBoost:[{d:"burgas",v:.03},{d:"varna",v:.02}]}}]}
+  ];
+}
+
+
+/* ---- right-click district menu (XP-style context menu) ----
+   Right-click any district: travel there, or open "Take action" for the moves
+   available there. From another district the actions travel first, then act. */
+let mapMenuEl=null;
+function closeMapMenu(){if(mapMenuEl){mapMenuEl.remove();mapMenuEl=null;}}
+function mapMenuItems(d){
+  const here=S.location===d.id,tc=here?0:travelCost(S.location,d.id);
+  const busy=S.paused||S.phase!=="campaign",canTravel=here||(!busy&&S.stamina>=tc);
+  const go=fn=>()=>{if(!here){travelTo(d.id);if(S.location!==d.id)return;}fn();};
+  const sp=n=>(tc?tc+" + ":"")+n+" SP";
+  const sub=[];
+  if(isPres())sub.push({label:"Campaign stop",cost:sp(COSTS.rallySP),disabled:busy||S.stamina<tc+COSTS.rallySP,run:go(presCampaignStop)});
+  else for(const i of activeIssueList())sub.push({label:"Rally: "+i.name,cost:sp(COSTS.rallySP),disabled:busy||S.stamina<tc+COSTS.rallySP,run:go(()=>doRally(i.id))});
+  sub.push({label:"Local media ads",cost:fmtMoney(COSTS.ad)+(tc?" + "+tc+" SP":""),disabled:busy||!canTravel||S.cash<COSTS.ad,run:go(buyAd)});
+  if(S.hq[d.id])sub.push({label:"Campaign HQ operational",disabled:true});
+  else sub.push({label:"Build Campaign HQ",cost:fmtMoney(COSTS.hq)+(tc?" + "+tc+" SP":""),disabled:busy||!canTravel||S.cash<COSTS.hq||Object.keys(S.hq).length>=COSTS.hqMax,run:go(buildHQ)});
+  const items=[{header:d.name+(here?" · you are here":"")}];
+  if(!here)items.push({label:"Travel here",cost:tc+" SP",disabled:busy||S.stamina<tc,run:()=>travelTo(d.id)});
+  items.push({label:here?"Take action":"Travel & take action",submenu:sub,disabled:busy});
+  items.push({sep:true});
+  items.push({label:"Inspect district",run:()=>{inspectorTab="district";selectDistrict(d.id);}});
+  items.push({label:"National polls",run:()=>setInspectorTab("national")});
+  return items;
+}
+function buildMapMenu(items,cls){
+  const m=document.createElement("div");
+  m.className="ctx-menu"+(cls?" "+cls:"");
+  m.setAttribute("role","menu");
+  for(const it of items){
+    if(it.sep){const s=document.createElement("div");s.className="ctx-sep";m.appendChild(s);continue;}
+    if(it.header){const h=document.createElement("div");h.className="ctx-head";h.textContent=it.header;m.appendChild(h);continue;}
+    const b=document.createElement("button");
+    b.type="button";b.className="ctx-item"+(it.submenu?" has-sub":"");b.setAttribute("role","menuitem");
+    b.disabled=!!it.disabled;
+    b.innerHTML='<span class="ctx-label">'+esc(it.label)+'</span>'+(it.cost?'<span class="ctx-cost">'+esc(it.cost)+'</span>':"")+(it.submenu?'<span class="ctx-arrow">▸</span>':"");
+    if(it.submenu){
+      const sub=buildMapMenu(it.submenu,"ctx-sub");
+      const wrap=document.createElement("div");wrap.className="ctx-sub-wrap";
+      wrap.appendChild(b);wrap.appendChild(sub);
+      const open=()=>{if(b.disabled)return;wrap.classList.add("open");placeSubMenu(wrap,sub);};
+      wrap.addEventListener("mouseenter",open);
+      wrap.addEventListener("mouseleave",()=>wrap.classList.remove("open"));
+      b.addEventListener("click",e=>{e.stopPropagation();open();const f=sub.querySelector(".ctx-item:not(:disabled)");if(f)f.focus();});
+      b.addEventListener("keydown",e=>{if(e.key==="ArrowRight"){open();const f=sub.querySelector(".ctx-item:not(:disabled)");if(f)f.focus();}});
+      sub.addEventListener("keydown",e=>{if(e.key==="ArrowLeft"){wrap.classList.remove("open");b.focus();e.stopPropagation();}});
+      m.appendChild(wrap);
+      continue;
+    }
+    b.addEventListener("click",e=>{e.stopPropagation();if(b.disabled)return;closeMapMenu();it.run();});
+    m.appendChild(b);
+  }
+  m.addEventListener("keydown",e=>{
+    if(e.key!=="ArrowDown"&&e.key!=="ArrowUp")return;
+    const list=Array.from(m.querySelectorAll(":scope > .ctx-item:not(:disabled), :scope > .ctx-sub-wrap > .ctx-item:not(:disabled)"));
+    const i=list.indexOf(document.activeElement);
+    const n=list[(i+(e.key==="ArrowDown"?1:-1)+list.length)%list.length];
+    if(n){n.focus();e.preventDefault();e.stopPropagation();}
+  });
+  return m;
+}
+function placeSubMenu(wrap,sub){
+  sub.classList.remove("flip");
+  sub.style.top="";
+  const r=sub.getBoundingClientRect();
+  if(r.right>window.innerWidth-4)sub.classList.add("flip");
+  if(r.bottom>window.innerHeight-4)sub.style.top=Math.round(window.innerHeight-4-r.bottom)+"px";
+}
+function openMapMenu(d,x,y){
+  closeMapMenu();
+  if(!S||S.phase!=="campaign")return;
+  mapMenuEl=buildMapMenu(mapMenuItems(d));
+  document.body.appendChild(mapMenuEl);
+  const r=mapMenuEl.getBoundingClientRect();
+  const left=Math.min(x,window.innerWidth-r.width-4),top=Math.min(y,window.innerHeight-r.height-4);
+  mapMenuEl.style.left=Math.max(4,left)+"px";mapMenuEl.style.top=Math.max(4,top)+"px";
+  const first=mapMenuEl.querySelector(".ctx-item:not(:disabled)");
+  if(first)first.focus({preventScroll:true});
+}
+function bindMapMenu(){
+  if(typeof document==="undefined"||typeof window==="undefined"||typeof document.addEventListener!=="function")return;
+  document.addEventListener("pointerdown",e=>{if(mapMenuEl&&!mapMenuEl.contains(e.target))closeMapMenu();},true);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMapMenu();});
+  window.addEventListener("resize",closeMapMenu);
+  window.addEventListener("blur",closeMapMenu);
+  document.addEventListener("scroll",closeMapMenu,true);
 }
 
 function bindUI(){
@@ -5563,6 +5864,7 @@ function init(){
   bindRallyPopOutsideClose();
   bindMobilePreviewSafety();
   bindInteractionFx();
+  bindMapMenu();
   document.querySelectorAll(".diff-opt").forEach(o=>{
     if(o.querySelector("input").checked)o.classList.add("picked");
   });
@@ -5593,7 +5895,7 @@ if(typeof module!=="undefined"&&module.exports){
     doRally:doRally,travelTo:travelTo,buyAd:buyAd,buildHQ:buildHQ,districtShares:districtShares,nationalShares:nationalShares,
     previewRally:previewRally,previewAd:previewAd,previewHQ:previewHQ,previewTravel:previewTravel,rallyGainFor:rallyGainFor,adGainFor:adGainFor,previewLine:previewLine,
     candidateModifiers:candidateModifiers,rollPerformance:rollPerformance,performanceLines:performanceLines,districtsWhere:districtsWhere,renderDistrictDetail:renderDistrictDetail,faceSVG:faceSVG,defaultAppearance:defaultAppearance,PIXEL_FACE:PIXEL_FACE,
-    portraitHTML:portraitHTML,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
+    portraitHTML:portraitHTML,openMapMenu:openMapMenu,closeMapMenu:closeMapMenu,PRESET_LEADERS:PRESET_LEADERS,ATTR_BUDGET:ATTR_BUDGET,
     defaultPartyMachine:defaultPartyMachine,launchCampaign:launchCampaign,allocateStaff:allocateStaff,hireStaff:hireStaff,trainStaff:trainStaff,upgradePartyHQ:upgradePartyHQ,
     partyEnergyMax:partyEnergyMax,partyStaffCap:partyStaffCap,partyUpkeep:partyUpkeep,partyQuality:partyQuality,partyHireCost:partyHireCost,partyTrainCost:partyTrainCost,partyHqUpgradeCost:partyHqUpgradeCost,
     releaseCampaign:releaseCampaign,partyMachineTick:partyMachineTick,aiFlavorCampaign:aiFlavorCampaign,stanceLabel:stanceLabel,renderPartyMachine:renderPartyMachine,CAMPAIGN_CAP:CAMPAIGN_CAP,PHASE_NAMES:PHASE_NAMES,

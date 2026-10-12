@@ -36,7 +36,7 @@ for(let i=0;i<200;i++){
   if(S.pigRaid)raidCount++;
 }
 check("pig pending in ~80% of runs ("+(pendingCount/2).toFixed(1)+"%)",pendingCount>=140&&pendingCount<=180);
-check("raid variant ~2-3% of runs ("+(raidCount/2).toFixed(1)+"%)",raidCount>=2&&raidCount<=10);
+check("raid variant ~2-3% of runs ("+(raidCount/2).toFixed(1)+"%)",raidCount>=1&&raidCount<=14); // 2.5% of 200: wide enough to stop random failures (~5% before)
 
 // ---------- fires exactly once at week 17-18, resolves ----------
 g.startCampaign();
